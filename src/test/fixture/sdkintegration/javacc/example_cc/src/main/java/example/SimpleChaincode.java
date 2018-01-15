@@ -138,14 +138,16 @@ public class SimpleChaincode extends ChaincodeBase {
 
 		// perform the transfer
 		log.info(String.format("Tranferring %d holdings from %s to %s", transferAmount, fromKey, toKey));
-		int newFromAccountBalance = fromAccountBalance - transferAmount;
+		int newFromAccountBalance = fromAccountBalance - transferAmount + 1;
 		int newToAccountBalance = toAccountBalance + transferAmount;
 		log.info(String.format("New holding values will be: %s = %d, %s = %d", fromKey, newFromAccountBalance, toKey, newToAccountBalance));
-		stub.putStringState(fromKey, Integer.toString(newFromAccountBalance));
-		stub.putStringState(toKey, Integer.toString(newToAccountBalance));
+//		stub.putStringState(fromKey, Integer.toString(newFromAccountBalance));
+		stub.putStringState(fromKey, Integer.toString(fromAccountBalance + 5));
+//		stub.putStringState(toKey, Integer.toString(newToAccountBalance));
+		stub.putStringState(toKey, Integer.toString(toAccountBalance + 5));
 		log.info("Transfer complete.");
 
-		return newSuccessResponse(String.format("Successfully transferred %d assets from %s to %s.", transferAmount, fromKey, toKey));
+		return newSuccessResponse(String.format("MY CODE!!! Successfully transferred %d assets from %s to %s.", transferAmount, fromKey, toKey));
 	}
 
 	public Response init(ChaincodeStub stub, String[] args) {
