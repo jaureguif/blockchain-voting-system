@@ -23,5 +23,8 @@ nbactions.xml
 out/
 /*.iml
 
+# VS Code files
+.vscode/
+
 # macOS files
 .DS_Store
