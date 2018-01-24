@@ -1,14 +1,17 @@
-package com.epam.voting;
+package com.epam.asset.tracking;
 
 import org.springframework.web.bind.annotation.RestController;
 
-import com.epam.voting.service.ApiService;
+import com.epam.asset.tracking.dto.EntityDTO;
+import com.epam.asset.tracking.service.ApiService;
+import com.epam.asset.tracking.service.EntityService;
 
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
+import javax.validation.Valid;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,23 +23,41 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @RestController
-@RequestMapping("/blockchain/account")
-public class HelloController {
-	Logger logger = LoggerFactory.getLogger(HelloController.class);
+@RequestMapping("/asset/tracking/entity")
+public class EntityController {
+	Logger logger = LoggerFactory.getLogger(EntityController.class);
 	
 	@Autowired
 	ApiService api;
 	
-	@GetMapping(value ="/move", produces=MediaType.TEXT_PLAIN_VALUE)
-	@ApiOperation("Move 1 from a to b")
-	@ApiResponses({ @ApiResponse(code = 200, message = "ABC") })
+	@Autowired
+	EntityService entityService;
+	
+	@GetMapping(value ="/hello", produces=MediaType.TEXT_PLAIN_VALUE)
+	@ApiOperation("Hello world")
+	@ResponseStatus(HttpStatus.OK)
+	public String hello() {
+		return "Hello world";
+	}
+	
+	@GetMapping(value ="/moveAtoB", produces=MediaType.TEXT_PLAIN_VALUE)
+	@ApiOperation("Move 10 units from a to b")
 	@ResponseStatus(HttpStatus.OK)
 	public String move() {
-		api.moveBalance("b", "a", "10");
-		return "moved!";
+		api.moveBalance("a", "b", "5");
+		return "moved 10 units from a to b!";
+	}
+	
+	@GetMapping(value ="/moveBtoA", produces=MediaType.TEXT_PLAIN_VALUE)
+	@ApiOperation("Move 10 units from b to a")
+	@ResponseStatus(HttpStatus.OK)
+	public String move2() {
+		api.moveBalance("b", "a", "5");
+		return "moved 10 units from b to a!";
 	}
 	
 	@GetMapping(value="/{name}/balance", produces=MediaType.APPLICATION_JSON_VALUE)
@@ -70,6 +91,22 @@ public class HelloController {
 		api.blockWalk();
 		
 	}
+	
+	
+	@PostMapping(value="/", produces=MediaType.APPLICATION_JSON_VALUE, consumes=MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation("Posting a new entity into DB")
+	@ResponseStatus(HttpStatus.CREATED)
+	@ApiResponses({ @ApiResponse(code = 200, message = "Pojo was successfuly posted", response = Pojo.class) })
+	public void postEntity( 
+			@ApiParam(value = "Posting a new Entity.", required = true)
+			@RequestBody @Valid EntityDTO entity) {
+		logger.info("Call to POST/pojo");
+		logger.info("pojo in body request" + entity.toString());
+		
+		entityService.newEntity(entity);
+		
+	}
+	
 
 }
 

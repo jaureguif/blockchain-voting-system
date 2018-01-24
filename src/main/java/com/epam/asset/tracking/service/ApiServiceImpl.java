@@ -1,6 +1,5 @@
-package com.epam.voting.service;
+package com.epam.asset.tracking.service;
 
-import com.epam.voting.service.ApiService;
 import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hyperledger.fabric.sdk.BlockInfo.EnvelopeType.TRANSACTION_ENVELOPE;
@@ -54,7 +53,6 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
 import org.hyperledger.fabric.protos.ledger.rwset.kvrwset.KvRwset;
-import org.hyperledger.fabric.sdk.BlockEvent.TransactionEvent;
 import org.hyperledger.fabric.sdk.BlockInfo;
 import org.hyperledger.fabric.sdk.BlockchainInfo;
 import org.hyperledger.fabric.sdk.ChaincodeID;
@@ -81,6 +79,8 @@ import org.hyperledger.fabric_ca.sdk.RegistrationRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+
+import com.epam.asset.tracking.service.ApiService;
 
 import io.netty.util.internal.StringUtil;
 
@@ -128,6 +128,7 @@ public class ApiServiceImpl implements ApiService {
 			return null;
 		}
 	}
+	
 
 	@Override
 	public String getHello() {

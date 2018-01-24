@@ -1,4 +1,4 @@
-package com.epam.voting.service;
+package com.epam.asset.tracking.service;
 
 public interface ApiService {
 	
@@ -9,5 +9,5 @@ public interface ApiService {
 	void moveBalance(String fromName, String toName, String amount);
 
 	void blockWalk();
-	
+
 }
