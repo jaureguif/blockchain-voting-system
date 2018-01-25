@@ -2,9 +2,9 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.epam.chaincode</groupId>
-	<artifactId>votingSystem</artifactId>
-	<version>0.9</version>
-	<name>fabricSDKJavaVotingSystem</name>
+	<artifactId>asset-tracking</artifactId>
+	<version>0.9.0.1</version>
+	<name>fabricSDKJavaAssetTrackingSystem</name>
 	<url>http://maven.apache.org</url>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

@@ -2,6 +2,7 @@ package com.epam.asset.tracking.dto;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.Pattern;
 
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -10,51 +11,53 @@ import org.springframework.format.annotation.NumberFormat.Style;
 
 public class EntityDTO {
 
-	//Name --> Text, not allowed numbers or symbols
+	// Name --> Text, not allowed numbers or symbols
 	@NotEmpty
 	@Length(max = 140)
 	String name;
-	
-	//Last name --> Text, not allowed numbers or symbols
+
+	// Last name --> Text, not allowed numbers or symbols
 	@NotEmpty
 	@Length(max = 140)
 	String lastName;
-	
-	//User Name--> Text, not allowed numbers or symbols --> validation (user name unique)
+
+	// User Name--> Text, not allowed numbers or symbols --> validation (user name
+	// unique)
 	@NotEmpty
 	@Length(max = 140)
+	@Pattern(message="Not allowed numbers or symbols" , regexp="[a-zA-Z]")
 	String userName;
-	
-	//Password --> text, numbers, symbols
+
+	// Password --> text, numbers, symbols
 	@NotEmpty
 	@Length(max = 10)
 	String password;
-	
-	
-	//Type of business --> List (Computer sellers, computer repairers, house sellers, house brokers, car sellers, mechanics)
+
+	// Type of business --> List (Computer sellers, computer repairers, house
+	// sellers, house brokers, car sellers, mechanics)
 	@NotEmpty
 	@Length(max = 50)
 	String businessType;
 
-	//Address --> text and numbers
+	// Address --> text and numbers
 	@NotEmpty
 	@Length(max = 256)
 	String address;
-	
-	//City --> text, not allowed numbers or symbols
+
+	// City --> text, not allowed numbers or symbols
 	@NotEmpty
 	@Length(max = 140)
 	String city;
-	
-	//ZipCode --> just numbers validated just 5
+
+	// ZipCode --> just numbers validated just 5
 	@NotEmpty
 	@Length(min = 5, max = 5)
 	@NumberFormat(style = Style.NUMBER)
 	@Min(1)
 	@Max(99999)
 	String zipCode;
-	
-	//RFC --> Text and numbers not symbols
+
+	// RFC --> Text and numbers not symbols
 	@NotEmpty
 	@Length(max = 13)
 	String rfc;
@@ -130,6 +133,5 @@ public class EntityDTO {
 	public void setRfc(String rfc) {
 		this.rfc = rfc;
 	}
-	
 
 }
