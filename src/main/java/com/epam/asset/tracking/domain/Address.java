@@ -10,7 +10,6 @@ import java.util.Objects;
 public class Address {
 
   private String street;
-  private Integer number;
   private String zipCode;
   private String state;
   private String city;
@@ -22,14 +21,6 @@ public class Address {
 
   public void setStreet(String street) {
     this.street = street;
-  }
-
-  public Integer getNumber() {
-    return number;
-  }
-
-  public void setNumber(Integer number) {
-    this.number = number;
   }
 
   public String getZipCode() {
@@ -71,7 +62,6 @@ public class Address {
     if (getClass() != o.getClass()) return false;
     Address address = (Address) o;
     return Objects.equals(street, address.street) &&
-        Objects.equals(number, address.number) &&
         Objects.equals(zipCode, address.zipCode) &&
         Objects.equals(state, address.state) &&
         Objects.equals(city, address.city) &&
@@ -80,14 +70,13 @@ public class Address {
 
   @Override
   public int hashCode() {
-    return Objects.hash(street, number, zipCode, state, city, country);
+    return Objects.hash(street, zipCode, state, city, country);
   }
 
   @Override
   public String toString() {
     return "{ " +
         "street:\"" + street + '"' +
-        ", number:\"" + number +
         ", zipCode:\"" + zipCode + '"' +
         ", state:\"" + state + '"' +
         ", city:\"" + city + '"' +
