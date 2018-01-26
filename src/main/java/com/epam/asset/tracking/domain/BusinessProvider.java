@@ -61,11 +61,8 @@ public class BusinessProvider extends User {
     if (this == o) return true;
     if (o == null) return false;
     if (getClass() != o.getClass()) return false;
-    BusinessProvider that = (BusinessProvider) o;
-    return Objects.equals(name, that.name) &&
-        Objects.equals(rfc, that.rfc) &&
-        type == that.type &&
-        Objects.equals(address, that.address);
+    BusinessProvider bp = (BusinessProvider) o;
+    return isBusinessProviderEqualTo(bp);
   }
 
   protected boolean isBusinessProviderEqualTo(BusinessProvider other) {
