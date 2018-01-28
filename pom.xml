@@ -19,6 +19,14 @@
 		<version>1.5.9.RELEASE</version>
 	</parent>
 
+
+	<repositories>
+		<repository>
+			<id>hyperledger-snapshots-repo</id>
+			<url>https://nexus.hyperledger.org/content/repositories/snapshots</url>
+		</repository>
+	</repositories>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -34,7 +42,8 @@
 			<version>4.4.4</version><!--$NO-MVN-MAN-VER$ -->
 			<scope>compile</scope>
 		</dependency>
-		
+
+
 
 		<!-- Logging -->
 		<dependency>
@@ -89,7 +98,7 @@
 			<artifactId>jackson-core</artifactId>
 			<version>2.9.2</version><!--$NO-MVN-MAN-VER$ -->
 		</dependency>
-		
+
 		<!-- Test dependencies -->
 		<dependency>
 			<groupId>commons-httpclient</groupId>
