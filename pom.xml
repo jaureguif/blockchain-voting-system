@@ -27,13 +27,6 @@
 	</repositories>
 
 
-	<repositories>
-		<repository>
-			<id>hyperledger-snapshots-repo</id>
-			<url>https://nexus.hyperledger.org/content/repositories/snapshots</url>
-		</repository>
-	</repositories>
-
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
