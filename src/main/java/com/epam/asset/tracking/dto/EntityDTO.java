@@ -9,18 +9,20 @@ import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.format.annotation.NumberFormat;
 import org.springframework.format.annotation.NumberFormat.Style;
 
+import com.epam.asset.tracking.dto.validations.ValidationsUtil;
+
 public class EntityDTO {
 
 	// Name --> Text, not allowed numbers or symbols
 	@NotEmpty
 	@Length(max = 140)
-	@Pattern(message = "Not allowed numbers or symbols", regexp = "^[a-zA-Z]*$")
+	@Pattern(message = "Not allowed numbers or symbols", regexp = ValidationsUtil.LETTERS_WITH_SPACE)
 	String name;
 
 	// Last name --> Text, not allowed numbers or symbols
 	@NotEmpty
 	@Length(max = 140)
-	@Pattern(message = "Not allowed numbers or symbols", regexp = "^[a-zA-Z]*$")
+	@Pattern(message = "Not allowed numbers or symbols", regexp = ValidationsUtil.LETTERS_WITH_SPACE)
 	String lastName;
 
 	// User Name--> Text, not allowed numbers or symbols --> validation (user name
@@ -39,25 +41,25 @@ public class EntityDTO {
 	// sellers, house brokers, car sellers, mechanics)
 	@NotEmpty
 	@Length(min = 3, max = 60)
-	@Pattern(message = "Not allowed numbers or symbols", regexp = "^[a-zA-Z][a-zA-Z\\s]*[a-zA-Z]$")
+	@Pattern(message = "Not allowed numbers or symbols", regexp = ValidationsUtil.LETTERS_WITH_SPACE)
 	String businessType;
 
 	// Address --> text and numbers
 	@NotEmpty
 	@Length(min = 3, max = 256)
-	@Pattern(message = "Not allowed numbers or symbols", regexp = "^[A-Za-z0-9][A-Za-z0-9\\s]*[A-Za-z0-9]$")
+	@Pattern(message = "Not allowed symbols", regexp = ValidationsUtil.LETTERS_AND_NUMBERS_WITH_SPACE)
 	String address;
 
 	// City --> text, not allowed numbers or symbols
 	@NotEmpty
 	@Length(min = 2, max = 256)
-	@Pattern(message = "Not allowed numbers or symbols", regexp = "^[a-zA-Z][a-zA-Z\\s]*[a-zA-Z]$")
+	@Pattern(message = "Not allowed numbers or symbols", regexp = ValidationsUtil.LETTERS_WITH_SPACE)
 	String city;
 
 	// State --> text, not allowed numbers or symbols
 	@NotEmpty
 	@Length(min = 2, max = 256)
-	@Pattern(message = "Not allowed numbers or symbols", regexp = "^[a-zA-Z][a-zA-Z\\s]*[a-zA-Z]$")
+	@Pattern(message = "Not allowed numbers or symbols", regexp = ValidationsUtil.LETTERS_WITH_SPACE)
 	String state;
 
 	// ZipCode --> just numbers validated just 5
@@ -71,7 +73,7 @@ public class EntityDTO {
 	// RFC --> Text and numbers not symbols
 	@NotEmpty
 	@Length(max = 13)
-	@Pattern(message = "Not allowed numbers or symbols", regexp = "^[A-Za-z0-9][A-Za-z0-9\\s]*[A-Za-z0-9]$")
+	@Pattern(message = "Not allowed numbers or symbols", regexp = ValidationsUtil.LETTERS_AND_NUMBERS)
 	String rfc;
 
 	public String getName() {
