@@ -2,6 +2,8 @@ package com.epam.asset.tracking.domain;
 
 import java.util.Objects;
 
+import org.springframework.data.annotation.Id;
+
 /**
  * Base persistable entity.
  *
@@ -9,6 +11,7 @@ import java.util.Objects;
  */
 public abstract class BaseEntity<ID> {
 
+  @Id	
   private ID id;
 
   public ID getId() {

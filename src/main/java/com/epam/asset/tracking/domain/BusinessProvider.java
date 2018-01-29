@@ -2,14 +2,18 @@ package com.epam.asset.tracking.domain;
 
 import java.util.Objects;
 
+import org.springframework.data.mongodb.core.mapping.Document;
+
 /**
  * Provides/registers assets in the application.
  *
  * @author daniel_pedraza@epam.com
  */
+
+@Document
 public class BusinessProvider extends User {
 
-  public enum Type { /* TODO: add business types. */ }
+  public enum Type { HARDWARE, CAR, HOUSE }
 
   private String name;
   private String rfc;

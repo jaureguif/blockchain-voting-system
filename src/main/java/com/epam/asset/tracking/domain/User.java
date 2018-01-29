@@ -14,6 +14,7 @@ public class User extends BaseEntity<String> {
   private String username;
   private String password;
   private Role role;
+  private String email;
 
   public String getUsername() {
     return username;
@@ -38,6 +39,14 @@ public class User extends BaseEntity<String> {
   public void setRole(Role role) {
     this.role = role;
   }
+  
+  public String getEmail() {
+	return email;
+  }
+
+  public void setEmail(String email) {
+	this.email = email;
+  }
 
   @Override
   public boolean equals(Object o) {
@@ -52,7 +61,8 @@ public class User extends BaseEntity<String> {
     return isEntityEqualTo(other) &&
         Objects.equals(username, other.username) &&
         Objects.equals(password, other.password) &&
-        role == other.role;
+        role == other.role &&
+        Objects.equals(email, other.email);
   }
 
   @Override
@@ -72,6 +82,7 @@ public class User extends BaseEntity<String> {
         ", username:\"" + username + '"' +
         ", password:" + hiddenPassword() +
         ", role:\"" + role +
+        ", email:\"" + email +
         " }";
   }
 }
