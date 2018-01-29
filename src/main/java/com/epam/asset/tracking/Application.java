@@ -1,7 +1,5 @@
 package com.epam.asset.tracking;
 
-import java.util.Arrays;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
@@ -10,15 +8,21 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
+
+import java.util.Arrays;
 
 
 @SpringBootApplication
 @EnableAutoConfiguration
+@EnableMongoRepositories(basePackages="com.epam.asset.tracking.repository")
 @Configuration 
 public class Application {
+
 	Logger log = LoggerFactory.getLogger(Application.class);
-	
+
 	public static void main(String[] args) {
 		SpringApplication.run(Application.class, args);
 		
@@ -38,7 +42,4 @@ public class Application {
 
 		};
 	}
-	
-	
-
 }
