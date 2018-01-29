@@ -14,20 +14,20 @@ public class EntityDTO {
 	// Name --> Text, not allowed numbers or symbols
 	@NotEmpty
 	@Length(max = 140)
-	@Pattern(message = "Not allowed numbers or symbols", regexp = "^[a-zA-Z]$")
+	@Pattern(message = "Not allowed numbers or symbols", regexp = "^[a-zA-Z]*$")
 	String name;
 
 	// Last name --> Text, not allowed numbers or symbols
 	@NotEmpty
 	@Length(max = 140)
-	@Pattern(message = "Not allowed numbers or symbols", regexp = "^[a-zA-Z]$")
+	@Pattern(message = "Not allowed numbers or symbols", regexp = "^[a-zA-Z]*$")
 	String lastName;
 
 	// User Name--> Text, not allowed numbers or symbols --> validation (user name
 	// unique)
 	@NotEmpty
 	@Length(max = 140)
-	@Pattern(message = "Not allowed numbers or symbols", regexp = "^[a-zA-Z]$")
+	@Pattern(message = "Not allowed numbers or symbols", regexp = "^[a-zA-Z]*$")
 	String userName;
 
 	// Password --> text, numbers, symbols
