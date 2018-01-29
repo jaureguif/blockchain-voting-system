@@ -19,14 +19,19 @@ public class BusinessProvider extends User {
   private String rfc;
   private Type type;
   private Address address;
-
-  @Override
-  public void setRole(Role role) { }
-
-  @Override
-  public Role getRole() {
-    return Role.BUSINESS_PROVIDER;
+  
+  public BusinessProvider(){
+	  super(Role.BUSINESS_PROVIDER);
   }
+
+  @Override
+  public void setRole(Role role) {
+	  if(Role.BUSINESS_PROVIDER.equals(role))
+		  super.setRole(role);
+	  else
+		  throw new IllegalArgumentException("Business provider only accepts BusinessProvider Role");
+  }
+
 
   public String getName() {
     return name;
