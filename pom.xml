@@ -122,6 +122,14 @@
 		    <scope>test</scope>
 		</dependency>
 
+		<!-- Orika -->
+		<dependency>
+			<groupId>ma.glasnost.orika</groupId>
+			<artifactId>orika-core</artifactId>
+			<version>1.4.6</version>
+		</dependency>
+		<!-- End Orika -->
+
 	</dependencies>
 
 	<build>
