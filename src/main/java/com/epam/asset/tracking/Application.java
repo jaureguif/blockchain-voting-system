@@ -12,10 +12,9 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-
 @SpringBootApplication
+@Configuration
 @EnableAutoConfiguration
-@Configuration 
 public class Application {
 	Logger log = LoggerFactory.getLogger(Application.class);
 	
@@ -28,7 +27,7 @@ public class Application {
 	public CommandLineRunner commandLineRunner(ApplicationContext ctx) {
 		return args -> {
 
-			log.info("Let's inspect the beans provided by Spring Boot:");
+			log.info("Beans defined in the current context:");
 
 			String[] beanNames = ctx.getBeanDefinitionNames();
 			Arrays.sort(beanNames);
@@ -38,7 +37,4 @@ public class Application {
 
 		};
 	}
-	
-	
-
 }
