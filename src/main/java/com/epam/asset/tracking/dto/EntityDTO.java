@@ -64,7 +64,6 @@ public class EntityDTO {
 	String rfc;
 
 	@Email
-
 	String mail;
 
 	public String getName() {
