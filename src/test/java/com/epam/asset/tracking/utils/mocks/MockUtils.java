@@ -1,23 +1,30 @@
 package com.epam.asset.tracking.utils.mocks;
 
-import com.epam.asset.tracking.entities.AnEntity;
+import com.epam.asset.tracking.domain.Address;
+import com.epam.asset.tracking.domain.BusinessProvider;
+import com.epam.asset.tracking.dto.EntityDTO;
 
 /**
  * Created  on 1/26/2018.
  */
 public class MockUtils {
-    public static AnEntity mockUser() {
-        AnEntity entity = new AnEntity();
+    public static EntityDTO mockUser() {
+        EntityDTO dto = new EntityDTO();
 
-        entity.setAddress(Math.random()+ "");
-        entity.setBusinessType(Math.random()+ "");
-        entity.setCity(Math.random()+ "");
-        entity.setLastName(Math.random()+ "");
-        entity.setName(Math.random()+ "");
-        entity.setRfc(Math.random()+ "");
-        entity.setUserName(Math.random()+ "");
-        entity.setZipCode(Math.random()+ "");
+        dto.setAddress("5th st ");
+        dto.setName("ddd");
+        dto.setRfc("jomd123456");
+        dto.setCity("NY");
 
-        return entity;
+
+        dto.setZipCode("123456");
+        dto.setUserName("d");
+        dto.setZipCode("12345");
+        dto.setLastName("jjj");
+        dto.setBusinessType("btype");
+        dto.setMail("d@epam.com");
+        dto.setPassword("admin");
+
+        return dto;
     }
 }

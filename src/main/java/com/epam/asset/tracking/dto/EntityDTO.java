@@ -4,6 +4,7 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
 
+import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.format.annotation.NumberFormat;
@@ -61,6 +62,10 @@ public class EntityDTO {
 	@NotEmpty
 	@Length(max = 13)
 	String rfc;
+
+	@Email
+
+	String mail;
 
 	public String getName() {
 		return name;
@@ -132,6 +137,14 @@ public class EntityDTO {
 
 	public void setRfc(String rfc) {
 		this.rfc = rfc;
+	}
+
+	public String getMail() {
+		return mail;
+	}
+
+	public void setMail(String mail) {
+		this.mail = mail;
 	}
 
 }

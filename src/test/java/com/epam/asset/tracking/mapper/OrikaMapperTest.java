@@ -5,8 +5,8 @@ package com.epam.asset.tracking.mapper;
  */
 
 
+import com.epam.asset.tracking.domain.BusinessProvider;
 import com.epam.asset.tracking.dto.EntityDTO;
-import com.epam.asset.tracking.entities.AnEntity;
 import com.epam.asset.tracking.utils.mocks.MockUtils;
 import ma.glasnost.orika.MapperFacade;
 import org.junit.Assert;
@@ -28,11 +28,18 @@ public class OrikaMapperTest {
 
     @Test
     public void shouldBeMapped() {
-        AnEntity entity = MockUtils.mockUser();
-        EntityDTO dto = mapper.map(entity, EntityDTO.class);
 
-        Assert.assertNotNull(dto);
+        EntityDTO dto = MockUtils.mockUser();
+
         Assert.assertNotNull(dto.getAddress());
+        Assert.assertNotNull(dto);
+
+        BusinessProvider user = mapper.map(dto, BusinessProvider.class);
+
+        Assert.assertNotNull(user);
+        Assert.assertNotNull(user.getEmail());
+        Assert.assertNotNull(user.getAddress());
+        Assert.assertNotNull(user.getAddress().getCity());
     }
 
 }
