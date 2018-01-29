@@ -5,10 +5,12 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
 
 @SpringBootApplication
 @EnableAutoConfiguration
+@EnableMongoRepositories(basePackages="com.epam.asset.tracking.repository")
 @Configuration 
 public class Application {
 

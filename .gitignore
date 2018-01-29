@@ -1,7 +1,31 @@
-.DS_Store
+# Generated files
+target/
+build/
+bin/
+.gradle/
+*.class
+dist/
+
+# Eclipse project files
 .classpath
 .project
 .springBeans
 .settings/
-bin/
-target/
+test-output/
+
+# NetBeans project files
+.nb-gradle/
+.nb-gradle-properties
+nb-configuration.xml
+nbactions.xml
+
+# Idea project files
+.idea/
+out/
+/*.iml
+
+# VS Code files
+.vscode/
+
+# macOS files
+.DS_Store

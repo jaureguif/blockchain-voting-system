@@ -18,6 +18,14 @@
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>1.5.9.RELEASE</version>
 	</parent>
+	
+	<repositories>
+		<repository>
+			<id>hyperledger-snapshots-repo</id>
+			<url>https://nexus.hyperledger.org/content/repositories/snapshots</url>
+		</repository>
+	</repositories>
+
 
 	<dependencies>
 		<dependency>
@@ -34,7 +42,8 @@
 			<version>4.4.4</version><!--$NO-MVN-MAN-VER$ -->
 			<scope>compile</scope>
 		</dependency>
-		
+
+
 
 		<!-- Logging -->
 		<dependency>
@@ -60,9 +69,9 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.hyperledger</groupId>
-			<artifactId>shim-client</artifactId>
-			<version>1.0</version>
+			<groupId>org.hyperledger.fabric</groupId>
+			<artifactId>fabric-chaincode-shim</artifactId>
+			<version>1.2.0-SNAPSHOT</version>
 		</dependency>
 
 		<!-- Swagger dependencies -->
@@ -89,7 +98,7 @@
 			<artifactId>jackson-core</artifactId>
 			<version>2.9.2</version><!--$NO-MVN-MAN-VER$ -->
 		</dependency>
-		
+
 		<!-- Test dependencies -->
 		<dependency>
 			<groupId>commons-httpclient</groupId>
@@ -101,6 +110,16 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-mongodb</artifactId>
+        </dependency>
+       <dependency>
+		    <groupId>de.flapdoodle.embed</groupId>
+		    <artifactId>de.flapdoodle.embed.mongo</artifactId>
+		    <version>2.0.1</version>
+		    <scope>test</scope>
 		</dependency>
 
 	</dependencies>
