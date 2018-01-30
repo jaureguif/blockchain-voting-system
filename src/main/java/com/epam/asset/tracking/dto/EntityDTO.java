@@ -4,6 +4,7 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
 
+import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.format.annotation.NumberFormat;
@@ -17,50 +18,50 @@ public class EntityDTO {
 	@NotEmpty
 	@Length(max = 140)
 	@Pattern(message = "Not allowed numbers or symbols", regexp = ValidationsUtil.LETTERS_WITH_SPACE)
-	String name;
+	private String name;
 
 	// Last name --> Text, not allowed numbers or symbols
 	@NotEmpty
 	@Length(max = 140)
 	@Pattern(message = "Not allowed numbers or symbols", regexp = ValidationsUtil.LETTERS_WITH_SPACE)
-	String lastName;
+	private String lastName;
 
 	// User Name--> Text, not allowed numbers or symbols --> validation (user name
 	// unique)
 	@NotEmpty
 	@Length(max = 140)
 	@Pattern(message = "Not allowed numbers or symbols", regexp = "^[a-zA-Z]*$")
-	String userName;
+	private String userName;
 
 	// Password --> text, numbers, symbols
 	@NotEmpty
 	@Length(min = 8, max = 10)
-	String password;
+	private String password;
 
 	// Type of business --> List (Computer sellers, computer repairers, house
 	// sellers, house brokers, car sellers, mechanics)
 	@NotEmpty
 	@Length(min = 3, max = 60)
 	@Pattern(message = "Not allowed numbers or symbols", regexp = ValidationsUtil.LETTERS_WITH_SPACE)
-	String businessType;
+	private String businessType;
 
 	// Address --> text and numbers
 	@NotEmpty
 	@Length(min = 3, max = 256)
 	@Pattern(message = "Not allowed symbols", regexp = ValidationsUtil.LETTERS_AND_NUMBERS_WITH_SPACE)
-	String address;
+	private String address;
 
 	// City --> text, not allowed numbers or symbols
 	@NotEmpty
 	@Length(min = 2, max = 256)
 	@Pattern(message = "Not allowed numbers or symbols", regexp = ValidationsUtil.LETTERS_WITH_SPACE)
-	String city;
+	private String city;
 
 	// State --> text, not allowed numbers or symbols
 	@NotEmpty
 	@Length(min = 2, max = 256)
 	@Pattern(message = "Not allowed numbers or symbols", regexp = ValidationsUtil.LETTERS_WITH_SPACE)
-	String state;
+	private String state;
 
 	// ZipCode --> just numbers validated just 5
 	@NotEmpty
@@ -68,13 +69,16 @@ public class EntityDTO {
 	@NumberFormat(style = Style.NUMBER)
 	@Min(0)
 	@Max(99999)
-	String zipCode;
+	private String zipCode;
 
 	// RFC --> Text and numbers not symbols
 	@NotEmpty
 	@Length(max = 13)
 	@Pattern(message = "Not allowed numbers or symbols", regexp = ValidationsUtil.LETTERS_AND_NUMBERS)
-	String rfc;
+	private String rfc;
+
+	@Email
+	private String mail;
 
 	public String getName() {
 		return name;
@@ -154,6 +158,14 @@ public class EntityDTO {
 
 	public void setRfc(String rfc) {
 		this.rfc = rfc;
+	}
+
+	public String getMail() {
+		return mail;
+	}
+
+	public void setMail(String mail) {
+		this.mail = mail;
 	}
 
 }

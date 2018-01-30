@@ -15,6 +15,7 @@ import org.springframework.context.annotation.Configuration;
 @SpringBootApplication
 @Configuration
 @EnableAutoConfiguration
+@EnableMongoRepositories(basePackages="com.epam.asset.tracking.repository")
 public class Application {
 	Logger log = LoggerFactory.getLogger(Application.class);
 	
