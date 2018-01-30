@@ -34,12 +34,12 @@ public class OrikaMapperTest {
         Assert.assertNotNull(dto.getAddress());
         Assert.assertNotNull(dto);
 
-        BusinessProvider user = mapper.map(dto, BusinessProvider.class);
+        BusinessProvider provider = mapper.map(dto, BusinessProvider.class);
 
-        Assert.assertNotNull(user);
-        Assert.assertNotNull(user.getEmail());
-        Assert.assertNotNull(user.getAddress());
-        Assert.assertNotNull(user.getAddress().getCity());
+        Assert.assertNotNull(provider);
+        Assert.assertNotNull(provider.getEmail());
+        Assert.assertNotNull(provider.getAddress());
+        Assert.assertNotNull(provider.getAddress().getCity());
     }
 
 }

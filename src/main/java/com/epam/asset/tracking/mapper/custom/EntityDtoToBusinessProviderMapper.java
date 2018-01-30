@@ -16,16 +16,15 @@ public class EntityDtoToBusinessProviderMapper extends CustomMapper<EntityDTO, B
 
     @Override
     public void mapAtoB(EntityDTO dto, BusinessProvider entity, MappingContext context){
-        entity.setUsername(dto.getUserName());
         entity.setEmail(dto.getMail());
-        entity.setPassword(dto.getPassword());
+
         Address address = new Address();
         address.setCity(dto.getCity());
         address.setZipCode(dto.getZipCode());
 
         entity.setAddress(address);
+        entity.setRole(User.Role.valueOf(dto.getRole()));
+        entity.setType(BusinessProvider.Type.valueOf(dto.getBusinessType()));
 
-        entity.setRfc(dto.getRfc());
-        entity.setName(dto.getName());
     }
 }

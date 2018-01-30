@@ -66,6 +66,9 @@ public class EntityDTO {
 	@Email
 	String mail;
 
+	@NotEmpty
+	String role;
+
 	public String getName() {
 		return name;
 	}
@@ -146,4 +149,11 @@ public class EntityDTO {
 		this.mail = mail;
 	}
 
+	public String getRole() {
+		return role;
+	}
+
+	public void setRole(String role) {
+		this.role = role;
+	}
 }
