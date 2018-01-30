@@ -1,8 +1,8 @@
 Blockchain Asset Tracking System
 ================================
 
-[![Coverage](https://codecov.io/gh/jaureguif/blockchain-voting-system/branch/master/graph/badge.svg)](https://codecov.io/gh/jaureguif/blockchain-voting-system)
-[![Build Status](https://travis-ci.org/jaureguif/blockchain-voting-system.svg?branch=master)](https://travis-ci.org/jaureguif/blockchain-voting-system)
+[![Coverage](https://codecov.io/gh/jaureguif/blockchain-voting-system/branch/dev/graph/badge.svg)](https://codecov.io/gh/jaureguif/blockchain-voting-system)
+[![Build Status](https://travis-ci.org/jaureguif/blockchain-voting-system.svg?branch=dev)](https://travis-ci.org/jaureguif/blockchain-voting-system)
 
 ## Prerequisites
 ----------------
