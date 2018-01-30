@@ -24,6 +24,9 @@ public class MockUtils {
         dto.setBusinessType("btype");
         dto.setMail("d@epam.com");
         dto.setPassword("admin");
+        dto.setRole("BUSINESS_PROVIDER");
+        dto.setBusinessType("HARDWARE");
+
 
         return dto;
     }
