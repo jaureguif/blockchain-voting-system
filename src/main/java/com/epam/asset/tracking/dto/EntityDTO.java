@@ -48,7 +48,7 @@ public class EntityDTO {
 	// Address --> text and numbers
 	@NotEmpty
 	@Length(min = 3, max = 256)
-	@Pattern(message = "Not allowed symbols", regexp = ValidationsUtil.LETTERS_AND_NUMBERS_WITH_SPACE)
+	@Pattern(message = "Not allowed symbols", regexp = ValidationsUtil.LETTERS_AND_NUMBERS_WITH_SPACE_COMMA_AND_PERIOD)
 	private String address;
 
 	// City --> text, not allowed numbers or symbols
@@ -74,7 +74,7 @@ public class EntityDTO {
 	// RFC --> Text and numbers not symbols
 	@NotEmpty
 	@Length(max = 13)
-	@Pattern(message = "Not allowed numbers or symbols", regexp = ValidationsUtil.LETTERS_AND_NUMBERS)
+	@Pattern(message = "Not allowed numbers or symbols", regexp = "^[A-Za-z0-9]*$")
 	private String rfc;
 
 	@Email
