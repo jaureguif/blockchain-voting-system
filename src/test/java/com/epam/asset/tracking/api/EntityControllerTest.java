@@ -1,4 +1,4 @@
-package com.epam.asset.tracking.web.balance;
+package com.epam.asset.tracking.api;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -26,18 +26,13 @@ public class EntityControllerTest extends AbstractWebTest{
 	@MockBean
 	EntityService entity;
 
-	@Test
-	public void REMOVETHIS() {
-		
-	}
-	
 	//@Test
 	public void shouldReturnDefaultMessage() throws Exception {
 		mockMvc.perform(get("/asset/tracking/entity/hello")).andDo(print()).andExpect(status().isOk())
 				.andExpect(content().string(containsString("Hello world")));
 	}
 	
-	//@Test
+	@Test
 	public void shouldReturn201() throws Exception {
 		
 		JSONObject json = new JSONObject("{\n" + 

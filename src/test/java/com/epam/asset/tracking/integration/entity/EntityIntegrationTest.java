@@ -9,28 +9,24 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import org.junit.Test;
 import org.springframework.http.MediaType;
 
+import com.epam.asset.tracking.dto.EntityDTO;
 import com.epam.asset.tracking.integration.AbstractIntegrationTest;
 
 public class EntityIntegrationTest extends AbstractIntegrationTest {
-	
+
 	@Test
-	public void REMOVETHIS() {
-		
-	}
-	
-	//@Test
 	public void shouldReturn201() throws Exception {
-		
-		
+
+		EntityDTO dto = new EntityDTO();
+		dto.setAddress(
+				"string with a comma, not at the end, of course, but with a period at the end. and one more thing...");
+		dto.setBusinessType("businessType");
+
 		mockMvc.perform(post("/asset/tracking/entity/")
 				.contentType(MediaType.APPLICATION_JSON)
-				.content("{}"))
-			.andDo(print())
-			.andExpect(status().isCreated())
-			.andExpect(content().string(containsString("Hello world")));
+				.content(jacksonMapper.writeValueAsString(dto)))
+				.andDo(print()).andExpect(status().isCreated())
+				.andExpect(content().string(containsString("Hello world")));
 	}
-	
-	
-	
 
 }
