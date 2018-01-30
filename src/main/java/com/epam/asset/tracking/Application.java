@@ -11,17 +11,18 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
 @SpringBootApplication
 @Configuration
 @EnableAutoConfiguration
-@EnableMongoRepositories(basePackages="com.epam.asset.tracking.repository")
+@EnableMongoRepositories(basePackages = "com.epam.asset.tracking.repository")
 public class Application {
 	Logger log = LoggerFactory.getLogger(Application.class);
-	
+
 	public static void main(String[] args) {
 		SpringApplication.run(Application.class, args);
-		
+
 	}
 
 	@Bean
