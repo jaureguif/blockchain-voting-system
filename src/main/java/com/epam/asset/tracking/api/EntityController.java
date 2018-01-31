@@ -98,14 +98,25 @@ public class EntityController {
 	}
 
 	@PostMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-	@ApiOperation("Posting a new entity into DB")
+	@ApiOperation(value = "Posting a new,unique, business provider into DB", notes = "Current validations are:"
+			+ "<br>"+ "Not allowed numbers or symbols (space is not allowed): <b>username</b>"
+			+ "<br>"+ "Not allowed numbers or symbols (space is allowed): <b>name</b>, <b>lastname</b>, <b>city</b> & <b>state</b>"
+			+ "<br>"+ "Not allowed symbols (space, comma and periods are allowed): <b>address</b>"
+			+ "<br>"+ "<b>businessType</b>, one of(case insensitive): Computer Seller, Computer Repair, Car Seller, Car Mechanic, House Seller, House Broker"
+			+ "<br>"+ "<b>rfc</b> rules: Alphanumeric, not special characters allowed"
+			+ "<br>"+ "<b>zipcode</b> rules: Numeric only, lenght exactly 5 digits"
+			+ "<br>"+ "<b>password</b> rules: Text, numbers & symbols allowed, lenght must be between 8 and 10 characters")
 	@ResponseStatus(HttpStatus.CREATED)
-	@ApiResponses({ @ApiResponse(code = 201, message = "Pojo was successfuly posted", response = Pojo.class),
-					@ApiResponse(code = 409, message = "Username already taken", response = Pojo.class)})
+	@ApiResponses({ @ApiResponse(code = 201, message = "Pojo was successfuly posted and insterted in DB."),
+		@ApiResponse(code = 400, message = "Bad, request. Probably a validation error in the payload."),
+		@ApiResponse(code = 409, message = "Username already taken. Please choose another.")})
 	public void postEntity(
-			@ApiParam(value = "Posting a new Bussiness Provider.", required = true) @RequestBody @Valid EntityDTO entity) {
-		logger.info("Call to POST/entity");
-		logger.info("pojo in body request" + entity.toString());
+			@ApiParam(value = "Posting a new Bussiness Provider. <br><br>"
+					+ "Username nust be unique, otherwize application will return a 409 status code. <br><br>"
+					+ "Business Type is validated against allowed values (listed in implementation notes)"
+					, required = true) @RequestBody @Valid EntityDTO entity) {
+		logger.debug("Call to POST/entity");
+		logger.info("payload in body request" + entity.toString());
 
 		entity.setRole(Role.BUSINESS_PROVIDER.name());
 		BusinessProvider bp = mapper.map(entity, BusinessProvider.class);

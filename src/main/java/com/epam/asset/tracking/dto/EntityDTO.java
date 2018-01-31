@@ -11,6 +11,7 @@ import org.springframework.format.annotation.NumberFormat;
 import org.springframework.format.annotation.NumberFormat.Style;
 
 import com.epam.asset.tracking.dto.validations.ValidationsUtil;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class EntityDTO {
 
@@ -74,13 +75,13 @@ public class EntityDTO {
 	// RFC --> Text and numbers not symbols
 	@NotEmpty
 	@Length(max = 13)
-	@Pattern(message = "Not allowed numbers or symbols", regexp = "^[A-Za-z0-9]*$")
+	@Pattern(message = "Alphanumeric, not special characters allowed", regexp = "^[A-Za-z0-9]*$")
 	private String rfc;
 
 	@Email
 	private String email;
 
-	//@NotEmpty
+	@JsonIgnore
 	String role;
 
 	public String getName() {
