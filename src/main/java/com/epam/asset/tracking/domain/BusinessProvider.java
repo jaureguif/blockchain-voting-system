@@ -13,91 +13,90 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document
 public class BusinessProvider extends User {
 
-  public enum Type { HARDWARE, CAR, HOUSE }
+	private String name;
+	private String lastName;
+	private String rfc;
+	private BUSINESS_TYPE type;
+	private Address address;
 
-  private String name;
-  private String rfc;
-  private Type type;
-  private Address address;
-  
-  public BusinessProvider(){
-	  super(Role.BUSINESS_PROVIDER);
-  }
+	public BusinessProvider() {
+		super(Role.BUSINESS_PROVIDER);
+	}
 
-  @Override
-  public void setRole(Role role) {
-	  if(Role.BUSINESS_PROVIDER.equals(role))
-		  super.setRole(role);
-	  else
-		  throw new IllegalArgumentException("Business provider only accepts BusinessProvider Role");
-  }
+	@Override
+	public void setRole(Role role) {
+		if (Role.BUSINESS_PROVIDER.equals(role))
+			super.setRole(role);
+		else
+			throw new IllegalArgumentException("Business provider only accepts BusinessProvider Role");
+	}
 
+	public String getName() {
+		return name;
+	}
 
-  public String getName() {
-    return name;
-  }
+	public String getLastName() {
+		return lastName;
+	}
 
-  public void setName(String name) {
-    this.name = name;
-  }
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
+	}
 
-  public String getRfc() {
-    return rfc;
-  }
+	public void setName(String name) {
+		this.name = name;
+	}
 
-  public void setRfc(String rfc) {
-    this.rfc = rfc;
-  }
+	public String getRfc() {
+		return rfc;
+	}
 
-  public Type getType() {
-    return type;
-  }
+	public void setRfc(String rfc) {
+		this.rfc = rfc;
+	}
 
-  public void setType(Type type) {
-    this.type = type;
-  }
+	public BUSINESS_TYPE getType() {
+		return type;
+	}
 
-  public Address getAddress() {
-    return address;
-  }
+	public void setType(BUSINESS_TYPE type) {
+		this.type = type;
+	}
 
-  public void setAddress(Address address) {
-    this.address = address;
-  }
+	public Address getAddress() {
+		return address;
+	}
 
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null) return false;
-    if (getClass() != o.getClass()) return false;
-    BusinessProvider bp = (BusinessProvider) o;
-    return isBusinessProviderEqualTo(bp);
-  }
+	public void setAddress(Address address) {
+		this.address = address;
+	}
 
-  protected boolean isBusinessProviderEqualTo(BusinessProvider other) {
-    return isUserEqualTo(other) &&
-        Objects.equals(name, other.name) &&
-        Objects.equals(rfc, other.rfc) &&
-        Objects.equals(address, other.address) &&
-        type == other.type;
-  }
+	@Override
+	public boolean equals(Object o) {
+		if (this == o)
+			return true;
+		if (o == null)
+			return false;
+		if (getClass() != o.getClass())
+			return false;
+		BusinessProvider bp = (BusinessProvider) o;
+		return isBusinessProviderEqualTo(bp);
+	}
 
-  @Override
-  public int hashCode() {
-    return Objects.hash(super.hashCode(), name, rfc, type, address);
-  }
+	protected boolean isBusinessProviderEqualTo(BusinessProvider other) {
+		return isUserEqualTo(other) && Objects.equals(name, other.name) && Objects.equals(rfc, other.rfc)
+				&& Objects.equals(address, other.address) && type == other.type;
+	}
 
-  @Override
-  public String toString() {
-    return "{ " +
-        "id:\"" + getId() + '"' +
-        ", username:\"" + getUsername() + '"' +
-        ", password:" + hiddenPassword() +
-        ", role:\"" + getRole() + '"' +
-        ", name:\"" + name + '"' +
-        ", rfc:\"" + rfc + '"' +
-        ", type:\"" + type + '"' +
-        ", address:" + address +
-        " }";
-  }
+	@Override
+	public int hashCode() {
+		return Objects.hash(super.hashCode(), name, rfc, type, address);
+	}
+
+	@Override
+	public String toString() {
+		return "{ " + "id:\"" + getId() + '"' + ", username:\"" + getUsername() + '"' + ", password:" + hiddenPassword()
+				+ ", role:\"" + getRole() + '"' + ", name:\"" + name + '"' + ", rfc:\"" + rfc + '"' + ", type:\"" + type
+				+ '"' + ", address:" + address + " }";
+	}
 }

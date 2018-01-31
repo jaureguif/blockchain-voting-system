@@ -1,6 +1,5 @@
-package com.epam.asset.tracking.integration.entity;
+package com.epam.asset.tracking.api;
 
-import static org.hamcrest.CoreMatchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -8,16 +7,39 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.UUID;
 
+import org.hamcrest.text.IsEmptyString;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 
 import com.epam.asset.tracking.dto.EntityDTO;
-import com.epam.asset.tracking.integration.AbstractIntegrationTest;
+import com.epam.asset.tracking.repository.BusinessProviderRepository;
+import com.epam.asset.tracking.service.ApiService;
+import com.epam.asset.tracking.service.BusinessProviderService;
+import com.epam.asset.tracking.service.EntityService;
+import com.epam.asset.tracking.web.AbstractWebTest;
 
-public class EntityIntegrationTest extends AbstractIntegrationTest {
+import ma.glasnost.orika.MapperFacade;
 
-	String username;
+public class EntityControllerTest extends AbstractWebTest{
+	
+	@MockBean
+	ApiService api;
+	
+	@MockBean
+	EntityService entity;
+	
+	@MockBean
+	MapperFacade mapperFacade;
+	
+	@MockBean
+	BusinessProviderService businessProviderService;
+	
+	@MockBean
+	BusinessProviderRepository businessProviderRepository;
+	
+	private String username;
 	
 	@Before
 	public void setup() {
@@ -25,14 +47,14 @@ public class EntityIntegrationTest extends AbstractIntegrationTest {
 		username = UUID.randomUUID().toString().replaceAll("-", "").replaceAll("[0-9]", "");
 		
 	}
-	
+
 	@Test
 	public void shouldReturn201() throws Exception {
-
+		
 		EntityDTO dto = new EntityDTO();
 		dto.setAddress(
 				"string with a comma, not at the end, of course, but with a period at the end. and one more thing...");
-		dto.setBusinessType("car mechanic");
+		dto.setBusinessType("businessType");
 		dto.setCity("CityTEST");
 		dto.setLastName("lastNameTest");
 		dto.setEmail("foo@mail.com");
@@ -45,12 +67,17 @@ public class EntityIntegrationTest extends AbstractIntegrationTest {
 		dto.setUsername(username);
 		
 		System.out.println(jacksonMapper.writeValueAsString(dto));
-
+		
+		
 		mockMvc.perform(post("/asset/tracking/entity/")
-				.contentType(MediaType.APPLICATION_JSON)
+				.contentType(MediaType.APPLICATION_JSON_UTF8)
 				.content(jacksonMapper.writeValueAsString(dto)))
-				.andDo(print())
-				.andExpect(status().isCreated());
+			.andDo(print())
+			.andExpect(status().isCreated())
+			.andExpect(content().string(IsEmptyString.isEmptyString()));
 	}
 
+
 }
+
+

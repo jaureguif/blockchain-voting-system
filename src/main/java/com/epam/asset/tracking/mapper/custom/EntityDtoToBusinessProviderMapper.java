@@ -2,6 +2,7 @@ package com.epam.asset.tracking.mapper.custom;
 
 import com.epam.asset.tracking.domain.Address;
 import com.epam.asset.tracking.domain.BusinessProvider;
+import com.epam.asset.tracking.domain.BUSINESS_TYPE;
 import com.epam.asset.tracking.domain.User;
 import com.epam.asset.tracking.dto.EntityDTO;
 import ma.glasnost.orika.CustomMapper;
@@ -16,16 +17,16 @@ public class EntityDtoToBusinessProviderMapper extends CustomMapper<EntityDTO, B
 
     @Override
     public void mapAtoB(EntityDTO dto, BusinessProvider entity, MappingContext context){
-        entity.setUsername(dto.getUserName());
-        entity.setEmail(dto.getMail());
-        entity.setPassword(dto.getPassword());
+        
         Address address = new Address();
+        address.setStreet(dto.getAddress());
         address.setCity(dto.getCity());
+        address.setState(dto.getState());
         address.setZipCode(dto.getZipCode());
 
         entity.setAddress(address);
+        entity.setRole(User.Role.valueOf(dto.getRole()));
+        entity.setType(BUSINESS_TYPE.getEnum(dto.getBusinessType()));
 
-        entity.setRfc(dto.getRfc());
-        entity.setName(dto.getName());
     }
 }
