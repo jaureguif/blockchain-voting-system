@@ -1,8 +1,9 @@
-package com.epam.asset.tracking;
+package com.epam.asset.tracking.api;
 
 import org.springframework.web.bind.annotation.RestController;
 
 import com.epam.asset.tracking.domain.BusinessProvider;
+import com.epam.asset.tracking.domain.User.Role;
 import com.epam.asset.tracking.dto.EntityDTO;
 import com.epam.asset.tracking.exception.DuplicateKeyExceptionWrapper;
 import com.epam.asset.tracking.service.ApiService;
@@ -22,7 +23,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -100,12 +100,14 @@ public class EntityController {
 	@PostMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation("Posting a new entity into DB")
 	@ResponseStatus(HttpStatus.CREATED)
-	@ApiResponses({ @ApiResponse(code = 200, message = "Pojo was successfuly posted", response = Pojo.class) })
+	@ApiResponses({ @ApiResponse(code = 201, message = "Pojo was successfuly posted", response = Pojo.class),
+					@ApiResponse(code = 409, message = "Username already taken", response = Pojo.class)})
 	public void postEntity(
-			@ApiParam(value = "Posting a new Entity.", required = true) @RequestBody @Valid EntityDTO entity) {
-		logger.info("Call to POST/pojo");
+			@ApiParam(value = "Posting a new Bussiness Provider.", required = true) @RequestBody @Valid EntityDTO entity) {
+		logger.info("Call to POST/entity");
 		logger.info("pojo in body request" + entity.toString());
 
+		entity.setRole(Role.BUSINESS_PROVIDER.name());
 		BusinessProvider bp = mapper.map(entity, BusinessProvider.class);
 		
 		try {

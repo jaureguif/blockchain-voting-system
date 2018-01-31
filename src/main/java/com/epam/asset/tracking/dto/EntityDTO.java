@@ -29,9 +29,9 @@ public class EntityDTO {
 	// User Name--> Text, not allowed numbers or symbols --> validation (user name
 	// unique)
 	@NotEmpty
-	@Length(max = 140)
-	@Pattern(message = "Not allowed numbers or symbols", regexp = "^[a-zA-Z]*$")
-	private String userName;
+	@Length(max = 30)
+	@Pattern(message = "Not allowed numbers or symbols", regexp = ValidationsUtil.LETTERS_AND_NUMBERS)
+	private String username;
 
 	// Password --> text, numbers, symbols
 	@NotEmpty
@@ -78,9 +78,9 @@ public class EntityDTO {
 	private String rfc;
 
 	@Email
-	private String mail;
+	private String email;
 
-	@NotEmpty
+	//@NotEmpty
 	String role;
 
 	public String getName() {
@@ -99,12 +99,12 @@ public class EntityDTO {
 		this.lastName = lastName;
 	}
 
-	public String getUserName() {
-		return userName;
+	public String getUsername() {
+		return username;
 	}
 
-	public void setUserName(String userName) {
-		this.userName = userName;
+	public void setUsername(String username) {
+		this.username = username;
 	}
 
 	public String getPassword() {
@@ -163,13 +163,13 @@ public class EntityDTO {
 		this.rfc = rfc;
 	}
 
-	public String getMail() {
-		return mail;
-	}
+	public String getEmail() {
+		return email;
+	  }
 
-	public void setMail(String mail) {
-		this.mail = mail;
-	}
+	  public void setEmail(String email) {
+		this.email = email;
+	  }
 
 	public String getRole() {
 		return role;
