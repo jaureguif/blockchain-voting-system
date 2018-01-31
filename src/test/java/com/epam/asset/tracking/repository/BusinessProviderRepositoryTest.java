@@ -13,6 +13,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import com.epam.asset.tracking.Application;
 import com.epam.asset.tracking.domain.Address;
 import com.epam.asset.tracking.domain.BusinessProvider;
+import com.epam.asset.tracking.domain.BUSINESS_TYPE;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class)
@@ -29,7 +30,7 @@ public class BusinessProviderRepositoryTest {
 	private static final int NUMBER = 2234;
 	private static final String ZIPCODE = "3332";
 	private static final String STREET = "Anillo periferico";
-	private static final BusinessProvider.Type BUSINESS_TYPE = BusinessProvider.Type.CAR;
+	private static final BUSINESS_TYPE BIZZ_TYPE = BUSINESS_TYPE.CAR_SELLER;
 	private static final String EMAIL = "email@email.com";
 	private static final String NAME = "audi factory";
 	private static final String USERNAME = "audi";
@@ -47,7 +48,7 @@ public class BusinessProviderRepositoryTest {
 		address.setStreet(STREET);
 		
 		entity.setAddress(address);
-		entity.setType(BUSINESS_TYPE);
+		entity.setType(BIZZ_TYPE);
 		entity.setEmail(EMAIL);
 		entity.setName(NAME);
 		entity.setUsername(USERNAME);
