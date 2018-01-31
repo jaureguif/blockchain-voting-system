@@ -98,7 +98,7 @@ public class EntityController {
 	}
 
 	@PostMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-	@ApiOperation(value = "Posting a new,unique, business provider into DB", notes = "Current validations are:"
+	@ApiOperation(value = "Posting a new, unique, business provider into DB", notes = "Current validations are:"
 			+ "<br>"+ "Not allowed numbers or symbols (space is not allowed): <b>username</b>"
 			+ "<br>"+ "Not allowed numbers or symbols (space is allowed): <b>name</b>, <b>lastname</b>, <b>city</b> & <b>state</b>"
 			+ "<br>"+ "Not allowed symbols (space, comma and periods are allowed): <b>address</b>"
