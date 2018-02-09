@@ -44,8 +44,10 @@ import java.util.concurrent.TimeoutException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.epam.asset.tracking.domain.Asset;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
@@ -754,6 +756,48 @@ public class ApiServiceImpl implements ApiService {
 
 	}
 
+	@Override
+	public Asset getAssetById(String id) {
+		return null;
+	}
+
+	private String getAssetFromFabric(String id) throws InvalidArgumentException, ProposalException {
+		String payload = null;
+
+		try {
+			setup();
+		} catch (Exception e) {
+			e.printStackTrace();
+			log.error("Error in setup: {}", e);
+		}
+
+		QueryByChaincodeRequest queryByChaincodeRequest = client.newQueryProposalRequest();
+		queryByChaincodeRequest.setArgs(new String[] { "query", id});
+		queryByChaincodeRequest.setFcn("invoke");
+		queryByChaincodeRequest.setChaincodeID(chaincodeID);
+
+		Map<String, byte[]> transientMap = new HashMap<>();
+		transientMap.put("HyperLedgerFabric", "QueryByChaincodeRequest:JavaSDK".getBytes(UTF_8));
+		transientMap.put("method", "QueryByChaincodeRequest".getBytes(UTF_8));
+		queryByChaincodeRequest.setTransientMap(transientMap);
+
+		Collection<ProposalResponse> queryProposals = channel.queryByChaincode(queryByChaincodeRequest,
+				channel.getPeers());
+		for (ProposalResponse proposalResponse : queryProposals) {
+			if (!proposalResponse.isVerified() || proposalResponse.getStatus() != ProposalResponse.Status.SUCCESS) {
+				fail("Failed query proposal from peer " + proposalResponse.getPeer().getName() + " status: "
+						+ proposalResponse.getStatus() + ". Messages: " + proposalResponse.getMessage()
+						+ ". Was verified : " + proposalResponse.isVerified());
+			} else {
+				payload = proposalResponse.getProposalResponse().getResponse().getPayload().toStringUtf8();
+				log.info("Query payload of {} from peer {} returned {}", id,
+						proposalResponse.getPeer().getName(), payload);
+
+			}
+		}
+		channel.shutdown(true);
+		return payload;
+	}
 }
 
 class SampleOrg {
@@ -1672,4 +1716,6 @@ class TestConfig {
 		}
 
 	}
+
+
 }
