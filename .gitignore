@@ -9,6 +9,7 @@ dist/
 # Eclipse project files
 .classpath
 .project
+.springBeans
 .settings/
 test-output/
 
