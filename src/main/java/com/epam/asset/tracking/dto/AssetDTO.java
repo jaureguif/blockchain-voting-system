@@ -1,14 +1,27 @@
-package com.epam.asset.tracking.domain;
+package com.epam.asset.tracking.dto;
 
+import java.util.Set;
 
-public class Asset {
+import org.hibernate.validator.constraints.NotEmpty;
+
+import com.epam.asset.tracking.domain.Event;
+
+public class AssetDTO {
 	
+	@NotEmpty
 	private String id;
+	@NotEmpty
 	private String serialNumber;
+	@NotEmpty
 	private String assetType;
+	@NotEmpty
 	private Set<Event> events;
+	@NotEmpty
 	private String ownerName;
+	@NotEmpty
 	private String description;
+	
+	
 	
 	public String getId() {
 		return id;
