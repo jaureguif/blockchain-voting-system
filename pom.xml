@@ -99,7 +99,20 @@
 			<version>2.9.2</version><!--$NO-MVN-MAN-VER$ -->
 		</dependency>
 
-		<!-- Test dependencies -->
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>2.9.2</version><!--$NO-MVN-MAN-VER$ -->
+		</dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <version>2.9.0</version>
+        </dependency>
+
+
+        <!-- Test dependencies -->
 		<dependency>
 			<groupId>commons-httpclient</groupId>
 			<artifactId>commons-httpclient</artifactId>
