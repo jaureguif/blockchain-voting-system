@@ -47,7 +47,7 @@ func (t *SimpleChaincode) Init(stub shim.ChaincodeStubInterface) pb.Response {
 		Description:  "1908 FORD MODEL T\nCOLOR: ANYONE, AS LONG AS IT IS BLACK\nINTERIORS COLOR: BROWN LEATHER.\nENGINE: 2.9 L FOUR CYLINDERS\nENGINE NUMBER: 000015\nMADE IN: UNITED STATES\nBUYER NAME: THOMAS EDISON\nADDRESS: 345 Llewellyn Park, New Jersey, United States, USA.\nSELLER NAME: HENRY FORD",
 	}
 	jsonBlob, _ := json.Marshal(asset)
-	err := stub.PutState("1", jsonBlob)
+	err := stub.PutState(asset.UUID, jsonBlob)
 
 	if err != nil {
 		return shim.Error(err.Error())

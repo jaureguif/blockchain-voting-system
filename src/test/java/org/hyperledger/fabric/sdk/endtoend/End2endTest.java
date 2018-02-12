@@ -358,8 +358,7 @@ public class End2endTest {
           new File(TEST_FIXTURES_PATH + "/sdkintegration/chaincodeendorsementpolicy.yaml"));
       instantiateProposalRequest.setChaincodeEndorsementPolicy(chaincodeEndorsementPolicy);
 
-      out("Sending instantiateProposalRequest to all peers with arguments: a and b set to 100 and %s respectively",
-          "" + (200 + delta));
+      out("Sending instantiateProposalRequest to all peers");
       successful.clear();
       failed.clear();
 
@@ -392,8 +391,7 @@ public class End2endTest {
 
       ///////////////
       /// Send instantiate transaction to orderer
-      out("Sending instantiateTransaction to orderer with a and b set to 100 and %s respectively",
-          "" + (200 + delta));
+      out("Sending instantiateTransaction to orderer ");
       channel.sendTransaction(successful, orderers).thenApply(transactionEvent -> {
 
         try {
@@ -403,9 +401,9 @@ public class End2endTest {
           out("Finished transaction with transaction id %s", transactionEvent.getTransactionID());
           testTxID = transactionEvent.getTransactionID(); // used in the channel queries later
 
-          out("Now query chaincode for the value of b.");
+          out("Now query chaincode");
           QueryByChaincodeRequest queryByChaincodeRequest = client.newQueryProposalRequest();
-          queryByChaincodeRequest.setArgs(new String[]{"query", "1"});
+          queryByChaincodeRequest.setArgs(new String[]{"query", "14a12ef0-9409-4872-9341-9ab003059ce9"});
           queryByChaincodeRequest.setFcn("invoke");
           queryByChaincodeRequest.setChaincodeID(chaincodeID);
 
