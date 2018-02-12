@@ -1,20 +1,22 @@
 package com.epam.asset.tracking.domain;
 
 
+import java.util.Set;
+
 public class Asset {
 	
-	private String id;
+	private String uuid;
 	private String serialNumber;
 	private String assetType;
 	private Set<Event> events;
 	private String ownerName;
 	private String description;
 	
-	public String getId() {
-		return id;
+	public String getUuid() {
+		return uuid;
 	}
-	public void setId(String id) {
-		this.id = id;
+	public void setUuid(String id) {
+		this.uuid = id;
 	}
 	public String getSerialNumber() {
 		return serialNumber;
