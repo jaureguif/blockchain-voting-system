@@ -14,8 +14,13 @@
 
 package org.hyperledger.fabric.sdk.endtoend;
 
+import static java.lang.String.format;
+import static java.nio.charset.StandardCharsets.UTF_8;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
+
 import java.io.File;
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Paths;
 import java.util.Collection;
@@ -26,11 +31,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.codec.binary.Hex;
-import org.hyperledger.fabric.protos.ledger.rwset.kvrwset.KvRwset;
 import org.hyperledger.fabric.sdk.BlockEvent;
-import org.hyperledger.fabric.sdk.BlockInfo;
-import org.hyperledger.fabric.sdk.BlockchainInfo;
 import org.hyperledger.fabric.sdk.ChaincodeEndorsementPolicy;
 import org.hyperledger.fabric.sdk.ChaincodeID;
 import org.hyperledger.fabric.sdk.Channel;
@@ -45,33 +46,19 @@ import org.hyperledger.fabric.sdk.ProposalResponse;
 import org.hyperledger.fabric.sdk.QueryByChaincodeRequest;
 import org.hyperledger.fabric.sdk.SDKUtils;
 import org.hyperledger.fabric.sdk.TestConfigHelper;
-import org.hyperledger.fabric.sdk.TransactionInfo;
-import org.hyperledger.fabric.sdk.TransactionProposalRequest;
-import org.hyperledger.fabric.sdk.TxReadWriteSetInfo;
-import org.hyperledger.fabric.sdk.exception.InvalidArgumentException;
-import org.hyperledger.fabric.sdk.exception.InvalidProtocolBufferRuntimeException;
-import org.hyperledger.fabric.sdk.exception.ProposalException;
 import org.hyperledger.fabric.sdk.exception.TransactionEventException;
 import org.hyperledger.fabric.sdk.security.CryptoSuite;
 import org.hyperledger.fabric.sdk.testutils.TestConfig;
+import org.hyperledger.fabric.sdkintegration.SampleOrg;
+import org.hyperledger.fabric.sdkintegration.SampleStore;
+import org.hyperledger.fabric.sdkintegration.SampleUser;
+import org.hyperledger.fabric.sdkintegration.Util;
 import org.hyperledger.fabric_ca.sdk.HFCAClient;
 import org.hyperledger.fabric_ca.sdk.RegistrationRequest;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import org.hyperledger.fabric.sdkintegration.SampleOrg;
-import org.hyperledger.fabric.sdkintegration.SampleStore;
-import org.hyperledger.fabric.sdkintegration.SampleUser;
-import org.hyperledger.fabric.sdkintegration.Util;
-
-import static java.lang.String.format;
-import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.hyperledger.fabric.sdk.BlockInfo.EnvelopeType.TRANSACTION_ENVELOPE;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 /**
  * Test end to end scenario
@@ -89,12 +76,43 @@ public class End2endTest {
 
     private static final String FOO_CHANNEL_NAME = "foo";
     private static final String BAR_CHANNEL_NAME = "bar";
+    private static final Map<String, String> TX_EXPECTED;
 
-    String testTxID = null;  // save the CC invoke TxID and use in queries
+    static {
+        TX_EXPECTED = new HashMap<>();
+        TX_EXPECTED.put("readset1", "Missing readset for channel bar block 1");
+        TX_EXPECTED.put("writeset1", "Missing writeset for channel bar block 1");
+    }
 
     private final TestConfigHelper configHelper = new TestConfigHelper();
-
+    String testTxID = null;  // save the CC invoke TxID and use in queries
     private Collection<SampleOrg> testSampleOrgs;
+
+    static void out(String format, Object... args) {
+
+        System.err.flush();
+        System.out.flush();
+
+        System.out.println(format(format, args));
+        System.err.flush();
+        System.out.flush();
+
+    }
+
+    static String printableString(final String string) {
+        int maxLogStringLength = 64;
+        if (string == null || string.length() == 0) {
+            return string;
+        }
+
+        String ret = string.replaceAll("[^\\p{Print}]", "?");
+
+        ret = ret.substring(0, Math.min(ret.length(), maxLogStringLength)) + (ret.length() > maxLogStringLength ? "..." : "");
+
+        return ret;
+
+    }
+    //CHECKSTYLE.ON: Method length is 320 lines (max allowed is 150).
 
     @Before
     public void checkConfig() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, MalformedURLException {
@@ -204,8 +222,8 @@ public class End2endTest {
             runChannel(client, barChannel, true, sampleOrg, 100); //run a newly constructed bar channel with different b value!
             //let bar channel just shutdown so we have both scenarios.
 
-            out("\nTraverse the blocks for chain %s ", barChannel.getName());
-            blockWalker(barChannel);
+
+
             out("That's all folks!");
 
         } catch (Exception e) {
@@ -297,6 +315,9 @@ public class End2endTest {
                 }
             }
 
+
+
+
             //   client.setUserContext(sampleOrg.getUser(TEST_ADMIN_NAME));
             //  final ChaincodeID chaincodeID = firstInstallProposalResponse.getChaincodeID();
             // Note installing chaincode does not require transaction no need to
@@ -308,7 +329,7 @@ public class End2endTest {
             instantiateProposalRequest.setProposalWaitTime(testConfig.getProposalWaitTime());
             instantiateProposalRequest.setChaincodeID(chaincodeID);
             instantiateProposalRequest.setFcn("init");
-            instantiateProposalRequest.setArgs(new String[] {"a", "500", "b", "" + (200 + delta)});
+            instantiateProposalRequest.setArgs(new String[0]);
             Map<String, byte[]> tm = new HashMap<>();
             tm.put("HyperLedgerFabric", "InstantiateProposalRequest:JavaSDK".getBytes(UTF_8));
             tm.put("method", "InstantiateProposalRequest".getBytes(UTF_8));
@@ -346,115 +367,26 @@ public class End2endTest {
                 fail("Not enough endorsers for instantiate :" + successful.size() + "endorser failed with " + first.getMessage() + ". Was verified:" + first.isVerified());
             }
 
+            /*******/
+            /*******/
+
             ///////////////
             /// Send instantiate transaction to orderer
             out("Sending instantiateTransaction to orderer with a and b set to 100 and %s respectively", "" + (200 + delta));
             channel.sendTransaction(successful, orderers).thenApply(transactionEvent -> {
 
-                waitOnFabric(0);
 
-                assertTrue(transactionEvent.isValid()); // must be valid to be here.
-                out("Finished instantiate transaction with transaction id %s", transactionEvent.getTransactionID());
-
-                try {
-                    successful.clear();
-                    failed.clear();
-
-                    client.setUserContext(sampleOrg.getUser(TESTUSER_1_NAME));
-
-                    ///////////////
-                    /// Send transaction proposal to all peers
-                    TransactionProposalRequest transactionProposalRequest = client.newTransactionProposalRequest();
-                    transactionProposalRequest.setChaincodeID(chaincodeID);
-                    transactionProposalRequest.setFcn("invoke");
-                    transactionProposalRequest.setProposalWaitTime(testConfig.getProposalWaitTime());
-                    transactionProposalRequest.setArgs(new String[] {"move", "a", "b", "100"});
-
-                    Map<String, byte[]> tm2 = new HashMap<>();
-                    tm2.put("HyperLedgerFabric", "TransactionProposalRequest:JavaSDK".getBytes(UTF_8));
-                    tm2.put("method", "TransactionProposalRequest".getBytes(UTF_8));
-                    tm2.put("result", ":)".getBytes(UTF_8));  /// This should be returned see chaincode.
-                    transactionProposalRequest.setTransientMap(tm2);
-
-                    out("sending transactionProposal to all peers with arguments: move(a,b,100)");
-
-                    Collection<ProposalResponse> transactionPropResp = channel.sendTransactionProposal(transactionProposalRequest, channel.getPeers());
-                    for (ProposalResponse response : transactionPropResp) {
-                        if (response.getStatus() == ProposalResponse.Status.SUCCESS) {
-                            out("Successful transaction proposal response Txid: %s from peer %s", response.getTransactionID(), response.getPeer().getName());
-                            successful.add(response);
-                        } else {
-                            failed.add(response);
-                        }
-                    }
-
-                    // Check that all the proposals are consistent with each other. We should have only one set
-                    // where all the proposals above are consistent.
-                    Collection<Set<ProposalResponse>> proposalConsistencySets = SDKUtils.getProposalConsistencySets(transactionPropResp);
-                    if (proposalConsistencySets.size() != 1) {
-                        fail(format("Expected only one set of consistent proposal responses but got %d", proposalConsistencySets.size()));
-                    }
-
-                    out("Received %d transaction proposal responses. Successful+verified: %d . Failed: %d",
-                            transactionPropResp.size(), successful.size(), failed.size());
-                    if (failed.size() > 0) {
-                        ProposalResponse firstTransactionProposalResponse = failed.iterator().next();
-                        fail("Not enough endorsers for invoke(move a,b,100):" + failed.size() + " endorser error: " +
-                                firstTransactionProposalResponse.getMessage() +
-                                ". Was verified: " + firstTransactionProposalResponse.isVerified());
-                    }
-                    out("Successfully received transaction proposal responses.");
-
-                    ProposalResponse resp = transactionPropResp.iterator().next();
-                    byte[] x = resp.getChaincodeActionResponsePayload(); // This is the data returned by the chaincode.
-                    String resultAsString = null;
-                    if (x != null) {
-                        resultAsString = new String(x, "UTF-8");
-                    }
-                    assertEquals(":)", resultAsString);
-
-                    assertEquals(200, resp.getChaincodeActionResponseStatus()); //Chaincode's status.
-
-                    TxReadWriteSetInfo readWriteSetInfo = resp.getChaincodeActionResponseReadWriteSetInfo();
-                    //See blockwalker below how to transverse this
-                    assertNotNull(readWriteSetInfo);
-                    assertTrue(readWriteSetInfo.getNsRwsetCount() > 0);
-
-                    ChaincodeID cid = resp.getChaincodeID();
-                    assertNotNull(cid);
-                    assertEquals(CHAIN_CODE_PATH, cid.getPath());
-                    assertEquals(CHAIN_CODE_NAME, cid.getName());
-                    assertEquals(CHAIN_CODE_VERSION, cid.getVersion());
-
-                    ////////////////////////////
-                    // Send Transaction Transaction to orderer
-                    out("Sending chaincode transaction(move a,b,100) to orderer.");
-                    return channel.sendTransaction(successful).get(testConfig.getTransactionWaitTime(), TimeUnit.SECONDS);
-
-                } catch (Exception e) {
-                    out("Caught an exception while invoking chaincode");
-                    e.printStackTrace();
-                    fail("Failed invoking chaincode with error : " + e.getMessage());
-                }
-
-                return null;
-
-            }).thenApply(transactionEvent -> {
                 try {
 
                     waitOnFabric(0);
 
-                    assertTrue(transactionEvent.isValid()); // must be valid to be here.
+
                     out("Finished transaction with transaction id %s", transactionEvent.getTransactionID());
                     testTxID = transactionEvent.getTransactionID(); // used in the channel queries later
 
-                    ////////////////////////////
-                    // Send Query Proposal to all peers
-                    //
-                    String expect = "" + (300 + delta);
                     out("Now query chaincode for the value of b.");
                     QueryByChaincodeRequest queryByChaincodeRequest = client.newQueryProposalRequest();
-                    queryByChaincodeRequest.setArgs(new String[] {"query", "b"});
+                    queryByChaincodeRequest.setArgs(new String[] {"query", "1"});
                     queryByChaincodeRequest.setFcn("invoke");
                     queryByChaincodeRequest.setChaincodeID(chaincodeID);
 
@@ -471,8 +403,8 @@ public class End2endTest {
                                     + ". Was verified : " + proposalResponse.isVerified());
                         } else {
                             String payload = proposalResponse.getProposalResponse().getResponse().getPayload().toStringUtf8();
-                            out("Query payload of b from peer %s returned %s", proposalResponse.getPeer().getName(), payload);
-                            assertEquals(payload, expect);
+                            out("Query payload from peer %s returned %s", proposalResponse.getPeer().getName(), payload);
+                            assertThat(payload).isNotNull().isNotBlank();
                         }
                     }
 
@@ -496,45 +428,7 @@ public class End2endTest {
                 return null;
             }).get(testConfig.getTransactionWaitTime(), TimeUnit.SECONDS);
 
-            // Channel queries
 
-            // We can only send channel queries to peers that are in the same org as the SDK user context
-            // Get the peers from the current org being used and pick one randomly to send the queries to.
-            Set<Peer> peerSet = sampleOrg.getPeers();
-            //  Peer queryPeer = peerSet.iterator().next();
-            //   out("Using peer %s for channel queries", queryPeer.getName());
-
-            BlockchainInfo channelInfo = channel.queryBlockchainInfo();
-            out("Channel info for : " + channelName);
-            out("Channel height: " + channelInfo.getHeight());
-            String chainCurrentHash = Hex.encodeHexString(channelInfo.getCurrentBlockHash());
-            String chainPreviousHash = Hex.encodeHexString(channelInfo.getPreviousBlockHash());
-            out("Chain current block hash: " + chainCurrentHash);
-            out("Chainl previous block hash: " + chainPreviousHash);
-
-            // Query by block number. Should return latest block, i.e. block number 2
-            BlockInfo returnedBlock = channel.queryBlockByNumber(channelInfo.getHeight() - 1);
-            String previousHash = Hex.encodeHexString(returnedBlock.getPreviousHash());
-            out("queryBlockByNumber returned correct block with blockNumber " + returnedBlock.getBlockNumber()
-                    + " \n previous_hash " + previousHash);
-            assertEquals(channelInfo.getHeight() - 1, returnedBlock.getBlockNumber());
-            assertEquals(chainPreviousHash, previousHash);
-
-            // Query by block hash. Using latest block's previous hash so should return block number 1
-            byte[] hashQuery = returnedBlock.getPreviousHash();
-            returnedBlock = channel.queryBlockByHash(hashQuery);
-            out("queryBlockByHash returned block with blockNumber " + returnedBlock.getBlockNumber());
-            assertEquals(channelInfo.getHeight() - 2, returnedBlock.getBlockNumber());
-
-            // Query block by TxID. Since it's the last TxID, should be block 2
-            returnedBlock = channel.queryBlockByTransactionID(testTxID);
-            out("queryBlockByTxID returned block with blockNumber " + returnedBlock.getBlockNumber());
-            assertEquals(channelInfo.getHeight() - 1, returnedBlock.getBlockNumber());
-
-            // query transaction by ID
-            TransactionInfo txInfo = channel.queryTransactionByID(testTxID);
-            out("QueryTransactionByID returned TransactionInfo: txID " + txInfo.getTransactionID()
-                    + "\n     validation code " + txInfo.getValidationCode().getNumber());
 
             out("Running for Channel %s done", channelName);
 
@@ -544,7 +438,6 @@ public class End2endTest {
             fail("Test failed with error : " + e.getMessage());
         }
     }
-    //CHECKSTYLE.ON: Method length is 320 lines (max allowed is 150).
 
     private Channel constructChannel(String name, HFClient client, SampleOrg sampleOrg) throws Exception {
         ////////////////////////////
@@ -623,17 +516,6 @@ public class End2endTest {
 
     }
 
-    static void out(String format, Object... args) {
-
-        System.err.flush();
-        System.out.flush();
-
-        System.out.println(format(format, args));
-        System.err.flush();
-        System.out.flush();
-
-    }
-
     private void waitOnFabric(int additional) {
         // wait a few seconds for the peers to catch up with each other via the gossip network.
         // Another way would be to wait on all the peers event hubs for the event containing the transaction TxID
@@ -658,163 +540,6 @@ public class End2endTest {
         }
 
         return matches[0];
-
-    }
-
-    private static final Map<String, String> TX_EXPECTED;
-
-    static {
-        TX_EXPECTED = new HashMap<>();
-        TX_EXPECTED.put("readset1", "Missing readset for channel bar block 1");
-        TX_EXPECTED.put("writeset1", "Missing writeset for channel bar block 1");
-    }
-
-    void blockWalker(Channel channel) throws InvalidArgumentException, ProposalException, IOException {
-        try {
-            BlockchainInfo channelInfo = channel.queryBlockchainInfo();
-
-            for (long current = channelInfo.getHeight() - 1; current > -1; --current) {
-                BlockInfo returnedBlock = channel.queryBlockByNumber(current);
-                final long blockNumber = returnedBlock.getBlockNumber();
-
-                out("current block number %d has data hash: %s", blockNumber, Hex.encodeHexString(returnedBlock.getDataHash()));
-                out("current block number %d has previous hash id: %s", blockNumber, Hex.encodeHexString(returnedBlock.getPreviousHash()));
-                out("current block number %d has calculated block hash is %s", blockNumber, Hex.encodeHexString(SDKUtils.calculateBlockHash(blockNumber, returnedBlock.getPreviousHash(), returnedBlock.getDataHash())));
-
-                final int envelopCount = returnedBlock.getEnvelopCount();
-                assertEquals(1, envelopCount);
-                out("current block number %d has %d envelope count:", blockNumber, returnedBlock.getEnvelopCount());
-                int i = 0;
-                for (BlockInfo.EnvelopeInfo envelopeInfo : returnedBlock.getEnvelopeInfos()) {
-                    ++i;
-
-                    out("  Transaction number %d has transaction id: %s", i, envelopeInfo.getTransactionID());
-                    final String channelId = envelopeInfo.getChannelId();
-                    assertTrue("foo".equals(channelId) || "bar".equals(channelId));
-
-                    out("  Transaction number %d has channel id: %s", i, channelId);
-                    out("  Transaction number %d has epoch: %d", i, envelopeInfo.getEpoch());
-                    out("  Transaction number %d has transaction timestamp: %tB %<te,  %<tY  %<tT %<Tp", i, envelopeInfo.getTimestamp());
-                    out("  Transaction number %d has type id: %s", i, "" + envelopeInfo.getType());
-
-                    if (envelopeInfo.getType() == TRANSACTION_ENVELOPE) {
-                        BlockInfo.TransactionEnvelopeInfo transactionEnvelopeInfo = (BlockInfo.TransactionEnvelopeInfo) envelopeInfo;
-
-                        out("  Transaction number %d has %d actions", i, transactionEnvelopeInfo.getTransactionActionInfoCount());
-                        assertEquals(1, transactionEnvelopeInfo.getTransactionActionInfoCount()); // for now there is only 1 action per transaction.
-                        out("  Transaction number %d isValid %b", i, transactionEnvelopeInfo.isValid());
-                        assertEquals(transactionEnvelopeInfo.isValid(), true);
-                        out("  Transaction number %d validation code %d", i, transactionEnvelopeInfo.getValidationCode());
-                        assertEquals(0, transactionEnvelopeInfo.getValidationCode());
-
-                        int j = 0;
-                        for (BlockInfo.TransactionEnvelopeInfo.TransactionActionInfo transactionActionInfo : transactionEnvelopeInfo.getTransactionActionInfos()) {
-                            ++j;
-                            out("   Transaction action %d has response status %d", j, transactionActionInfo.getResponseStatus());
-                            assertEquals(200, transactionActionInfo.getResponseStatus());
-                            out("   Transaction action %d has response message bytes as string: %s", j,
-                                    printableString(new String(transactionActionInfo.getResponseMessageBytes(), "UTF-8")));
-                            out("   Transaction action %d has %d endorsements", j, transactionActionInfo.getEndorsementsCount());
-                            assertEquals(2, transactionActionInfo.getEndorsementsCount());
-
-                            for (int n = 0; n < transactionActionInfo.getEndorsementsCount(); ++n) {
-                                BlockInfo.EndorserInfo endorserInfo = transactionActionInfo.getEndorsementInfo(n);
-                                out("Endorser %d signature: %s", n, Hex.encodeHexString(endorserInfo.getSignature()));
-                                out("Endorser %d endorser: %s", n, new String(endorserInfo.getEndorser(), "UTF-8"));
-                            }
-                            out("   Transaction action %d has %d chaincode input arguments", j, transactionActionInfo.getChaincodeInputArgsCount());
-                            for (int z = 0; z < transactionActionInfo.getChaincodeInputArgsCount(); ++z) {
-                                out("     Transaction action %d has chaincode input argument %d is: %s", j, z,
-                                        printableString(new String(transactionActionInfo.getChaincodeInputArgs(z), "UTF-8")));
-                            }
-
-                            out("   Transaction action %d proposal response status: %d", j,
-                                    transactionActionInfo.getProposalResponseStatus());
-                            out("   Transaction action %d proposal response payload: %s", j,
-                                    printableString(new String(transactionActionInfo.getProposalResponsePayload())));
-
-                            TxReadWriteSetInfo rwsetInfo = transactionActionInfo.getTxReadWriteSet();
-                            if (null != rwsetInfo) {
-                                out("   Transaction action %d has %d name space read write sets", j, rwsetInfo.getNsRwsetCount());
-
-                                for (TxReadWriteSetInfo.NsRwsetInfo nsRwsetInfo : rwsetInfo.getNsRwsetInfos()) {
-                                    final String namespace = nsRwsetInfo.getNaamespace();
-                                    KvRwset.KVRWSet rws = nsRwsetInfo.getRwset();
-
-                                    int rs = -1;
-                                    for (KvRwset.KVRead readList : rws.getReadsList()) {
-                                        rs++;
-
-                                        out("     Namespace %s read set %d key %s  version [%d:%d]", namespace, rs, readList.getKey(),
-                                                readList.getVersion().getBlockNum(), readList.getVersion().getTxNum());
-
-                                        if ("bar".equals(channelId) && blockNumber == 2) {
-                                            if ("example_cc_go".equals(namespace)) {
-                                                if (rs == 0) {
-                                                    assertEquals("a", readList.getKey());
-                                                    assertEquals(1, readList.getVersion().getBlockNum());
-                                                    assertEquals(0, readList.getVersion().getTxNum());
-                                                } else if (rs == 1) {
-                                                    assertEquals("b", readList.getKey());
-                                                    assertEquals(1, readList.getVersion().getBlockNum());
-                                                    assertEquals(0, readList.getVersion().getTxNum());
-                                                } else {
-                                                    fail(format("unexpected readset %d", rs));
-                                                }
-
-                                                TX_EXPECTED.remove("readset1");
-                                            }
-                                        }
-                                    }
-
-                                    rs = -1;
-                                    for (KvRwset.KVWrite writeList : rws.getWritesList()) {
-                                        rs++;
-                                        String valAsString = printableString(new String(writeList.getValue().toByteArray(), "UTF-8"));
-
-                                        out("     Namespace %s write set %d key %s has value '%s' ", namespace, rs,
-                                                writeList.getKey(),
-                                                valAsString);
-
-                                        if ("bar".equals(channelId) && blockNumber == 2) {
-                                            if (rs == 0) {
-                                                assertEquals("a", writeList.getKey());
-                                                assertEquals("400", valAsString);
-                                            } else if (rs == 1) {
-                                                assertEquals("b", writeList.getKey());
-                                                assertEquals("400", valAsString);
-                                            } else {
-                                                fail(format("unexpected writeset %d", rs));
-                                            }
-
-                                            TX_EXPECTED.remove("writeset1");
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            if (!TX_EXPECTED.isEmpty()) {
-                fail(TX_EXPECTED.get(0));
-            }
-        } catch (InvalidProtocolBufferRuntimeException e) {
-            throw e.getCause();
-        }
-    }
-
-    static String printableString(final String string) {
-        int maxLogStringLength = 64;
-        if (string == null || string.length() == 0) {
-            return string;
-        }
-
-        String ret = string.replaceAll("[^\\p{Print}]", "?");
-
-        ret = ret.substring(0, Math.min(ret.length(), maxLogStringLength)) + (ret.length() > maxLogStringLength ? "..." : "");
-
-        return ret;
 
     }
 
