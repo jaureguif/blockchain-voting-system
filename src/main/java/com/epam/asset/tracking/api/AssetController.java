@@ -30,7 +30,9 @@ public class AssetController {
 
 	@GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation("Getting a unique Asset by its Id")
-	@ApiResponses({ @ApiResponse(code = 200, message = "Returns an Asset by its Id", response = Asset.class) })
+	@ApiResponses({@ApiResponse(code = 200, message = "Returns an Asset by its Id", response = Asset.class),
+		@ApiResponse(code = 400, message = "Bad, request. Most-likely the id is not a valid UUID string"),
+		@ApiResponse(code = 404, message = "Asset with given UUID was not found")})
 	@ResponseStatus(HttpStatus.OK)
 	public Asset getAssetById(
 			@ApiParam(value = "The id of the asset that we want to retrieve", required = true) @PathVariable @Valid UUID id)
