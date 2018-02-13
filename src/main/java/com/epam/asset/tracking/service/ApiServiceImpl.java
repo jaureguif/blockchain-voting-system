@@ -137,8 +137,7 @@ public class ApiServiceImpl implements ApiService {
 			return null;
 		}
 
-		return mapper.convert(jsonStr, Asset.class, null);
-		//return mapper.map(jsonStr, Asset.class);
+		return mapper.map(jsonStr, Asset.class);
 
 	}
 	
