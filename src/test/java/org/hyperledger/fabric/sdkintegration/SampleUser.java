@@ -34,7 +34,7 @@ public class SampleUser implements User, Serializable {
     private Set<String> roles;
     private String account;
     private String affiliation;
-    private String organization;
+    public String organization;
     private String enrollmentSecret;
     Enrollment enrollment = null; //need access in test env.
 
