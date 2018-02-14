@@ -92,8 +92,8 @@ public class ApiServiceImpl implements ApiService {
 	private static final String TEST_ADMIN_NAME = "admin";
 	private static final String TESTUSER_1_NAME = "user1";
 
-	private static final String CHAIN_CODE_NAME = "example_cc_go";
-	private static final String CHAIN_CODE_PATH = "github.com/example_cc";
+	private static final String CHAIN_CODE_NAME = "asset_t_smart_contract_go";
+	private static final String CHAIN_CODE_PATH = "com.epam.blockchain.chaincode/asset_t_smart_contract";
 	private static final String CHAIN_CODE_VERSION = "1";
 
 	private static final String CHANNEL_NAME = "foo";
