@@ -24,8 +24,7 @@ import (
 	pb "github.com/hyperledger/fabric/protos/peer"
 )
 
-// SimpleChaincode example simple Chaincode implementation
-type SimpleChaincode struct {
+type AssetTrackingSmartContract struct {
 }
 
 type Asset struct {
@@ -36,8 +35,8 @@ type Asset struct {
 	Description  string `json:"description"`
 }
 
-// Init initializes the chaincode state
-func (t *SimpleChaincode) Init(stub shim.ChaincodeStubInterface) pb.Response {
+// Initializes the chaincode state
+func (t *AssetTrackingSmartContract) Init(stub shim.ChaincodeStubInterface) pb.Response {
 	fmt.Println("########### Init ###########")
 	asset := Asset{
 		UUID:         "14a12ef0-9409-4872-9341-9ab003059ce9",
@@ -57,8 +56,8 @@ func (t *SimpleChaincode) Init(stub shim.ChaincodeStubInterface) pb.Response {
 
 }
 
-// Invoke makes payment of X units from A to B
-func (t *SimpleChaincode) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
+// Invoke makes queries... currently
+func (t *AssetTrackingSmartContract) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
 	fmt.Println("########### Invoke ###########")
 	function, args := stub.GetFunctionAndParameters()
 
@@ -85,7 +84,8 @@ func (t *SimpleChaincode) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
 	}
 }
 
-func (t *SimpleChaincode) query(stub shim.ChaincodeStubInterface, args []string) pb.Response {
+// Finds an asset by id
+func (t *AssetTrackingSmartContract) query(stub shim.ChaincodeStubInterface, args []string) pb.Response {
 	fmt.Println("########### Query ###########")
 	if len(args) != 2 {
 		return shim.Error("Incorrect number of arguments. Expecting name of the person to query")
@@ -111,8 +111,8 @@ func (t *SimpleChaincode) query(stub shim.ChaincodeStubInterface, args []string)
 }
 
 func main() {
-	err := shim.Start(new(SimpleChaincode))
+	err := shim.Start(new(AssetTrackingSmartContract))
 	if err != nil {
-		fmt.Printf("Error starting Simple chaincode: %s", err)
+		fmt.Printf("Error starting chaincode: %s", err)
 	}
 }
