@@ -165,7 +165,7 @@
 				<artifactId>maven-checkstyle-plugin</artifactId>
 				<configuration>
 					<configLocation>code-style/checkstyle-configuration.xml</configLocation>
-					<consoleOutput>true</consoleOutput>
+					<consoleOutput>false</consoleOutput>
 					<includeTestSourceDirectory>true</includeTestSourceDirectory>
 				</configuration>
 				<executions>
