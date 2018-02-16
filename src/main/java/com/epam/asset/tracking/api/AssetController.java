@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/asset/tracking/asset")
 public class AssetController {
 
-	Logger logger = LoggerFactory.getLogger(AssetController.class);
+	private static final Logger logger = LoggerFactory.getLogger(AssetController.class);
 
 	@Autowired
 	ApiService api;
