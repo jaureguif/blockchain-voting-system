@@ -14,6 +14,7 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import ma.glasnost.orika.MapperFacade;
@@ -21,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -59,9 +61,11 @@ public class EntityController {
 		@ApiResponse(code = 409, message = "Username already taken. Please choose another.")})
 	public void postEntity(
 			@ApiParam(value = "Posting a new Bussiness Provider. <br><br>"
-					+ "Username nust be unique, otherwize application will return a 409 status code. <br><br>"
+					+ "Username must be unique, otherwize application will return a 409 status code. <br><br>"
 					+ "Business Type is validated against allowed values (listed in implementation notes)"
-					, required = true) @RequestBody @Valid EntityDTO entity) {
+					, required = true) @RequestBody @Valid EntityDTO entity, HttpServletRequest req) {
+		
+		logger.debug("Call to POST/entity Request " + req);
 		logger.debug("Call to POST/entity");
 		logger.info("payload in body request" + entity.toString());
 

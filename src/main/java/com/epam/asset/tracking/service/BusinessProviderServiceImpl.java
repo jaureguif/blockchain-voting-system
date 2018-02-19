@@ -7,7 +7,7 @@ import com.epam.asset.tracking.domain.BusinessProvider;
 import com.epam.asset.tracking.repository.BusinessProviderRepository;
 
 @Component
-public class BusinessProviderServiceImpl  implements BusinessProviderService{
+public class BusinessProviderServiceImpl implements BusinessProviderService{
 
 	@Autowired
 	private BusinessProviderRepository repository;

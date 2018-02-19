@@ -10,6 +10,8 @@ import io.swagger.annotations.ApiResponses;
 
 import java.util.UUID;
 
+import javax.annotation.security.RolesAllowed;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.slf4j.Logger;
@@ -28,6 +30,7 @@ public class AssetController {
 	@Autowired
 	ApiService api;
 
+	@RolesAllowed("ROLE_ADMIN")
 	@GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation("Getting a unique Asset by its Id")
 	@ApiResponses({@ApiResponse(code = 200, message = "Returns an Asset by its Id", response = Asset.class),
@@ -35,7 +38,7 @@ public class AssetController {
 		@ApiResponse(code = 404, message = "Asset with given UUID was not found")})
 	@ResponseStatus(HttpStatus.OK)
 	public Asset getAssetById(
-			@ApiParam(value = "The id of the asset that we want to retrieve", required = true) @PathVariable @Valid UUID id)
+			@ApiParam(value = "The id of the asset that we want to retrieve", required = true) @PathVariable @Valid UUID id, HttpServletRequest req)
 			throws AssetNotFoundException {
 		logger.debug("Call to GET:/asset/tracking/asset/{id}");
 
