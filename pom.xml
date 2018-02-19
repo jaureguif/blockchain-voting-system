@@ -164,6 +164,7 @@
 							<format>xml</format>
 						</formats>
 						<instrumentation>
+						<ignoreTrivial>true</ignoreTrivial>
 							<excludes>
 								<!--Excluding custom Exceptions -->
 								<exclude>com/epam/asset/tracking/exception/**/*.class</exclude>
