@@ -3,6 +3,7 @@ package com.epam.asset.tracking.integration.entity;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.spy;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -57,6 +58,7 @@ public class EntityIntegrationTest extends AbstractIntegrationTest {
 		System.out.println(jacksonMapper.writeValueAsString(dto));
 
 		mockMvc.perform(post("/asset/tracking/entity/")
+				.with(httpBasic("admin","admin"))
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(jacksonMapper.writeValueAsString(dto)))
 				.andDo(print())
@@ -84,6 +86,7 @@ public class EntityIntegrationTest extends AbstractIntegrationTest {
 		System.out.println(jacksonMapper.writeValueAsString(dto));
 		
 		mockMvc.perform(post("/asset/tracking/entity/")
+				.with(httpBasic("admin","admin"))
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(jacksonMapper.writeValueAsString(dto)))
 				.andDo(print())
@@ -110,6 +113,7 @@ public class EntityIntegrationTest extends AbstractIntegrationTest {
 			.when(businessProviderService).save(any());
 		
 		mockMvc.perform(post("/asset/tracking/entity/")
+				.with(httpBasic("admin","admin"))
 				.contentType(MediaType.APPLICATION_JSON_UTF8)
 				.content(jacksonMapper.writeValueAsString(dto)))
 			.andDo(print())

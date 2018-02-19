@@ -20,7 +20,7 @@ public class UserServiceImpl implements UserDetailsService, UserService {
 	User user = removeThis();
 	
 	private User removeThis() {
-		User user = new User(Role.USER);
+		User user = new User(Role.ADMIN);
 		user.setUsername("Adam");
 		user.setPassword("$2a$04$I9Q2sDc4QGGg5WNTLmsz0.fvGv3OjoZyj81PrSFyGOqMphqfS2qKu");
 		return user;
