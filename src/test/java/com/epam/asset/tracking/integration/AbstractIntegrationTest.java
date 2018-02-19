@@ -12,10 +12,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
-public class AbstractIntegrationTest {
+public abstract class AbstractIntegrationTest {
 
 	@Autowired
 	protected MockMvc mockMvc;
 
 	protected ObjectMapper jacksonMapper = new ObjectMapper();
+	
 }

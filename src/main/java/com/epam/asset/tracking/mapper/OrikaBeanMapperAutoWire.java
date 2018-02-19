@@ -58,7 +58,7 @@ public class OrikaBeanMapperAutoWire extends ConfigurableMapper implements Appli
      *
      * @param mapper
      */
-    @SuppressWarnings("rawtypes")
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     public void addMapper(Mapper<?, ?> mapper) {
         factory.classMap(mapper.getAType(), mapper.getBType())
                 .byDefault()
