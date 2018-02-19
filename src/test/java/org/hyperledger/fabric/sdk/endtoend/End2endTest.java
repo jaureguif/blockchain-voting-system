@@ -71,7 +71,7 @@ public class End2endTest {
   private static final String TEST_FIXTURES_PATH = "src/test/fixture";
 
   private static final String CHAIN_CODE_NAME = "asset_t_smart_contract_go";
-  private static final String CHAIN_CODE_PATH = "github.com/asset_t_smart_contract";
+  private static final String CHAIN_CODE_PATH = "com.epam.blockchain.chaincode/asset_t_smart_contract";
   private static final String CHAIN_CODE_VERSION = "1";
 
   private static final String FOO_CHANNEL_NAME = "foo";
@@ -282,12 +282,12 @@ public class End2endTest {
 
           ////For GO language and serving just a single user, chaincodeSource is mostly likely the users GOPATH
           installProposalRequest.setChaincodeSourceLocation(
-              new File(TEST_FIXTURES_PATH + "/sdkintegration/gocc/sample1"));
+              new File(TEST_FIXTURES_PATH + "/sdkintegration/gocc"));
         } else {
           // On bar chain install from an input stream.
 
           installProposalRequest.setChaincodeInputStream(Util.generateTarGzInputStream(
-              (Paths.get(TEST_FIXTURES_PATH, "/sdkintegration/gocc/sample1", "src", CHAIN_CODE_PATH)
+              (Paths.get(TEST_FIXTURES_PATH, "/sdkintegration/gocc", "src", CHAIN_CODE_PATH)
                     .toFile()),
               Paths.get("src", CHAIN_CODE_PATH).toString()));
 

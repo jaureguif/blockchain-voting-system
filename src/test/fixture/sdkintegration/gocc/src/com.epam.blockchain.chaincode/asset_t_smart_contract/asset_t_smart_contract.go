@@ -51,6 +51,34 @@ func (t *AssetTrackingSmartContract) Init(stub shim.ChaincodeStubInterface) pb.R
 	if err != nil {
 		return shim.Error(err.Error())
 	}
+	
+	asset = Asset{
+		UUID:         "9d40ee4e-bf1e-4f74-8237-c5e9b6e8f6d3",
+		SerialNumber: "3VW1W21KIBM312176",
+		AssetType:    "VEHICLE",
+		OwnerName:    "Jhonn Doe",
+		Description:  "2011 VW JETTA STYLE ACTIVE MANUAL TRANSMISION. SIDE AIRBAGS PACKAGE, COLOR: WHITE CANDY     INTERIOR COLOR: BLACK FABRIC .    ENGINE: 2.5L FIVE CYLINDERS     ENGINE NUMBER: CCC094323     MADE IN: MEXICO      BUYER NAME: JHONN DOE     ADDRESS: 123 ABBY ROAD, THE DOMAIN. AUTIN TEXAS, USA.     SELLER NAME: RAY REDDINGTON",
+	}
+	jsonBlob, _ = json.Marshal(asset)
+	err = stub.PutState(asset.UUID, jsonBlob)
+
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+	
+	asset = Asset{
+		UUID:         "ab3af1a9-6d81-4be8-94f8-cd1667a894cb",
+		SerialNumber: "157590103000100120006906040003",
+		AssetType:    "REAL_ESTATE",
+		OwnerName:    "Donald Trump",
+		Description:  "Address: 1600 Pennsylvania Ave NW, Washington, DC 20500, USA Floor space: 5,110 m2       Construction started:    October 13, 1792,       Completed:   November 1, 1800",
+	}
+	jsonBlob, _ = json.Marshal(asset)
+	err = stub.PutState(asset.UUID, jsonBlob)
+
+	if err != nil {
+		return shim.Error(err.Error())
+	}
 
 	return shim.Success(nil)
 
