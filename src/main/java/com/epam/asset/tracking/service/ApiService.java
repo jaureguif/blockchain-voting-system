@@ -1,13 +1,12 @@
 package com.epam.asset.tracking.service;
 
-public interface ApiService {
-	
-	String getHello();
-	
-	String getBalance(String holderName);
-	
-	void moveBalance(String fromName, String toName, String amount);
+import java.util.UUID;
 
-	void blockWalk();
+import com.epam.asset.tracking.domain.Asset;
+import com.epam.asset.tracking.exception.AssetNotFoundException;
+
+public interface ApiService {
+
+	Asset getAssetById(UUID id) throws AssetNotFoundException;
 
 }
