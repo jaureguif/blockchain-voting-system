@@ -165,7 +165,10 @@
 						</formats>
 						<instrumentation>
 							<excludes>
+								<!--Excluding custom Exceptions -->
 								<exclude>com/epam/asset/tracking/exception/**/*.class</exclude>
+								<!--Excluding ValidationsUtil because this class is used only as a constants repo -->
+								<exclude>com/epam/asset/tracking/dto/validations/ValidationsUtil.class</exclude>
 								<exclude>org/hyperledger/**/*.class</exclude>
 								<exclude>org/hyperledger/**/*Test.class</exclude>
 							</excludes>
