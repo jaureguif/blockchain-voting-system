@@ -2,10 +2,6 @@ package com.epam.asset.tracking.service;
 
 import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.hyperledger.fabric.sdk.BlockInfo.EnvelopeType.TRANSACTION_ENVELOPE;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.ByteArrayInputStream;
@@ -22,7 +18,6 @@ import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Serializable;
 import java.io.StringReader;
-import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
@@ -38,9 +33,8 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -52,9 +46,6 @@ import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
-import org.hyperledger.fabric.protos.ledger.rwset.kvrwset.KvRwset;
-import org.hyperledger.fabric.sdk.BlockInfo;
-import org.hyperledger.fabric.sdk.BlockchainInfo;
 import org.hyperledger.fabric.sdk.ChaincodeID;
 import org.hyperledger.fabric.sdk.Channel;
 import org.hyperledger.fabric.sdk.Enrollment;
@@ -64,12 +55,8 @@ import org.hyperledger.fabric.sdk.Orderer;
 import org.hyperledger.fabric.sdk.Peer;
 import org.hyperledger.fabric.sdk.ProposalResponse;
 import org.hyperledger.fabric.sdk.QueryByChaincodeRequest;
-import org.hyperledger.fabric.sdk.SDKUtils;
-import org.hyperledger.fabric.sdk.TransactionProposalRequest;
-import org.hyperledger.fabric.sdk.TxReadWriteSetInfo;
 import org.hyperledger.fabric.sdk.User;
 import org.hyperledger.fabric.sdk.exception.InvalidArgumentException;
-import org.hyperledger.fabric.sdk.exception.InvalidProtocolBufferRuntimeException;
 import org.hyperledger.fabric.sdk.exception.ProposalException;
 import org.hyperledger.fabric.sdk.helper.Config;
 import org.hyperledger.fabric.sdk.helper.Utils;
@@ -78,11 +65,16 @@ import org.hyperledger.fabric_ca.sdk.HFCAClient;
 import org.hyperledger.fabric_ca.sdk.RegistrationRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.epam.asset.tracking.annotation.CoverageIgnore;
+import com.epam.asset.tracking.domain.Asset;
+import com.epam.asset.tracking.exception.AssetNotFoundException;
 import com.epam.asset.tracking.service.ApiService;
 
 import io.netty.util.internal.StringUtil;
+import ma.glasnost.orika.MapperFacade;
 
 @Service
 public class ApiServiceImpl implements ApiService {
@@ -92,104 +84,98 @@ public class ApiServiceImpl implements ApiService {
 	private final ChaincodeID chaincodeID = ChaincodeID.newBuilder().setName(CHAIN_CODE_NAME)
 			.setVersion(CHAIN_CODE_VERSION).setPath(CHAIN_CODE_PATH).build();
 	private HFClient client = null;
-	Channel channel = null;
+	private Channel channel = null;
 
 	private final TestConfigHelper configHelper = new TestConfigHelper();
 	private Collection<SampleOrg> testSampleOrgs;
-
-	String testTxID = null; // save the CC invoke TxID and use in queries
 
 	private static final TestConfig testConfig = TestConfig.getConfig();
 	private static final String TEST_ADMIN_NAME = "admin";
 	private static final String TESTUSER_1_NAME = "user1";
 
-	private static final String CHAIN_CODE_NAME = "example_cc_go";
-	private static final String CHAIN_CODE_PATH = "github.com/example_cc";
+	private static final String CHAIN_CODE_NAME = "asset_t_smart_contract_go";
+	private static final String CHAIN_CODE_PATH = "com.epam.blockchain.chaincode/asset_t_smart_contract";
 	private static final String CHAIN_CODE_VERSION = "1";
 
-	private static final String FOO_CHANNEL_NAME = "foo";
+	private static final String CHANNEL_NAME = "foo";
 
-	// TODO review
-	private static final Map<String, String> TX_EXPECTED;
-
-	static {
-		TX_EXPECTED = new HashMap<>();
-		TX_EXPECTED.put("readset1", "Missing readset for channel bar block 1");
-		TX_EXPECTED.put("writeset1", "Missing writeset for channel bar block 1");
-	}
+	@Autowired
+	private MapperFacade mapper;
 
 	@Override
-	public String getBalance(String holderName) {
+	public Asset getAssetById(UUID id) throws AssetNotFoundException {
 
+		String jsonStr;
 		try {
-			return getBalanceFromFabric(holderName);
+			jsonStr = getAssetFromFabric(id);
 		} catch (InvalidArgumentException | ProposalException e) {
-			log.error("Error in getBalance: {}", e);
+			log.error("Error when trying to retrieve asset with id " + id, e);
 			return null;
 		}
-	}
-	
 
-	@Override
-	public String getHello() {
+		return mapper.map(jsonStr, Asset.class);
+
+	}
+
+	private String getAssetFromFabric(UUID id)
+			throws InvalidArgumentException, ProposalException, AssetNotFoundException {
+		String payload = null;
 
 		try {
 			setup();
-		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
+		} catch (Exception e) {
 			e.printStackTrace();
-		} catch (NoSuchFieldException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (SecurityException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalArgumentException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.error("Error in setup: {}", e);
 		}
-		return "OK";
 
-	}
+		QueryByChaincodeRequest queryByChaincodeRequest = client.newQueryProposalRequest();
+		queryByChaincodeRequest.setArgs(new String[] { "query", id.toString() });
+		queryByChaincodeRequest.setFcn("invoke");
+		queryByChaincodeRequest.setChaincodeID(chaincodeID);
 
-	@Override
-	public void moveBalance(String fromName, String toName, String amount) {
-		
-		try {
-			moveBalanceInFabric(fromName, toName, amount);
-			log.info("Moved!");
-		} catch (InvalidArgumentException | ProposalException | InterruptedException | ExecutionException
-				| TimeoutException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		Map<String, byte[]> transientMap = new HashMap<>();
+		transientMap.put("HyperLedgerFabric", "QueryByChaincodeRequest:JavaSDK".getBytes(UTF_8));
+		transientMap.put("method", "QueryByChaincodeRequest".getBytes(UTF_8));
+		queryByChaincodeRequest.setTransientMap(transientMap);
+
+		Collection<ProposalResponse> queryProposals = channel.queryByChaincode(queryByChaincodeRequest,
+				channel.getPeers());
+		for (ProposalResponse proposalResponse : queryProposals) {
+			if (!proposalResponse.isVerified() || proposalResponse.getStatus() != ProposalResponse.Status.SUCCESS) {
+
+				if (proposalResponse.getMessage().toUpperCase().contains("NOT FOUND")) {
+					throw new AssetNotFoundException(
+							"Failed query proposal from peer " + proposalResponse.getPeer().getName() + " status: "
+									+ proposalResponse.getStatus() + ". Messages: " + proposalResponse.getMessage()
+									+ ". Was verified : " + proposalResponse.isVerified());
+				} else {
+					throw new ProposalException(
+							"Failed query proposal from peer " + proposalResponse.getPeer().getName() + " status: "
+									+ proposalResponse.getStatus() + ". Messages: " + proposalResponse.getMessage()
+									+ ". Was verified : " + proposalResponse.isVerified());
+				}
+
+			} else {
+				payload = proposalResponse.getProposalResponse().getResponse().getPayload().toStringUtf8();
+				log.info("Query payload of {} from peer {} returned {}", id, proposalResponse.getPeer().getName(),
+						payload);
+
+			}
 		}
-		
+		channel.shutdown(true);
+		return payload;
 	}
-	
-	@Override
-	public void blockWalk() {
-		try {
-			setup();
-			blockWalker(channel);
-		} catch (InvalidArgumentException | ProposalException | IOException | NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} 
-	}
-	
-	public void setup() throws MalformedURLException, NoSuchFieldException, SecurityException, IllegalArgumentException,
-			IllegalAccessException {
 
-		log.info("\n\n\nRUNNING: setup.\n");
+	private void setup() throws MalformedURLException, NoSuchFieldException, SecurityException,
+			IllegalArgumentException, IllegalAccessException {
+
+		log.info("RUNNING: setup.");
+
 		configHelper.clearConfig();
 		configHelper.customizeConfig();
 
 		testSampleOrgs = testConfig.getIntegrationTestsSampleOrgs();
 		// Set up hfca for each sample org
-
 		for (SampleOrg sampleOrg : testSampleOrgs) {
 			sampleOrg.setCAClient(HFCAClient.createNewInstance(sampleOrg.getCALocation(), sampleOrg.getCAProperties()));
 		}
@@ -201,10 +187,7 @@ public class ApiServiceImpl implements ApiService {
 
 			// Create instance of client.
 			client = HFClient.createNewInstance();
-
 			client.setCryptoSuite(CryptoSuite.Factory.getCryptoSuite());
-
-			// client.setMemberServices(peerOrg1FabricCA);
 
 			////////////////////////////
 			// Set up USERS
@@ -238,19 +221,15 @@ public class ApiServiceImpl implements ApiService {
 
 				SampleUser user = sampleStore.getMember(TESTUSER_1_NAME, sampleOrg.getName());
 				if (!user.isRegistered()) { // users need to be registered AND enrolled
-					RegistrationRequest rr = new RegistrationRequest(user.getName(), "org1.department1");
-					// user.setEnrollmentSecret(ca.register(rr, admin));
+					new RegistrationRequest(user.getName(), "org1.department1");
 				}
 				if (!user.isEnrolled()) {
-					// user.setEnrollment(ca.enroll(user.getName(), user.getEnrollmentSecret()));
 					user.setMspId(mspid);
 				}
 				sampleOrg.addUser(user); // Remember user belongs to this Org
 
 				final String sampleOrgName = sampleOrg.getName();
 				final String sampleOrgDomainName = sampleOrg.getDomainName();
-
-				// src/test/fixture/sdkintegration/e2e-2Orgs/channel/crypto-config/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp/keystore/
 
 				SampleUser peerOrgAdmin = sampleStore.getMember(sampleOrgName + "Admin", sampleOrgName,
 						sampleOrg.getMSPID(),
@@ -270,15 +249,10 @@ public class ApiServiceImpl implements ApiService {
 			////////////////////////////
 			// Construct and run the channels
 			SampleOrg sampleOrg = testConfig.getIntegrationTestsSampleOrg("peerOrg1");
-			Channel fooChannel = constructChannel(FOO_CHANNEL_NAME, client, sampleOrg);
-			// runChannel(client, fooChannel, sampleOrg, 0);
-			// blockWalker(fooChannel);
-			// fooChannel.shutdown(true); // Force foo channel to shutdown clean up
-			// resources.
-			log.info("\n");
+			Channel fooChannel = constructChannel(CHANNEL_NAME, client, sampleOrg);
 
 			log.info("That's all folks!");
-			//client.setUserContext(sampleOrg.getUser(TESTUSER_1_NAME));
+			// client.setUserContext(sampleOrg.getUser(TESTUSER_1_NAME));
 			channel = fooChannel;
 
 		} catch (Exception e) {
@@ -288,7 +262,7 @@ public class ApiServiceImpl implements ApiService {
 		}
 	}
 
-	File findFileSk(File directory) {
+	private File findFileSk(File directory) {
 
 		File[] matches = directory.listFiles((dir, name) -> name.endsWith("_sk"));
 
@@ -393,367 +367,6 @@ public class ApiServiceImpl implements ApiService {
 		return newChannel;
 
 	}
-
-	// CHECKSTYLE.OFF: Method length is 320 lines (max allowed is 150).
-	void runChannel(HFClient client, Channel channel, SampleOrg sampleOrg, int delta) {
-
-		try {
-
-			final String channelName = channel.getName();
-			log.info("Running channel %s", channelName);
-			channel.setTransactionWaitTime(testConfig.getTransactionWaitTime());
-			channel.setDeployWaitTime(testConfig.getDeployWaitTime());
-
-			//////// QUERY?
-			// We can only send channel queries to peers that are in the same org as the SDK
-			// user context
-			// Get the peers from the current org being used and pick one randomly to send
-			// the queries to.
-			Set<Peer> peerSet = sampleOrg.getPeers();
-			// Peer queryPeer = peerSet.iterator().next();
-			// log.info("Using peer %s for channel queries", queryPeer.getName());
-
-			BlockchainInfo channelInfo = channel.queryBlockchainInfo();
-			log.info("Channel info for : " + channelName);
-			log.info("Channel height: " + channelInfo.getHeight());
-			String chainCurrentHash = Hex.encodeHexString(channelInfo.getCurrentBlockHash());
-			String chainPreviousHash = Hex.encodeHexString(channelInfo.getPreviousBlockHash());
-			log.info("Chain current block hash: " + chainCurrentHash);
-			log.info("Chainl previous block hash: " + chainPreviousHash);
-
-			// Query by block number. Should return latest block, i.e. block number 2
-			BlockInfo returnedBlock = channel.queryBlockByNumber(channelInfo.getHeight() - 1);
-			String previousHash = Hex.encodeHexString(returnedBlock.getPreviousHash());
-			log.info("queryBlockByNumber returned correct block with blockNumber " + returnedBlock.getBlockNumber()
-					+ " \n previous_hash " + previousHash);
-
-			// Query by block hash. Using latest block's previous hash so should return
-			// block number 1
-			byte[] hashQuery = returnedBlock.getPreviousHash();
-			returnedBlock = channel.queryBlockByHash(hashQuery);
-			log.info("queryBlockByHash returned block with blockNumber " + returnedBlock.getBlockNumber());
-
-			String holderName = "a";
-			String balance = getBalanceFromFabric(holderName);
-
-			log.info("Balance of {} is {}", holderName, balance);
-
-		} catch (Exception e) {
-			log.info("Caught an exception running channel %s", channel.getName());
-			e.printStackTrace();
-			fail("Test failed with error : " + e.getMessage());
-		}
-
-	}
-
-	private String getBalanceFromFabric(String holderName) throws InvalidArgumentException, ProposalException {
-		String payload = null;
-
-		try {
-			setup();
-		} catch (Exception e) {
-			e.printStackTrace();
-			log.error("Error in setup: {}", e);
-		}
-
-		QueryByChaincodeRequest queryByChaincodeRequest = client.newQueryProposalRequest();
-		queryByChaincodeRequest.setArgs(new String[] { "query", holderName });
-		queryByChaincodeRequest.setFcn("invoke");
-		queryByChaincodeRequest.setChaincodeID(chaincodeID);
-
-		Map<String, byte[]> transientMap = new HashMap<>();
-		transientMap.put("HyperLedgerFabric", "QueryByChaincodeRequest:JavaSDK".getBytes(UTF_8));
-		transientMap.put("method", "QueryByChaincodeRequest".getBytes(UTF_8));
-		queryByChaincodeRequest.setTransientMap(transientMap);
-
-		Collection<ProposalResponse> queryProposals = channel.queryByChaincode(queryByChaincodeRequest,
-				channel.getPeers());
-		for (ProposalResponse proposalResponse : queryProposals) {
-			if (!proposalResponse.isVerified() || proposalResponse.getStatus() != ProposalResponse.Status.SUCCESS) {
-				fail("Failed query proposal from peer " + proposalResponse.getPeer().getName() + " status: "
-						+ proposalResponse.getStatus() + ". Messages: " + proposalResponse.getMessage()
-						+ ". Was verified : " + proposalResponse.isVerified());
-			} else {
-				payload = proposalResponse.getProposalResponse().getResponse().getPayload().toStringUtf8();
-				log.info("Query payload of {} from peer {} returned {}", holderName,
-						proposalResponse.getPeer().getName(), payload);
-
-			}
-		}
-		channel.shutdown(true);
-		return payload;
-	}
-
-	
-	private void moveBalanceInFabric(String fromName, String toName, String amount) throws InterruptedException, ExecutionException, TimeoutException, InvalidArgumentException, ProposalException {
-		
-		Collection<ProposalResponse> successful = new LinkedList<>();
-        Collection<ProposalResponse> failed = new LinkedList<>();
-        
-		try {
-			setup();
-		} catch (MalformedURLException | NoSuchFieldException | SecurityException | IllegalArgumentException
-				| IllegalAccessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-         ///////////////
-         /// Send transaction proposal to all peers
-         TransactionProposalRequest transactionProposalRequest = client.newTransactionProposalRequest();
-         transactionProposalRequest.setChaincodeID(chaincodeID);
-         transactionProposalRequest.setFcn("invoke");
-         transactionProposalRequest.setProposalWaitTime(testConfig.getProposalWaitTime());
-         transactionProposalRequest.setArgs(new String[] {"move", fromName, toName, amount});
-
-         Map<String, byte[]> tm2 = new HashMap<>();
-         tm2.put("HyperLedgerFabric", "TransactionProposalRequest:JavaSDK".getBytes(UTF_8));
-         tm2.put("method", "TransactionProposalRequest".getBytes(UTF_8));
-         tm2.put("result", ":)".getBytes(UTF_8));  /// This should be returned see chaincode.
-         
-         try {
-			assertEquals(":)", new String(tm2.get("result"), "UTF-8"));
-		} catch (UnsupportedEncodingException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-         
-         transactionProposalRequest.setTransientMap(tm2);
-
-         log.info("sending transactionProposal to all peers with arguments: move({},{},{})", fromName, toName, amount );
-
-         Collection<ProposalResponse> transactionPropResp = channel.sendTransactionProposal(transactionProposalRequest, channel.getPeers());
-         for (ProposalResponse response : transactionPropResp) {
-             if (response.getStatus() == ProposalResponse.Status.SUCCESS) {
-                 log.info("Successful transaction proposal response Txid: {} from peer {}", response.getTransactionID(), response.getPeer().getName());
-                 successful.add(response);
-             } else {
-                 failed.add(response);
-             }
-         }
-
-         // Check that all the proposals are consistent with each other. We should have only one set
-         // where all the proposals above are consistent.
-         Collection<Set<ProposalResponse>> proposalConsistencySets = SDKUtils.getProposalConsistencySets(transactionPropResp);
-         if (proposalConsistencySets.size() != 1) {
-             fail(format("Expected only one set of consistent proposal responses but got %d", proposalConsistencySets.size()));
-         }
-
-         log.info("Received {} transaction proposal responses. Successful+verified: {} . Failed: {}",
-                 transactionPropResp.size(), successful.size(), failed.size());
-         if (failed.size() > 0) {
-             ProposalResponse firstTransactionProposalResponse = failed.iterator().next();
-             fail("Not enough endorsers for invoke(move a,b,100):" + failed.size() + " endorser error: " +
-                     firstTransactionProposalResponse.getMessage() +
-                     ". Was verified: " + firstTransactionProposalResponse.isVerified());
-         }
-         log.info("Successfully received transaction proposal responses.");
-
-         ProposalResponse resp = transactionPropResp.iterator().next();
-         byte[] x = resp.getChaincodeActionResponsePayload(); // This is the data returned by the chaincode.
-         String 	resultAsString = null;
-         if (x != null) {
-             try {
-				resultAsString = new String(x, "UTF-8");
-			} catch (UnsupportedEncodingException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-         }
-         //assertEquals(":)", resultAsString);
-
-         assertEquals(200, resp.getChaincodeActionResponseStatus()); //Chaincode's status.
-
-         TxReadWriteSetInfo readWriteSetInfo = resp.getChaincodeActionResponseReadWriteSetInfo();
-         //See blockwalker below how to transverse this
-         assertNotNull(readWriteSetInfo);
-         assertTrue(readWriteSetInfo.getNsRwsetCount() > 0);
-
-         ChaincodeID cid = resp.getChaincodeID();
-         assertNotNull(cid);
-         assertEquals(CHAIN_CODE_PATH, cid.getPath());
-         assertEquals(CHAIN_CODE_NAME, cid.getName());
-         assertEquals(CHAIN_CODE_VERSION, cid.getVersion());
-
-         ////////////////////////////
-         // Send Transaction Transaction to orderer
-         log.info("Sending chaincode transaction(move {}, {}, {}) to orderer.", fromName, toName, amount);
-         //return 
-         channel.sendTransaction(successful).get(testConfig.getTransactionWaitTime(), TimeUnit.SECONDS);
-         channel.shutdown(true);
-
-	}
-	
-	// CHECKSTYLE.ON: Method length is 320 lines (max allowed is 150).
-
-	void blockWalker(Channel channel) throws InvalidArgumentException, ProposalException, IOException {
-		try {
-			BlockchainInfo channelInfo = channel.queryBlockchainInfo();
-
-			for (long current = channelInfo.getHeight() - 1; current > -1; --current) {
-				BlockInfo returnedBlock = channel.queryBlockByNumber(current);
-				final long blockNumber = returnedBlock.getBlockNumber();
-
-				log.info("current block number {} has data hash: {}", blockNumber,
-						Hex.encodeHexString(returnedBlock.getDataHash()));
-				log.info("current block number {} has previous hash id: {}", blockNumber,
-						Hex.encodeHexString(returnedBlock.getPreviousHash()));
-				log.info("current block number {} has calculated block hash is {}", blockNumber,
-						Hex.encodeHexString(SDKUtils.calculateBlockHash(blockNumber, returnedBlock.getPreviousHash(),
-								returnedBlock.getDataHash())));
-
-				final int envelopCount = returnedBlock.getEnvelopCount();
-				assertEquals(1, envelopCount);
-				log.info("current block number {} has {} envelope count:", blockNumber,
-						returnedBlock.getEnvelopCount());
-				int i = 0;
-				for (BlockInfo.EnvelopeInfo envelopeInfo : returnedBlock.getEnvelopeInfos()) {
-					++i;
-
-					log.info("  Transaction number {} has transaction id: {}", i, envelopeInfo.getTransactionID());
-					final String channelId = envelopeInfo.getChannelId();
-					assertTrue("foo".equals(channelId) || "bar".equals(channelId));
-
-					log.info("  Transaction number {} has channel id: {}", i, channelId);
-					log.info("  Transaction number {} has epoch: {}", i, envelopeInfo.getEpoch());
-					log.info(format("  Transaction number %d has transaction timestamp: %tB %<te,  %<tY  %<tT %<Tp", i,
-							envelopeInfo.getTimestamp()));
-					log.info("  Transaction number %d has type id: {}", i, "" + envelopeInfo.getType());
-
-					if (envelopeInfo.getType() == TRANSACTION_ENVELOPE) {
-						BlockInfo.TransactionEnvelopeInfo transactionEnvelopeInfo = (BlockInfo.TransactionEnvelopeInfo) envelopeInfo;
-
-						log.info("  Transaction number {} has {} actions", i,
-								transactionEnvelopeInfo.getTransactionActionInfoCount());
-						assertEquals(1, transactionEnvelopeInfo.getTransactionActionInfoCount()); // for now there is
-																									// only 1 action per
-																									// transaction.
-						log.info("  Transaction number {} isValid {}", i, transactionEnvelopeInfo.isValid());
-						assertEquals(transactionEnvelopeInfo.isValid(), true);
-						log.info("  Transaction number {} validation code {}", i,
-								transactionEnvelopeInfo.getValidationCode());
-						assertEquals(0, transactionEnvelopeInfo.getValidationCode());
-
-						int j = 0;
-						for (BlockInfo.TransactionEnvelopeInfo.TransactionActionInfo transactionActionInfo : transactionEnvelopeInfo
-								.getTransactionActionInfos()) {
-							++j;
-							log.info("   Transaction action {} has response status {}", j,
-									transactionActionInfo.getResponseStatus());
-							assertEquals(200, transactionActionInfo.getResponseStatus());
-							log.info("   Transaction action {} has response message bytes as string: {}", j,
-									printableString(
-											new String(transactionActionInfo.getResponseMessageBytes(), "UTF-8")));
-							log.info("   Transaction action {} has {} endorsements", j,
-									transactionActionInfo.getEndorsementsCount());
-							assertEquals(2, transactionActionInfo.getEndorsementsCount());
-
-							for (int n = 0; n < transactionActionInfo.getEndorsementsCount(); ++n) {
-								BlockInfo.EndorserInfo endorserInfo = transactionActionInfo.getEndorsementInfo(n);
-								log.info("Endorser {} signature: {}", n,
-										Hex.encodeHexString(endorserInfo.getSignature()));
-								log.info("Endorser {} endorser: {}", n,
-										new String(endorserInfo.getEndorser(), "UTF-8"));
-							}
-							log.info("   Transaction action {} has {} chaincode input arguments", j,
-									transactionActionInfo.getChaincodeInputArgsCount());
-							for (int z = 0; z < transactionActionInfo.getChaincodeInputArgsCount(); ++z) {
-								log.info("     Transaction action %d has chaincode input argument %d is: %s", j, z,
-										printableString(
-												new String(transactionActionInfo.getChaincodeInputArgs(z), "UTF-8")));
-							}
-
-							log.info("   Transaction action %d proposal response status: %d", j,
-									transactionActionInfo.getProposalResponseStatus());
-							log.info("   Transaction action %d proposal response payload: %s", j,
-									printableString(new String(transactionActionInfo.getProposalResponsePayload())));
-
-							TxReadWriteSetInfo rwsetInfo = transactionActionInfo.getTxReadWriteSet();
-							if (null != rwsetInfo) {
-								log.info("   Transaction action %d has %d name space read write sets", j,
-										rwsetInfo.getNsRwsetCount());
-
-								for (TxReadWriteSetInfo.NsRwsetInfo nsRwsetInfo : rwsetInfo.getNsRwsetInfos()) {
-									final String namespace = nsRwsetInfo.getNaamespace();
-									KvRwset.KVRWSet rws = nsRwsetInfo.getRwset();
-
-									int rs = -1;
-									for (KvRwset.KVRead readList : rws.getReadsList()) {
-										rs++;
-
-										log.info("     Namespace %s read set %d key %s  version [%d:%d]", namespace, rs,
-												readList.getKey(), readList.getVersion().getBlockNum(),
-												readList.getVersion().getTxNum());
-
-										if ("bar".equals(channelId) && blockNumber == 2) {
-											if ("example_cc_go".equals(namespace)) {
-												if (rs == 0) {
-													assertEquals("a", readList.getKey());
-													assertEquals(1, readList.getVersion().getBlockNum());
-													assertEquals(0, readList.getVersion().getTxNum());
-												} else if (rs == 1) {
-													assertEquals("b", readList.getKey());
-													assertEquals(1, readList.getVersion().getBlockNum());
-													assertEquals(0, readList.getVersion().getTxNum());
-												} else {
-													fail(format("unexpected readset %d", rs));
-												}
-
-												TX_EXPECTED.remove("readset1");
-											}
-										}
-									}
-
-									rs = -1;
-									for (KvRwset.KVWrite writeList : rws.getWritesList()) {
-										rs++;
-										String valAsString = printableString(
-												new String(writeList.getValue().toByteArray(), "UTF-8"));
-
-										log.info("     Namespace %s write set %d key %s has value '%s' ", namespace, rs,
-												writeList.getKey(), valAsString);
-
-										if ("bar".equals(channelId) && blockNumber == 2) {
-											if (rs == 0) {
-												assertEquals("a", writeList.getKey());
-												assertEquals("400", valAsString);
-											} else if (rs == 1) {
-												assertEquals("b", writeList.getKey());
-												assertEquals("400", valAsString);
-											} else {
-												fail(format("unexpected writeset %d", rs));
-											}
-
-											TX_EXPECTED.remove("writeset1");
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		} catch (InvalidProtocolBufferRuntimeException e) {
-			throw e.getCause();
-		}
-	}
-
-	// TODO remove this
-	static String printableString(final String string) {
-		int maxLogStringLength = 64;
-		if (string == null || string.length() == 0) {
-			return string;
-		}
-
-		String ret = string.replaceAll("[^\\p{Print}]", "?");
-
-		ret = ret.substring(0, Math.min(ret.length(), maxLogStringLength))
-				+ (ret.length() > maxLogStringLength ? "..." : "");
-
-		return ret;
-
-	}
-
 }
 
 class SampleOrg {
@@ -931,7 +544,7 @@ class SampleUser implements User, Serializable {
 		if (null == memberStr) {
 			saveState();
 		} else {
-			restoreState();
+			// restoreState();
 		}
 
 	}
@@ -1028,6 +641,7 @@ class SampleUser implements User, Serializable {
 	 * Restore the state of this user from the key value store (if found). If not
 	 * found, do nothing.
 	 */
+	@CoverageIgnore
 	SampleUser restoreState() {
 		String memberStr = keyValStore.getValue(keyValStoreName);
 		if (null != memberStr) {
@@ -1518,19 +1132,6 @@ class TestConfig {
 		return ret;
 	}
 
-	/**
-	 * getProperty returns the value for given property key. If not found, it will
-	 * set the property to defaultValueidea-IC-171.3780.107
-	 *
-	 * @param property
-	 * @param defaultValue
-	 * @return property value as a String
-	 */
-	private String getProperty(String property, String defaultValue) {
-
-		return sdkProperties.getProperty(property, defaultValue);
-	}
-
 	static private void defaultProperty(String key, String value) {
 
 		String ret = System.getProperty(key);
@@ -1581,7 +1182,8 @@ class TestConfig {
 
 	}
 
-	private final static String tlsbase = "src/test/fixture/sdkintegration/e2e-2Orgs/tls/";
+	// private final static String tlsbase =
+	// "src/test/fixture/sdkintegration/e2e-2Orgs/tls/";
 
 	public Properties getPeerProperties(String name) {
 
@@ -1621,40 +1223,6 @@ class TestConfig {
 
 		return getEndPointProperties("peer", name); // uses same as named peer
 
-	}
-
-	private Properties getTLSProperties(String type, String name) {
-		Properties ret = null;
-		if (runningFabricTLS) {
-			String cert = tlsbase + "/" + type + "/" + name + "/cert.pem";
-			File cf = new File(cert);
-			if (!cf.exists() || !cf.isFile()) {
-				throw new RuntimeException("Missing cert file " + cf.getAbsolutePath());
-			}
-			ret = new Properties();
-			ret.setProperty("pemFile", cert);
-			ret.setProperty("trustServerCertificate", "true"); // testing environment only NOT FOR PRODUCTION!
-			ret.setProperty("sslProvider", "openSSL");
-			ret.setProperty("negotiationType", "TLS");
-		}
-		return ret;
-	}
-
-	private Properties getTLSProperties(String cert) {
-		Properties ret = null;
-		if (runningFabricTLS) {
-			// String cert = tlsbase + "/" + type + "/" + name + "/ca.pem";
-			File cf = new File(tlsbase + cert);
-			if (!cf.exists() || !cf.isFile()) {
-				throw new RuntimeException("TEST error missing cert file " + cf.getAbsolutePath());
-			}
-			ret = new Properties();
-			ret.setProperty("pemFile", cf.getAbsolutePath());
-			ret.setProperty("trustServerCertificate", "true"); // testing environment only NOT FOR PRODUCTION!
-			ret.setProperty("sslProvider", "openSSL");
-			ret.setProperty("negotiationType", "TLS");
-		}
-		return ret;
 	}
 
 	public String getTestChannlePath() {

@@ -99,7 +99,21 @@
 			<version>2.9.2</version><!--$NO-MVN-MAN-VER$ -->
 		</dependency>
 
-		<!-- Test dependencies -->
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>2.9.2</version><!--$NO-MVN-MAN-VER$ -->
+		</dependency>
+
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <version>2.9.0</version><!--$NO-MVN-MAN-VER$-->
+        </dependency>
+
+
+        <!-- Test dependencies -->
 		<dependency>
 			<groupId>commons-httpclient</groupId>
 			<artifactId>commons-httpclient</artifactId>
@@ -117,8 +131,8 @@
         </dependency>
        <dependency>
 		    <groupId>de.flapdoodle.embed</groupId>
-		    <artifactId>de.flapdoodle.embed.mongo</artifactId>
-		    <version>2.0.1</version>
+		    <artifactId>de.flapdoodle.embed.mongo</artifactId><!--$NO-MVN-MAN-VER$-->
+		    <version>2.0.1</version><!--$NO-MVN-MAN-VER$-->
 		    <scope>test</scope>
 		</dependency>
 
@@ -149,6 +163,21 @@
 							<format>html</format>
 							<format>xml</format>
 						</formats>
+						<instrumentation>
+						<ignoreTrivial>true</ignoreTrivial>
+						<ignoreMethodAnnotation>com.epam.asset.tracking.annotation.CoverageIgnore</ignoreMethodAnnotation>
+							<excludes>
+								<!--Excluding custom Exceptions -->
+								<exclude>com/epam/asset/tracking/exception/**/*.class</exclude>
+								<!--Excluding /domain & DTO POJOs -->
+								<exclude>com/epam/asset/tracking/domain/**/*.class</exclude>
+								<exclude>com/epam/asset/tracking/dto/**/*.class</exclude>
+								<!--Excluding ValidationsUtil because this class is used only as a constants repo -->
+								<exclude>com/epam/asset/tracking/dto/validations/ValidationsUtil.class</exclude>
+								<exclude>org/hyperledger/**/*.class</exclude>
+								<exclude>org/hyperledger/**/*Test.class</exclude>
+							</excludes>
+						</instrumentation>
 						<check />
 					</configuration>
 				</plugin>
@@ -165,7 +194,7 @@
 				<artifactId>maven-checkstyle-plugin</artifactId>
 				<configuration>
 					<configLocation>code-style/checkstyle-configuration.xml</configLocation>
-					<consoleOutput>true</consoleOutput>
+					<consoleOutput>false</consoleOutput>
 					<includeTestSourceDirectory>true</includeTestSourceDirectory>
 				</configuration>
 				<executions>

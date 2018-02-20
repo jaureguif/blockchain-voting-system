@@ -17,7 +17,6 @@ import com.epam.asset.tracking.dto.EntityDTO;
 import com.epam.asset.tracking.repository.BusinessProviderRepository;
 import com.epam.asset.tracking.service.ApiService;
 import com.epam.asset.tracking.service.BusinessProviderService;
-import com.epam.asset.tracking.service.EntityService;
 import com.epam.asset.tracking.web.AbstractWebTest;
 
 import ma.glasnost.orika.MapperFacade;
@@ -26,9 +25,6 @@ public class EntityControllerTest extends AbstractWebTest{
 	
 	@MockBean
 	ApiService api;
-	
-	@MockBean
-	EntityService entity;
 	
 	@MockBean
 	MapperFacade mapperFacade;

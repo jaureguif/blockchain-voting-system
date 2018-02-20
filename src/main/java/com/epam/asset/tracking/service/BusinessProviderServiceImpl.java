@@ -17,17 +17,4 @@ public class BusinessProviderServiceImpl  implements BusinessProviderService{
 		 return repository.save(entity);
 	}
 
-	@Override
-	public BusinessProvider findByName(String name) {
-		return repository.findByName(name);
-	}
-
-	public BusinessProviderRepository getRepository() {
-		return repository;
-	}
-
-	public void setRepository(BusinessProviderRepository repository) {
-		this.repository = repository;
-	}
-
 }

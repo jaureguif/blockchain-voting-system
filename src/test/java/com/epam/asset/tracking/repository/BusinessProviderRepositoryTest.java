@@ -27,7 +27,6 @@ public class BusinessProviderRepositoryTest {
 	private static final String CITY = "GDL";
 	private static final String COUNTRY = "Mexico";
 	private static final String STATE = "Jalisco";
-	private static final int NUMBER = 2234;
 	private static final String ZIPCODE = "3332";
 	private static final String STREET = "Anillo periferico";
 	private static final BUSINESS_TYPE BIZZ_TYPE = BUSINESS_TYPE.CAR_SELLER;
@@ -61,8 +60,9 @@ public class BusinessProviderRepositoryTest {
 		
 		//Retrieve it from in-memory database to check that it was actually saved
 		BusinessProvider businessProviderFromDb = repository.findByName(NAME);
-		assertEquals(entity, businessProviderFromDb);
 		
+		assertEquals(entity, businessProviderFromDb);
+		logger.info("Retrieve it from in-memory database succeded");
 		
 	}
 
