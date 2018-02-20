@@ -27,12 +27,12 @@ public class JsonStringToAssetConverter extends CustomConverter<String, Asset> {
 	 * @return Asset
 	 *
 	 **/
+	
+	private ObjectMapper objectMapper = new ObjectMapper();
 
 	@Override
 	public Asset convert(String source, Type<? extends Asset> destinationType) throws AssetConvertException {
 		Asset asset = null;
-
-		ObjectMapper objectMapper = new ObjectMapper();
 
 		if (!StringUtils.isEmpty(source)) {
 			try {
