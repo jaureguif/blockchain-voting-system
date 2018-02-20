@@ -68,6 +68,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.epam.asset.tracking.annotation.CoverageIgnore;
 import com.epam.asset.tracking.domain.Asset;
 import com.epam.asset.tracking.exception.AssetNotFoundException;
 import com.epam.asset.tracking.service.ApiService;
@@ -640,6 +641,7 @@ class SampleUser implements User, Serializable {
 	 * Restore the state of this user from the key value store (if found). If not
 	 * found, do nothing.
 	 */
+	@CoverageIgnore
 	SampleUser restoreState() {
 		String memberStr = keyValStore.getValue(keyValStoreName);
 		if (null != memberStr) {
