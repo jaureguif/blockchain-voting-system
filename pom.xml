@@ -165,6 +165,7 @@
 						</formats>
 						<instrumentation>
 						<ignoreTrivial>true</ignoreTrivial>
+						<ignoreMethodAnnotation>com.epam.asset.tracking.annotation.CoverageIgnore</ignoreMethodAnnotation>
 							<excludes>
 								<!--Excluding custom Exceptions -->
 								<exclude>com/epam/asset/tracking/exception/**/*.class</exclude>
