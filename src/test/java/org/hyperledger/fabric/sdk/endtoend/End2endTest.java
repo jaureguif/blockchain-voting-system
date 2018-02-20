@@ -45,6 +45,8 @@ import org.hyperledger.fabric.sdk.ProposalResponse;
 import org.hyperledger.fabric.sdk.QueryByChaincodeRequest;
 import org.hyperledger.fabric.sdk.SDKUtils;
 import org.hyperledger.fabric.sdk.TestConfigHelper;
+import org.hyperledger.fabric.sdk.TransactionProposalRequest;
+import org.hyperledger.fabric.sdk.TxReadWriteSetInfo;
 import org.hyperledger.fabric.sdk.exception.TransactionEventException;
 import org.hyperledger.fabric.sdk.security.CryptoSuite;
 import org.hyperledger.fabric.sdk.testutils.TestConfig;
@@ -75,6 +77,8 @@ public class End2endTest {
 
   private static final String FOO_CHANNEL_NAME = "foo";
   private static final String BAR_CHANNEL_NAME = "bar";
+  private static final byte[] EXPECTED_EVENT_DATA = "!".getBytes(UTF_8);
+  private static final String EXPECTED_EVENT_NAME = "event";
   private static final Map<String, String> TX_EXPECTED;
 
   static {
@@ -436,7 +440,133 @@ public class End2endTest {
         }
 
         return null;
-      }).exceptionally(e -> {
+      })
+       .thenApply(transactionEvent -> {
+        try {
+
+          waitOnFabric(0);
+
+          successful.clear();
+          failed.clear();
+
+          client.setUserContext(sampleOrg.getUser(TESTUSER_1_NAME));
+
+          ///////////////
+          /// Send transaction proposal to all peers
+          TransactionProposalRequest transactionProposalRequest  = client.newTransactionProposalRequest();
+          transactionProposalRequest.setArgs(new String[] {"create", "1", "1", "TERMINATOR", " Cyberdyne Systems", " Model 101 Series 800 Terminator"});
+          transactionProposalRequest.setFcn("invoke");
+          transactionProposalRequest.setProposalWaitTime(testConfig.getProposalWaitTime());
+          transactionProposalRequest.setChaincodeID(chaincodeID);
+
+          Map<String, byte[]> tm2 = new HashMap<>();
+          tm2.put("HyperLedgerFabric", "TransactionProposalRequest:JavaSDK".getBytes(UTF_8));
+          tm2.put("method", "TransactionProposalRequest".getBytes(UTF_8));
+          tm2.put("result", ":)".getBytes(UTF_8));  // This should be returned see chaincode why.
+          tm2.put(EXPECTED_EVENT_NAME, EXPECTED_EVENT_DATA);  //This should trigger an event see chaincode why.
+          transactionProposalRequest.setTransientMap(tm2);
+
+          out("sending transactionProposal to all peers with arguments: create(\"1\", \"1\", \"TERMINATOR\", \" Cyberdyne Systems\", \" Model 101 Series 800 Terminator\")");
+
+          Collection<ProposalResponse> transactionPropResp = channel.sendTransactionProposal(transactionProposalRequest, channel.getPeers());
+          for (ProposalResponse response : transactionPropResp) {
+            if (response.getStatus() == ProposalResponse.Status.SUCCESS) {
+              out("Successful transaction proposal response Txid: %s from peer %s", response.getTransactionID(), response.getPeer().getName());
+              successful.add(response);
+            } else {
+              failed.add(response);
+            }
+          }
+
+          // Check that all the proposals are consistent with each other. We should have only one set
+          // where all the proposals above are consistent. Note the when sending to Orderer this is done automatically.
+          //  Shown here as an example that applications can invoke and select.
+          // See org.hyperledger.fabric.sdk.proposal.consistency_validation config property.
+          Collection<Set<ProposalResponse>> proposalConsistencySets = SDKUtils.getProposalConsistencySets(transactionPropResp);
+          if (proposalConsistencySets.size() != 1) {
+            fail(format("Expected only one set of consistent proposal responses but got %d", proposalConsistencySets.size()));
+          }
+
+          out("Received %d transaction proposal responses. Successful+verified: %d . Failed: %d",
+              transactionPropResp.size(), successful.size(), failed.size());
+          if (failed.size() > 0) {
+            ProposalResponse firstTransactionProposalResponse = failed.iterator().next();
+            fail("Not enough endorsers for create():" + failed.size() + " endorser error: " +
+                firstTransactionProposalResponse.getMessage() +
+                ". Was verified: " + firstTransactionProposalResponse.isVerified());
+          }
+          out("Successfully received transaction proposal responses.");
+
+          ProposalResponse resp = transactionPropResp.iterator().next();
+          byte[] x = resp.getChaincodeActionResponsePayload(); // This is the data returned by the chaincode.
+          String resultAsString = null;
+          if (x != null) {
+            resultAsString = new String(x, "UTF-8");
+          }
+          out("Result: " + resultAsString + ", " + resp.getChaincodeActionResponseStatus());
+
+
+          ////////////////////////////
+          // Send Transaction Transaction to orderer
+          out("Sending chaincode transaction(create) to orderer.");
+          return channel.sendTransaction(successful).get(testConfig.getTransactionWaitTime(), TimeUnit.SECONDS);
+
+        } catch (Exception e) {
+          out("Caught an exception while invoking chaincode");
+          e.printStackTrace();
+          fail("Failed invoking chaincode with error : " + e.getMessage());
+        }
+
+         return null;
+       })
+             .thenApply(transactionEvent -> {
+
+               try {
+
+                 waitOnFabric(0);
+
+                 out("Finished transaction with transaction id %s", transactionEvent.getTransactionID());
+                 testTxID = transactionEvent.getTransactionID(); // used in the channel queries later
+
+                 out("Query chaincode and see if the Terminator was added");
+                 QueryByChaincodeRequest queryByChaincodeRequest = client.newQueryProposalRequest();
+                 queryByChaincodeRequest.setArgs(new String[]{"query", "1"});
+                 queryByChaincodeRequest.setFcn("invoke");
+                 queryByChaincodeRequest.setChaincodeID(chaincodeID);
+
+                 Map<String, byte[]> tm2 = new HashMap<>();
+                 tm2.put("HyperLedgerFabric", "QueryByChaincodeRequest:JavaSDK".getBytes(UTF_8));
+                 tm2.put("method", "QueryByChaincodeRequest".getBytes(UTF_8));
+                 queryByChaincodeRequest.setTransientMap(tm2);
+
+                 Collection<ProposalResponse> queryProposals = channel
+                     .queryByChaincode(queryByChaincodeRequest, channel.getPeers());
+                 for (ProposalResponse proposalResponse : queryProposals) {
+                   if (!proposalResponse.isVerified()
+                       || proposalResponse.getStatus() != ProposalResponse.Status.SUCCESS) {
+                     fail("Failed query proposal from peer " + proposalResponse.getPeer().getName()
+                         + " status: " + proposalResponse.getStatus() +
+                         ". Messages: " + proposalResponse.getMessage()
+                         + ". Was verified : " + proposalResponse.isVerified());
+                   } else {
+                     String payload = proposalResponse.getProposalResponse().getResponse().getPayload()
+                                                      .toStringUtf8();
+                     out("Query payload from peer %s returned %s", proposalResponse.getPeer().getName(),
+                         payload);
+                     assertThat(payload).isNotNull().isNotBlank();
+                   }
+                 }
+
+                 return null;
+               } catch (Exception e) {
+                 out("Caught exception while running query");
+                 e.printStackTrace();
+                 fail("Failed during chaincode query with error : " + e.getMessage());
+               }
+
+               return null;
+             })
+       .exceptionally(e -> {
         if (e instanceof TransactionEventException) {
           BlockEvent.TransactionEvent te = ((TransactionEventException) e).getTransactionEvent();
           if (te != null) {
