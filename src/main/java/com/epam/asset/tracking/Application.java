@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
-import annotation.CoverageIgnore;
+import com.epam.asset.tracking.annotation.CoverageIgnore;
 
 @SpringBootApplication
 @Configuration

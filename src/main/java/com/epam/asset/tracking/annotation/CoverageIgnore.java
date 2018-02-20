@@ -1,4 +1,4 @@
-package annotation;
+package com.epam.asset.tracking.annotation;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
