@@ -116,7 +116,7 @@ public class ApiServiceImpl implements ApiService {
 		return mapper.map(jsonStr, Asset.class);
 
 	}
-	
+
 	private String getAssetFromFabric(UUID id)
 			throws InvalidArgumentException, ProposalException, AssetNotFoundException {
 		String payload = null;
@@ -166,11 +166,11 @@ public class ApiServiceImpl implements ApiService {
 		return payload;
 	}
 
-	private void setup() throws MalformedURLException, NoSuchFieldException, SecurityException, IllegalArgumentException,
-			IllegalAccessException {
+	private void setup() throws MalformedURLException, NoSuchFieldException, SecurityException,
+			IllegalArgumentException, IllegalAccessException {
 
 		log.info("RUNNING: setup.");
-		
+
 		configHelper.clearConfig();
 		configHelper.customizeConfig();
 
@@ -544,7 +544,7 @@ class SampleUser implements User, Serializable {
 		if (null == memberStr) {
 			saveState();
 		} else {
-			//restoreState();
+			// restoreState();
 		}
 
 	}
@@ -1182,7 +1182,8 @@ class TestConfig {
 
 	}
 
-	//private final static String tlsbase = "src/test/fixture/sdkintegration/e2e-2Orgs/tls/";
+	// private final static String tlsbase =
+	// "src/test/fixture/sdkintegration/e2e-2Orgs/tls/";
 
 	public Properties getPeerProperties(String name) {
 

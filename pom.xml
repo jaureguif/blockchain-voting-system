@@ -169,8 +169,9 @@
 							<excludes>
 								<!--Excluding custom Exceptions -->
 								<exclude>com/epam/asset/tracking/exception/**/*.class</exclude>
-								<!--Excluding /domain POJOs -->
+								<!--Excluding /domain & DTO POJOs -->
 								<exclude>com/epam/asset/tracking/domain/**/*.class</exclude>
+								<exclude>com/epam/asset/tracking/dto/**/*.class</exclude>
 								<!--Excluding ValidationsUtil because this class is used only as a constants repo -->
 								<exclude>com/epam/asset/tracking/dto/validations/ValidationsUtil.class</exclude>
 								<exclude>org/hyperledger/**/*.class</exclude>
