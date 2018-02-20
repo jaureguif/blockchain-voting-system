@@ -13,6 +13,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
+import annotation.CoverageIgnore;
+
 @SpringBootApplication
 @Configuration
 @EnableAutoConfiguration
@@ -20,6 +22,7 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 public class Application {
 	Logger log = LoggerFactory.getLogger(Application.class);
 
+	@CoverageIgnore
 	public static void main(String[] args) {
 		SpringApplication.run(Application.class, args);
 
