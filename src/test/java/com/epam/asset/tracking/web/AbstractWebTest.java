@@ -12,7 +12,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @RunWith(SpringRunner.class)
 @WebMvcTest
 @AutoConfigureMockMvc
-public abstract class AbstractWebTest {
+public abstract class
+AbstractWebTest {
 	
 	@Autowired
 	protected MockMvc mockMvc;
