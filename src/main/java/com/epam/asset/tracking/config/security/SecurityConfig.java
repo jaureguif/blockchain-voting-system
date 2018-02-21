@@ -1,5 +1,6 @@
 package com.epam.asset.tracking.config.security;
 
+import com.epam.asset.tracking.service.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -37,6 +38,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Resource(name = "userService")
     private UserDetailsService userDetailsService;
 
+    @Bean
+    public UserDetailsService mongoUserDetails() {
+        return new UserServiceImpl();
+    }
+
     @Autowired
     private ClientDetailsService clientDetailsService;
 
@@ -49,7 +55,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     public void globalUserDetails(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService(userDetailsService)
-                .passwordEncoder(encoder());
+               .passwordEncoder(encoder());
     }
 
     @Override
@@ -59,18 +65,22 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         .anonymous().disable()
         .authorizeRequests()
         			.antMatchers("swagger-ui.html").permitAll()
-                .antMatchers("/asset/**").hasAnyRole("ADMIN", "USER")
+                .antMatchers("/asset/**").hasAnyRole("BUSINESS_PROVIDER", "USER")
                 .and()
         .httpBasic();
     }
     
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-            auth
+
+        UserDetailsService userDetailsService = mongoUserDetails();
+
+        auth.userDetailsService(userDetailsService);
+            /*auth
                     .inMemoryAuthentication()
                             .withUser("user").password("password").roles("USER")
                             .and()
-                            .withUser("admin").password("admin").roles("ADMIN");
+                            .withUser("admin").password("admin").roles("ADMIN");*/
     }
 
     @Bean
