@@ -68,6 +68,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.epam.asset.tracking.annotation.CoverageIgnore;
 import com.epam.asset.tracking.domain.Asset;
 import com.epam.asset.tracking.exception.AssetNotFoundException;
 import com.epam.asset.tracking.service.ApiService;
@@ -115,7 +116,7 @@ public class ApiServiceImpl implements ApiService {
 		return mapper.map(jsonStr, Asset.class);
 
 	}
-	
+
 	private String getAssetFromFabric(UUID id)
 			throws InvalidArgumentException, ProposalException, AssetNotFoundException {
 		String payload = null;
@@ -165,11 +166,11 @@ public class ApiServiceImpl implements ApiService {
 		return payload;
 	}
 
-	private void setup() throws MalformedURLException, NoSuchFieldException, SecurityException, IllegalArgumentException,
-			IllegalAccessException {
+	private void setup() throws MalformedURLException, NoSuchFieldException, SecurityException,
+			IllegalArgumentException, IllegalAccessException {
 
 		log.info("RUNNING: setup.");
-		
+
 		configHelper.clearConfig();
 		configHelper.customizeConfig();
 
@@ -543,7 +544,7 @@ class SampleUser implements User, Serializable {
 		if (null == memberStr) {
 			saveState();
 		} else {
-			//restoreState();
+			// restoreState();
 		}
 
 	}
@@ -640,6 +641,7 @@ class SampleUser implements User, Serializable {
 	 * Restore the state of this user from the key value store (if found). If not
 	 * found, do nothing.
 	 */
+	@CoverageIgnore
 	SampleUser restoreState() {
 		String memberStr = keyValStore.getValue(keyValStoreName);
 		if (null != memberStr) {
@@ -1180,7 +1182,8 @@ class TestConfig {
 
 	}
 
-	//private final static String tlsbase = "src/test/fixture/sdkintegration/e2e-2Orgs/tls/";
+	// private final static String tlsbase =
+	// "src/test/fixture/sdkintegration/e2e-2Orgs/tls/";
 
 	public Properties getPeerProperties(String name) {
 

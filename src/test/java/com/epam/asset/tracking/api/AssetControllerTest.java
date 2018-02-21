@@ -3,24 +3,17 @@ package com.epam.asset.tracking.api;
 import com.epam.asset.tracking.repository.BusinessProviderRepository;
 import com.epam.asset.tracking.service.ApiService;
 import com.epam.asset.tracking.service.BusinessProviderService;
-import com.epam.asset.tracking.service.EntityService;
 import com.epam.asset.tracking.web.AbstractWebTest;
 import ma.glasnost.orika.MapperFacade;
-import org.hamcrest.text.IsEmptyString;
 import org.junit.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
 
 public class AssetControllerTest extends AbstractWebTest {
     @MockBean
     ApiService api;
-
-    @MockBean
-    EntityService entity;
 
     @MockBean
     MapperFacade mapperFacade;

@@ -22,7 +22,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
-import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -73,14 +72,11 @@ public class EntityController {
 		BusinessProvider bp = mapper.map(entity, BusinessProvider.class);
 		
 		try {
-		businessProviderService.save(bp);
+			businessProviderService.save(bp);
 		}
 		catch(DuplicateKeyException dke) {
 			logger.info("Duplicated username {}, {}", bp.getUsername(), bp);
-			throw new DuplicateKeyExceptionWrapper("Duplicated username: " + bp.getUsername(), dke);
-			
+			throw new DuplicateKeyExceptionWrapper("Duplicated username: " + bp.getUsername(), dke);	
 		}
-
 	}
-
 }

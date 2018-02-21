@@ -30,6 +30,8 @@ import org.apache.commons.logging.LogFactory;
 import org.hyperledger.fabric.sdk.helper.Utils;
 import org.hyperledger.fabric.sdkintegration.SampleOrg;
 
+import com.epam.asset.tracking.annotation.CoverageIgnore;
+
 /**
  * Config allows for a global config of the toolkit. Central location for all
  * toolkit configuration defaults. Has a local config file that can override any
@@ -326,6 +328,7 @@ public class TestConfig {
 
 	}
 
+	@CoverageIgnore
 	private Properties getTLSProperties(String type, String name) {
 		Properties ret = null;
 		if (runningFabricTLS) {
@@ -343,6 +346,7 @@ public class TestConfig {
 		return ret;
 	}
 
+	@CoverageIgnore
 	private Properties getTLSProperties(String cert) {
 		Properties ret = null;
 		if (runningFabricTLS) {

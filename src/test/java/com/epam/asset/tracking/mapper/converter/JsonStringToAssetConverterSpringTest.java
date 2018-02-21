@@ -1,15 +1,14 @@
 package com.epam.asset.tracking.mapper.converter;
 
-import com.epam.asset.tracking.domain.Asset;
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.stereotype.Component;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import static org.junit.Assert.assertEquals;
+import com.epam.asset.tracking.domain.Asset;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest

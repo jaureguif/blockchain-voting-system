@@ -1,9 +1,18 @@
 package com.epam.asset.tracking.mapper.converter;
 
-import com.epam.asset.tracking.domain.Asset;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertEquals;
+
+import java.io.IOException;
+
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import com.epam.asset.tracking.domain.Asset;
+import com.epam.asset.tracking.exception.AssetConvertException;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 
 public class JsonStringToAssetConverterTest {
 
@@ -28,4 +37,40 @@ public class JsonStringToAssetConverterTest {
 
 
     }
+    
+    @Test
+    public void convertJSONStringToAssetEmptyString(){
+
+        String jsonAsset = "";
+
+        JsonStringToAssetConverter converter = new JsonStringToAssetConverter();
+
+
+        Asset asset = null;
+
+        //Converts the given JSON Script into an Asset Object
+        asset  = converter.convert(jsonAsset, null);
+
+        //Check if the values from the Asset object created matched the on the JSON String
+        assertThat("Asset is not null", asset, is(nullValue()));
+
+    }
+    
+    
+    @Test(expected = AssetConvertException.class)
+    public void convertJSONStringToAssetThrowsException() throws JsonParseException, JsonMappingException, IOException{
+
+        String jsonAsset = "notEmpty";
+
+        JsonStringToAssetConverter converter = new JsonStringToAssetConverter();
+
+        
+        //Converts the given JSON Script into an Asset Object (Expecting an exception to be thrown)
+        converter.convert(jsonAsset, null);
+
+    }
+    
+    
+    
+    
 }

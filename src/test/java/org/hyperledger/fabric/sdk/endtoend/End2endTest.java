@@ -16,7 +16,6 @@ package org.hyperledger.fabric.sdk.endtoend;
 
 import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 
@@ -254,7 +253,8 @@ public class End2endTest {
       channel.setTransactionWaitTime(testConfig.getTransactionWaitTime());
       channel.setDeployWaitTime(testConfig.getDeployWaitTime());
 
-      Collection<Peer> channelPeers = channel.getPeers();
+      @SuppressWarnings("unused")
+			Collection<Peer> channelPeers = channel.getPeers();
       Collection<Orderer> orderers = channel.getOrderers();
       final ChaincodeID chaincodeID;
       Collection<ProposalResponse> responses;

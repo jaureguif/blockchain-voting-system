@@ -8,4 +8,6 @@ public interface BusinessProviderRepository extends MongoRepository<BusinessProv
 	
 	public BusinessProvider findByName(String name);
 
+	public BusinessProvider findByUsername(String name);
+
 }

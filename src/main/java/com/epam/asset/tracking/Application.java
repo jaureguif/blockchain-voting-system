@@ -14,6 +14,11 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
+<<<<<<< HEAD
+
+import com.epam.asset.tracking.annotation.CoverageIgnore;
+=======
+>>>>>>> d9dfe09f45935f85a0696d0d7a22e11765520849
 
 @SpringBootApplication
 @EnableResourceServer
@@ -24,6 +29,7 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.E
 public class Application {
 	Logger log = LoggerFactory.getLogger(Application.class);
 
+	@CoverageIgnore
 	public static void main(String[] args) {
 		SpringApplication.run(Application.class, args);
 
