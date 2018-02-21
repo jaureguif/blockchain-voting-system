@@ -30,7 +30,7 @@ public class AssetController {
 	@Autowired
 	ApiService api;
 
-	@RolesAllowed("ROLE_ADMIN")
+	@RolesAllowed("ROLE_BUSINESS_PROVIDER")
 	@GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation("Getting a unique Asset by its Id")
 	@ApiResponses({@ApiResponse(code = 200, message = "Returns an Asset by its Id", response = Asset.class),
