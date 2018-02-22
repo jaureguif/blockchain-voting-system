@@ -1,6 +1,7 @@
 package com.epam.asset.tracking.api;
 
 import com.epam.asset.tracking.domain.Asset;
+import com.epam.asset.tracking.dto.AssetDTO;
 import com.epam.asset.tracking.exception.AssetNotFoundException;
 import com.epam.asset.tracking.service.ApiService;
 import io.swagger.annotations.ApiOperation;
@@ -17,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -29,7 +31,7 @@ public class AssetController {
 	ApiService api;
 
 	@GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-	@ApiOperation("Getting a unique Asset by its Id")
+	@ApiOperation("Getting an unique Asset by its Id")
 	@ApiResponses({@ApiResponse(code = 200, message = "Returns an Asset by its Id", response = Asset.class),
 		@ApiResponse(code = 400, message = "Bad, request. Most-likely the id is not a valid UUID string"),
 		@ApiResponse(code = 404, message = "Asset with given UUID was not found")})
@@ -41,5 +43,18 @@ public class AssetController {
 
 		return api.getAssetById(id);
 	}
+	
+	@ApiOperation("Post an Asset")
+	@ApiResponses({@ApiResponse(code = 201, message = "Returns saved Asset", response = Asset.class),
+		@ApiResponse(code = 400, message = "Bad, request.")})
+
+	@PostMapping(consumes= {"multipart/form-data"} )
+	public AssetDTO postAsset(@RequestBody AssetDTO asset) {
+		logger.debug("Call to POST:/asset/tracking/asset");
+		return ResponseEntity.created(location)
+	}
+		
+	
+	
 
 }
