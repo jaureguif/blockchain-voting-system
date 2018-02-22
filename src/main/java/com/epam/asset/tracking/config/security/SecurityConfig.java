@@ -1,10 +1,12 @@
 package com.epam.asset.tracking.config.security;
 
-import com.epam.asset.tracking.service.UserServiceImpl;
+import javax.annotation.Resource;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -17,7 +19,6 @@ import org.springframework.security.oauth2.provider.ClientDetailsService;
 import org.springframework.security.oauth2.provider.approval.ApprovalStore;
 import org.springframework.security.oauth2.provider.approval.TokenApprovalStore;
 import org.springframework.security.oauth2.provider.approval.TokenStoreUserApprovalHandler;
-import org.springframework.security.oauth2.provider.error.OAuth2AccessDeniedHandler;
 import org.springframework.security.oauth2.provider.request.DefaultOAuth2RequestFactory;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.InMemoryTokenStore;
@@ -25,103 +26,100 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
-import javax.annotation.Resource;
+import com.epam.asset.tracking.service.UserServiceImpl;
 
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(
-	    securedEnabled = true,
-	    jsr250Enabled = true,
-	    prePostEnabled = true)
+@EnableGlobalMethodSecurity(securedEnabled = true, jsr250Enabled = true, prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    @Resource(name = "userService")
-    private UserDetailsService userDetailsService;
+	@Resource(name = "userService")
+	private UserDetailsService userDetailsService;
 
-    @Bean
-    public UserDetailsService mongoUserDetails() {
-        return new UserServiceImpl();
-    }
+	@Bean
+	public UserDetailsService mongoUserDetails() {
+		return new UserServiceImpl();
+	}
 
-    @Autowired
-    private ClientDetailsService clientDetailsService;
+	@Autowired
+	private ClientDetailsService clientDetailsService;
 
-    @Override
-    @Bean
-    public AuthenticationManager authenticationManagerBean() throws Exception {
-        return super.authenticationManagerBean();
-    }
+	@Override
+	@Bean
+	public AuthenticationManager authenticationManagerBean() throws Exception {
+		return super.authenticationManagerBean();
+	}
 
-    @Autowired
-    public void globalUserDetails(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userDetailsService)
-               .passwordEncoder(encoder());
-    }
+	@Autowired
+	public void globalUserDetails(AuthenticationManagerBuilder auth) throws Exception {
+		auth.userDetailsService(userDetailsService).passwordEncoder(encoder());
+	}
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http
-        .csrf().disable()
-        .anonymous().disable()
-        .authorizeRequests()
-        			.antMatchers("swagger-ui.html").permitAll()
-                .antMatchers("/asset/**").hasAnyRole("BUSINESS_PROVIDER", "USER")
-                .and()
-        .httpBasic();
-    }
-    
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+	@Override
+	protected void configure(HttpSecurity http) throws Exception {
+		http
+			.csrf().disable()
+			.authorizeRequests()
+				.antMatchers("/swagger-ui.html").permitAll()
+				.mvcMatchers(HttpMethod.GET, "/asset/tracking/entity/*").permitAll()
+				.mvcMatchers(HttpMethod.GET, "/asset/tracking/asset/*").permitAll()
+				.mvcMatchers(HttpMethod.POST, "/asset/tracking/asset/").hasAnyRole("BUSINESS_PROVIDER", "USER")
+				.mvcMatchers(HttpMethod.PUT, "/asset/tracking/asset/").hasAnyRole("BUSINESS_PROVIDER", "USER")
+				.and().httpBasic();
+	}
 
-        UserDetailsService userDetailsService = mongoUserDetails();
+	@Override
+	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
 
-        auth.userDetailsService(userDetailsService);
-            /*auth
-                    .inMemoryAuthentication()
-                            .withUser("user").password("password").roles("USER")
-                            .and()
-                            .withUser("admin").password("admin").roles("ADMIN");*/
-    }
+		UserDetailsService userDetailsService = mongoUserDetails();
 
-    @Bean
-    public TokenStore tokenStore() {
-        return new InMemoryTokenStore();
-    }
+		auth.userDetailsService(userDetailsService);
+		/*
+		 * auth .inMemoryAuthentication()
+		 * .withUser("user").password("password").roles("USER") .and()
+		 * .withUser("admin").password("admin").roles("ADMIN");
+		 */
+	}
 
-    @Bean
-    @Autowired
-    public TokenStoreUserApprovalHandler userApprovalHandler(TokenStore tokenStore){
-        TokenStoreUserApprovalHandler handler = new TokenStoreUserApprovalHandler();
-        handler.setTokenStore(tokenStore);
-        handler.setRequestFactory(new DefaultOAuth2RequestFactory(clientDetailsService));
-        handler.setClientDetailsService(clientDetailsService);
-        return handler;
-    }
+	@Bean
+	public TokenStore tokenStore() {
+		return new InMemoryTokenStore();
+	}
 
-    @Bean
-    @Autowired
-    public ApprovalStore approvalStore(TokenStore tokenStore) throws Exception {
-        TokenApprovalStore store = new TokenApprovalStore();
-        store.setTokenStore(tokenStore);
-        return store;
-    }
+	@Bean
+	@Autowired
+	public TokenStoreUserApprovalHandler userApprovalHandler(TokenStore tokenStore) {
+		TokenStoreUserApprovalHandler handler = new TokenStoreUserApprovalHandler();
+		handler.setTokenStore(tokenStore);
+		handler.setRequestFactory(new DefaultOAuth2RequestFactory(clientDetailsService));
+		handler.setClientDetailsService(clientDetailsService);
+		return handler;
+	}
 
-    @Bean
-    public BCryptPasswordEncoder encoder(){
-        return new BCryptPasswordEncoder();
-    }
+	@Bean
+	@Autowired
+	public ApprovalStore approvalStore(TokenStore tokenStore) throws Exception {
+		TokenApprovalStore store = new TokenApprovalStore();
+		store.setTokenStore(tokenStore);
+		return store;
+	}
 
-    @Bean
-    public FilterRegistrationBean corsFilter() {
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        CorsConfiguration config = new CorsConfiguration();
-        config.setAllowCredentials(true);
-        config.addAllowedOrigin("*");
-        config.addAllowedHeader("*");
-        config.addAllowedMethod("*");
-        source.registerCorsConfiguration("/**", config);
-        FilterRegistrationBean bean = new FilterRegistrationBean(new CorsFilter(source));
-        bean.setOrder(0);
-        return bean;
-    }
+	@Bean
+	public BCryptPasswordEncoder encoder() {
+		return new BCryptPasswordEncoder();
+	}
+
+	@Bean
+	public FilterRegistrationBean corsFilter() {
+		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+		CorsConfiguration config = new CorsConfiguration();
+		config.setAllowCredentials(true);
+		config.addAllowedOrigin("*");
+		config.addAllowedHeader("*");
+		config.addAllowedMethod("*");
+		source.registerCorsConfiguration("/**", config);
+		FilterRegistrationBean bean = new FilterRegistrationBean(new CorsFilter(source));
+		bean.setOrder(0);
+		return bean;
+	}
 }

@@ -131,7 +131,6 @@
 		<dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-test</artifactId>
-			<version>4.0.0.RELEASE</version>
 			<scope>test</scope>
 		</dependency>
 
@@ -183,7 +182,16 @@
 							<format>xml</format>
 						</formats>
 						<instrumentation>
+						<ignoreTrivial>true</ignoreTrivial>
+						<ignoreMethodAnnotation>com.epam.asset.tracking.annotation.CoverageIgnore</ignoreMethodAnnotation>
 							<excludes>
+								<!--Excluding custom Exceptions -->
+								<exclude>com/epam/asset/tracking/exception/**/*.class</exclude>
+								<!--Excluding /domain & DTO POJOs -->
+								<exclude>com/epam/asset/tracking/domain/**/*.class</exclude>
+								<exclude>com/epam/asset/tracking/dto/**/*.class</exclude>
+								<!--Excluding ValidationsUtil because this class is used only as a constants repo -->
+								<exclude>com/epam/asset/tracking/dto/validations/ValidationsUtil.class</exclude>
 								<exclude>org/hyperledger/**/*.class</exclude>
 								<exclude>org/hyperledger/**/*Test.class</exclude>
 							</excludes>

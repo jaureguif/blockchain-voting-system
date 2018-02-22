@@ -1,9 +1,11 @@
 package com.epam.asset.tracking.service;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
+import org.apache.commons.lang.NotImplementedException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -11,40 +13,34 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import com.epam.asset.tracking.domain.BusinessProvider;
 import com.epam.asset.tracking.domain.User;
-import com.epam.asset.tracking.domain.User.Role;
+import com.epam.asset.tracking.repository.BusinessProviderRepository;
 
 @Service(value = "userService")
 public class UserServiceImpl implements UserDetailsService, UserService {
-	
-	User user = removeThis();
-	
-	private User removeThis() {
-		User user = new User(Role.ADMIN);
-		user.setUsername("Adam");
-		user.setPassword("$2a$04$I9Q2sDc4QGGg5WNTLmsz0.fvGv3OjoZyj81PrSFyGOqMphqfS2qKu");
-		return user;
-	}
-	
+
+	@Autowired
+	BusinessProviderRepository userRepository;
+
 	@Override
-	public UserDetails loadUserByUsername(String userId) throws UsernameNotFoundException {
-		
-		if(userId == null || !userId.equals(user.getUsername())) {
+	public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
+
+		Optional<BusinessProvider> user = userRepository.findByUsername(userName);
+
+		if (!user.isPresent()) {
 			throw new UsernameNotFoundException("Invalid username or password.");
 		}
-		return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), getAuthority());
+		return new org.springframework.security.core.userdetails.User(user.get().getUsername(),
+				user.get().getPassword(), getAuthority());
 	}
 
-	
 	private List<GrantedAuthority> getAuthority() {
-		return Arrays.asList(new SimpleGrantedAuthority("ROLE_ADMIN"));
+		return Arrays.asList(new SimpleGrantedAuthority("ROLE_BUSINESS_PROVIDER"));
 	}
 
 	@Override
 	public List<User> findAll() {
-		List<User> list = new ArrayList<>();
-		//userDao.findAll().iterator().forEachRemaining(list::add);
-		list.add(user);
-		return list;
+		throw new NotImplementedException();
 	}
 }
