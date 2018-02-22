@@ -1,7 +1,5 @@
 package com.epam.asset.tracking.config.security;
 
-import javax.annotation.Resource;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -33,9 +31,6 @@ import com.epam.asset.tracking.service.UserServiceImpl;
 @EnableGlobalMethodSecurity(securedEnabled = true, jsr250Enabled = true, prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-	@Resource(name = "userService")
-	private UserDetailsService userDetailsService;
-
 	@Bean
 	public UserDetailsService mongoUserDetails() {
 		return new UserServiceImpl();
@@ -48,11 +43,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	@Bean
 	public AuthenticationManager authenticationManagerBean() throws Exception {
 		return super.authenticationManagerBean();
-	}
-
-	@Autowired
-	public void globalUserDetails(AuthenticationManagerBuilder auth) throws Exception {
-		auth.userDetailsService(userDetailsService).passwordEncoder(encoder());
 	}
 
 	@Override
@@ -72,13 +62,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
 
 		UserDetailsService userDetailsService = mongoUserDetails();
-
-		auth.userDetailsService(userDetailsService);
-		/*
-		 * auth .inMemoryAuthentication()
-		 * .withUser("user").password("password").roles("USER") .and()
-		 * .withUser("admin").password("admin").roles("ADMIN");
-		 */
+		auth.userDetailsService(userDetailsService).passwordEncoder(encoder());
+		
 	}
 
 	@Bean

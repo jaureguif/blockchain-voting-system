@@ -18,6 +18,7 @@ public class BusinessProviderServiceImpl implements BusinessProviderService {
 
 	@Override
 	public BusinessProvider save(BusinessProvider entity) {
+		//encode password
 		entity.setPassword(bCryptPasswordEncoder.encode(entity.getPassword()));
 		return repository.save(entity);
 	}
