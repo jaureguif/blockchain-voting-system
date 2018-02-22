@@ -5,7 +5,7 @@ import java.util.Date;
 public class Event {
 	
 	private String summary;
-	private String Description;
+	private String description;
 	private Date date;
 	private String businessProviderId;
 	
@@ -16,10 +16,10 @@ public class Event {
 		this.summary = summary;
 	}
 	public String getDescription() {
-		return Description;
+		return description;
 	}
 	public void setDescription(String description) {
-		Description = description;
+		this.description = description;
 	}
 	public Date getDate() {
 		return date;

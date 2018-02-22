@@ -20,6 +20,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/asset/tracking/asset")
@@ -49,9 +50,10 @@ public class AssetController {
 		@ApiResponse(code = 400, message = "Bad, request.")})
 
 	@PostMapping(consumes= {"multipart/form-data"} )
-	public AssetDTO postAsset(@RequestBody AssetDTO asset) {
+	public AssetDTO postAsset(@RequestPart("file") MultipartFile file ) {
 		logger.debug("Call to POST:/asset/tracking/asset");
-		return ResponseEntity.created(location)
+		
+		return new AssetDTO();
 	}
 		
 	
