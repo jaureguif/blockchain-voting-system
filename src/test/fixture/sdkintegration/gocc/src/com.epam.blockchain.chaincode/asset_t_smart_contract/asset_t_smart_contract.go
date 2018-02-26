@@ -37,7 +37,6 @@ type Asset struct {
 	AssetType    string  `json:"assetType"`
 	OwnerName    string  `json:"ownerName"`
 	Description  string  `json:"description"`
-	Image        string  `json:"image"`
 	Events       []Event `json:"events"`
 }
 
@@ -46,7 +45,8 @@ type Event struct {
 	Description        string `json:"description"`
 	Date               string `json:"date"`
 	BusinessProviderID string `json:"businessProviderId"`
-	Attachment         string `json:"attachment"`
+	EncodedImage       string `json:"encodedImage"`
+	EncodedFiles       string `json:"attachment"`
 }
 
 // Initializes the chaincode state
@@ -179,29 +179,36 @@ func (t *AssetTrackingSmartContract) createAsset(args []string) Asset {
 		Summary:            "CREATED",
 		Description:        "CREATED",
 		Date:               time.Now().Format(time.RFC3339),
-		BusinessProviderID: args[7],
-		Attachment:         args[8],
+		BusinessProviderID: args[6],
 	}
+	if len(args) >= 8 {
+		if t.isBlank(args[7]) == false {
+			event.EncodedImage = args[7]
+		}
+		if len(args) >= 9 && t.isBlank(args[8]) == false {
+			event.EncodedFiles = args[8]
+		}
+	}
+
 	asset := Asset{
 		UUID:         args[1],
 		SerialNumber: args[2],
 		AssetType:    args[3],
 		OwnerName:    args[4],
 		Description:  args[5],
-		Image:        args[6],
 		Events:       []Event{event},
 	}
 	return asset
 }
 
 func (t *AssetTrackingSmartContract) validateAssetParams(args []string) error {
-	if len(args) != 9 {
-		return errors.New("Expecting 9 arguments, actual: " + strconv.Itoa(len(args)))
+	if len(args) < 7 {
+		return errors.New("Expecting 7 arguments, actual: " + strconv.Itoa(len(args)))
 	}
 	errorText := " "
-	for index, element := range args {
-		if t.isBlank(element) {
-			errorText += "[element at index " + strconv.Itoa(index) + " must not be blank] "
+	for i := 1; i <= 6; i++ {
+		if t.isBlank(args[i]) {
+			errorText += "[element at index " + strconv.Itoa(i) + " must not be blank] "
 		}
 	}
 	errorText = strings.TrimSpace(errorText)
