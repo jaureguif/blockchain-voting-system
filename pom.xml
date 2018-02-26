@@ -18,7 +18,7 @@
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>1.5.9.RELEASE</version>
 	</parent>
-	
+
 	<repositories>
 		<repository>
 			<id>hyperledger-snapshots-repo</id>
@@ -106,14 +106,19 @@
 		</dependency>
 
 
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-annotations</artifactId>
-            <version>2.9.0</version><!--$NO-MVN-MAN-VER$-->
-        </dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-annotations</artifactId>
+			<version>2.9.0</version><!--$NO-MVN-MAN-VER$ -->
+		</dependency>
+
+		<dependency>
+			<groupId>com.fasterxml.jackson.datatype</groupId>
+			<artifactId>jackson-datatype-jsr310</artifactId>
+		</dependency>
 
 
-        <!-- Test dependencies -->
+		<!-- Test dependencies -->
 		<dependency>
 			<groupId>commons-httpclient</groupId>
 			<artifactId>commons-httpclient</artifactId>
@@ -126,14 +131,14 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-mongodb</artifactId>
-        </dependency>
-       <dependency>
-		    <groupId>de.flapdoodle.embed</groupId>
-		    <artifactId>de.flapdoodle.embed.mongo</artifactId><!--$NO-MVN-MAN-VER$-->
-		    <version>2.0.1</version><!--$NO-MVN-MAN-VER$-->
-		    <scope>test</scope>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-mongodb</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>de.flapdoodle.embed</groupId>
+			<artifactId>de.flapdoodle.embed.mongo</artifactId><!--$NO-MVN-MAN-VER$ -->
+			<version>2.0.1</version><!--$NO-MVN-MAN-VER$ -->
+			<scope>test</scope>
 		</dependency>
 
 		<!-- Orika -->
@@ -143,21 +148,21 @@
 			<version>1.4.6</version>
 		</dependency>
 		<!-- End Orika -->
-		
+
 		<!-- Multipart File -->
 		<dependency>
-		    <groupId>commons-fileupload</groupId>
-		    <artifactId>commons-fileupload</artifactId>
-		    <version>1.3.1</version>
+			<groupId>commons-fileupload</groupId>
+			<artifactId>commons-fileupload</artifactId>
+			<version>1.3.1</version>
 		</dependency>
 		<!-- End Multipart File -->
-		
+
 		<!-- Live Reload -->
-	    <dependency>
-	        <groupId>org.springframework.boot</groupId>
-	        <artifactId>spring-boot-devtools</artifactId>
-	        <optional>true</optional>
-	    </dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-devtools</artifactId>
+			<optional>true</optional>
+		</dependency>
 		<!-- End Live Reload -->
 
 	</dependencies>
@@ -180,15 +185,16 @@
 							<format>xml</format>
 						</formats>
 						<instrumentation>
-						<ignoreTrivial>true</ignoreTrivial>
-						<ignoreMethodAnnotation>com.epam.asset.tracking.annotation.CoverageIgnore</ignoreMethodAnnotation>
+							<ignoreTrivial>true</ignoreTrivial>
+							<ignoreMethodAnnotation>com.epam.asset.tracking.annotation.CoverageIgnore</ignoreMethodAnnotation>
 							<excludes>
 								<!--Excluding custom Exceptions -->
 								<exclude>com/epam/asset/tracking/exception/**/*.class</exclude>
 								<!--Excluding /domain & DTO POJOs -->
 								<exclude>com/epam/asset/tracking/domain/**/*.class</exclude>
 								<exclude>com/epam/asset/tracking/dto/**/*.class</exclude>
-								<!--Excluding ValidationsUtil because this class is used only as a constants repo -->
+								<!--Excluding ValidationsUtil because this class is used only as 
+									a constants repo -->
 								<exclude>com/epam/asset/tracking/dto/validations/ValidationsUtil.class</exclude>
 								<exclude>org/hyperledger/**/*.class</exclude>
 								<exclude>org/hyperledger/**/*Test.class</exclude>

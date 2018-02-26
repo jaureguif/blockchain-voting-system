@@ -1,6 +1,7 @@
 package com.epam.asset.tracking.api;
 
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -77,12 +78,24 @@ public class AssetController {
     Event registerEvent = new Event();
     registerEvent.setSummary("Asset Registration");
     // registerEvent.setBusinessProviderId(request.getUserPrincipal().getName());
-    //registerEvent.setDate(ZonedDateTime.now());
+    registerEvent.setDate(ZonedDateTime.now());
+    registerEvent.setDescription(String.format("Registration of an asset of type %s     "
+                                              + "On date: %s     "
+                                              + "Serial number: %s     "
+                                              + "Owner name: %s     "
+                                              + "Business provider id: %s     "
+                                              + "Attached image name: %s"
+                                              , asset.getAssetType()
+                                              , registerEvent.getDate().format(DateTimeFormatter.RFC_1123_DATE_TIME)
+                                              , asset.getSerialNumber()
+                                              , asset.getOwnerName()
+                                              , registerEvent.getBusinessProviderId()
+                                              , file.getOriginalFilename()));
     registerEvent.setEncodedImage(mapper.map(file, String.class));
 
     asset.getEvents().add(registerEvent);
     // TODO
-    // saveAsset(asset);
+    // api.saveAsset(asset);
 
     return asset;
   }
