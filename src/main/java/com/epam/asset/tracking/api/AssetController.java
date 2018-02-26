@@ -64,7 +64,7 @@ public class AssetController {
 
   @PostMapping(value = "/", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public Asset postAsset(@RequestPart("file") MultipartFile file, AssetDTO dto, HttpServletRequest request) {
+  public Asset postAsset(@RequestPart("file") MultipartFile file, @Valid AssetDTO dto, HttpServletRequest request) {
     logger.debug("Call to POST:/asset/tracking/asset");
     // TODO validate dto fields
 

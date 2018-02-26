@@ -1,17 +1,17 @@
 package com.epam.asset.tracking.dto;
 
-import org.hibernate.validator.constraints.NotEmpty;
+
 
 public class AssetDTO {
 
   private String serialNumber;
-  @NotEmpty
+  
   private String assetType;
-  @NotEmpty
+  
   private String ownerName;
-  @NotEmpty
+  
   private String description;
-  @NotEmpty
+  
   private String summary;
 
   public String getSerialNumber() {
