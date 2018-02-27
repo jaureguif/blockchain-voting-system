@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,6 +29,9 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
+import io.swagger.annotations.BasicAuthDefinition;
+import io.swagger.annotations.SecurityDefinition;
 import ma.glasnost.orika.MapperFacade;
 
 @RestController
@@ -56,15 +60,17 @@ public class AssetController {
 
     return api.getAssetById(id);
   }
+  
 
-  @ApiOperation("Post an Asset")
+  @ApiOperation(value = "Post an Asset", authorizations = {@Authorization(value="basicAuth")})
   @ApiResponses({@ApiResponse(code = 201, message = "Returns saved Asset", response = Asset.class),
       @ApiResponse(code = 400, message = "Bad, request.")})
 
   @PostMapping(value = "/", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  //@RolesAllowed("ROLE_BUSINESS_PROVIDER")   
-  public Asset postAsset(@RequestPart("file") MultipartFile file, @Valid AssetDTO dto,
+  @Secured(value = {"ROLE_BUSINESS_PROVIDER"})
+  @RolesAllowed("ROLE_BUSINESS_PROVIDER")
+  public Asset postAsset(@RequestPart("file") MultipartFile file, AssetDTO dto,
       HttpServletRequest request) {
     logger.debug("Call to POST:/asset/tracking/asset");
     // TODO validate dto fields
@@ -79,7 +85,7 @@ public class AssetController {
 
     Event registerEvent = new Event();
     registerEvent.setSummary("Asset Registration");
-    //registerEvent.setBusinessProviderId(request.getUserPrincipal().getName());
+    registerEvent.setBusinessProviderId(request.getUserPrincipal().getName());
     registerEvent.setDate(ZonedDateTime.now());
     registerEvent.setDescription(String.format(
         "Registration of an asset of type %s     " + "On date: %s     " + "Serial number: %s     "
