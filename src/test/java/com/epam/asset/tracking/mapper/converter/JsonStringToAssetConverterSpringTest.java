@@ -1,5 +1,8 @@
 package com.epam.asset.tracking.mapper.converter;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
@@ -48,10 +51,7 @@ public class JsonStringToAssetConverterSpringTest {
         asset  = converter.convert(jsonAsset, null);
 
         //Check if the values from the Asset object created matched the on the JSON String
-        assertEquals("Object property should be null when Asset returned is null", asset.getUuid(), null);
-        assertEquals("Object property should be null when Asset returned is null", asset.getSerialNumber(), null);
-        assertEquals("Object property should be null when Asset returned is null",  asset.getAssetType(), null);
-        assertEquals("Object property should be null when Asset returned is null", asset.getDescription(), null);
+        assertThat("Asset is not null", asset, is(nullValue()));
 
 
     }
