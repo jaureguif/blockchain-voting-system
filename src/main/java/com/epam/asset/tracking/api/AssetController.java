@@ -1,5 +1,6 @@
 package com.epam.asset.tracking.api;
 
+import java.lang.reflect.Constructor;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.UUID;
@@ -81,7 +82,8 @@ public class AssetController {
   @Secured(value = {"ROLE_BUSINESS_PROVIDER"})
   @RolesAllowed("ROLE_BUSINESS_PROVIDER")
   public Asset postAsset(@RequestPart("file") MultipartFile file, AssetDTO dto,
-      HttpServletRequest request) throws AssetNotFoundException, NoSuchMethodException, SecurityException, MethodArgumentNotValidException {
+      HttpServletRequest request) throws AssetNotFoundException, NoSuchMethodException,
+      SecurityException, MethodArgumentNotValidException {
     logger.debug("Call to POST:/asset/tracking/asset");
 
     String businessProviderName = businesProviderRepository
@@ -120,19 +122,12 @@ public class AssetController {
   private void validate(AssetDTO asset)
       throws NoSuchMethodException, SecurityException, MethodArgumentNotValidException {
 
-
     BeanPropertyBindingResult errors = new BeanPropertyBindingResult(asset, "asset");
-
     validator.validate(asset, errors);
-
     if (errors.hasErrors()) {
-
       throw new MethodArgumentNotValidException(
-
-          new MethodParameter(null),
-
+          new MethodParameter(this.getClass().getDeclaredMethod("postAsset", MultipartFile.class, AssetDTO.class, HttpServletRequest.class), 0),
           errors);
-
     }
   }
 
