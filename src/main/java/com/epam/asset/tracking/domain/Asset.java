@@ -1,6 +1,7 @@
 package com.epam.asset.tracking.domain;
 
 
+import java.util.HashSet;
 import java.util.Set;
 
 public class Asset {
@@ -31,6 +32,9 @@ public class Asset {
 		this.assetType = assetType;
 	}
 	public Set<Event> getEvents() {
+	    if(events == null) {
+	      events = new HashSet<>();
+	    }
 		return events;
 	}
 	public void setEvents(Set<Event> events) {

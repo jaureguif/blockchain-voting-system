@@ -37,8 +37,8 @@ public class EntityController {
 	@Autowired
 	ApiService api;
 
-	@Autowired
-	private MapperFacade mapper;
+  @Autowired
+  private MapperFacade mapper;
 
 	@Autowired
 	BusinessProviderService businessProviderService;
