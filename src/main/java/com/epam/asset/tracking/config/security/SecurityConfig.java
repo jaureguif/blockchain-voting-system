@@ -53,9 +53,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				.antMatchers("/swagger-ui.html").permitAll()
 				.mvcMatchers("/asset/tracking/entity/*").permitAll()//for all http method
 				.mvcMatchers(HttpMethod.GET, "/asset/tracking/asset/*").permitAll()
-				.mvcMatchers(HttpMethod.POST, "/asset/tracking/asset/")
-				.permitAll()
-				//.hasRole("BUSINESS_PROVIDER")
+				.mvcMatchers(HttpMethod.POST, "/asset/tracking/asset/").hasRole("BUSINESS_PROVIDER")
 				.mvcMatchers(HttpMethod.PUT, "/asset/tracking/asset/").hasRole("BUSINESS_PROVIDER")
 				.and().httpBasic();
 	}

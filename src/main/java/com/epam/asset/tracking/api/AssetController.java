@@ -26,7 +26,6 @@ import com.epam.asset.tracking.dto.AssetDTO;
 import com.epam.asset.tracking.exception.AssetNotFoundException;
 import com.epam.asset.tracking.repository.BusinessProviderRepository;
 import com.epam.asset.tracking.service.ApiService;
-import com.epam.asset.tracking.service.BusinessProviderService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
@@ -96,14 +95,12 @@ public class AssetController {
     registerEvent.setDate(ZonedDateTime.now());
     registerEvent.setDescription(String.format(
         "Registration of an asset of type %s     " + "On date: %s     " + "Serial number: %s     "
-            + "Owner name: %s     " + "Business provider id: %s     " + "Business provider name: %s     " + "Attached image name: %s",
+            + "Owner name: %s     " + "Business provider id: %s     "
+            + "Business provider name: %s     " + "Attached image name: %s",
         asset.getAssetType(), registerEvent.getDate().format(DateTimeFormatter.RFC_1123_DATE_TIME),
-        asset.getSerialNumber(), asset.getOwnerName(), 
-        registerEvent.getBusinessProviderId(),
-        businessProviderName,
-        file.getOriginalFilename()));
+        asset.getSerialNumber(), asset.getOwnerName(), registerEvent.getBusinessProviderId(),
+        businessProviderName, file.getOriginalFilename()));
     registerEvent.setEncodedImage(mapper.map(file, String.class));
-
     asset.getEvents().add(registerEvent);
 
     // Save asset to blockchain
