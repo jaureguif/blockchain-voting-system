@@ -9,9 +9,15 @@ import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.Errors;
+import org.springframework.validation.Validator;
+import org.springframework.validation.beanvalidation.SpringValidatorAdapter;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -63,6 +69,8 @@ public class AssetController {
     return api.getAssetById(id);
   }
 
+  @Autowired
+  private Validator validator;
 
   @ApiOperation(value = "Post an Asset", authorizations = {@Authorization(value = "basicAuth")})
   @ApiResponses({@ApiResponse(code = 201, message = "Returns saved Asset", response = Asset.class),
@@ -73,14 +81,14 @@ public class AssetController {
   @Secured(value = {"ROLE_BUSINESS_PROVIDER"})
   @RolesAllowed("ROLE_BUSINESS_PROVIDER")
   public Asset postAsset(@RequestPart("file") MultipartFile file, AssetDTO dto,
-      HttpServletRequest request) throws AssetNotFoundException {
+      HttpServletRequest request) throws AssetNotFoundException, NoSuchMethodException, SecurityException, MethodArgumentNotValidException {
     logger.debug("Call to POST:/asset/tracking/asset");
-    // TODO validate dto fields
-
 
     String businessProviderName = businesProviderRepository
         .findByUsername(request.getUserPrincipal().getName()).get().getName();
 
+
+    this.validate(dto);
 
     Asset asset = new Asset();
     asset.setUuid(UUID.randomUUID());
@@ -108,4 +116,24 @@ public class AssetController {
 
     return api.getAssetById(asset.getUuid());
   }
+
+  private void validate(AssetDTO asset)
+      throws NoSuchMethodException, SecurityException, MethodArgumentNotValidException {
+
+
+    BeanPropertyBindingResult errors = new BeanPropertyBindingResult(asset, "asset");
+
+    validator.validate(asset, errors);
+
+    if (errors.hasErrors()) {
+
+      throw new MethodArgumentNotValidException(
+
+          new MethodParameter(null),
+
+          errors);
+
+    }
+  }
+
 }

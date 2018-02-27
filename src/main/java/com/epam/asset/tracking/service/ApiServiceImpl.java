@@ -106,12 +106,9 @@ public class ApiServiceImpl implements ApiService {
   public String saveAsset(Asset asset) {
     String result = null;
     try {
-      try {
+     
         result = saveAssetToFabric(asset);
-      } catch (AssetNotFoundException e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
-      }
+     
     } catch (InvalidArgumentException | ProposalException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
@@ -135,7 +132,7 @@ public class ApiServiceImpl implements ApiService {
   }
 
   private String saveAssetToFabric(Asset asset)
-      throws InvalidArgumentException, ProposalException, AssetNotFoundException {
+      throws InvalidArgumentException, ProposalException {
 
     Collection<ProposalResponse> successful = new LinkedList<>();
     Collection<ProposalResponse> failed = new LinkedList<>();

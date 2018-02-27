@@ -1,17 +1,19 @@
 package com.epam.asset.tracking.dto;
 
-
+import javax.validation.constraints.NotNull;
 
 public class AssetDTO {
 
+  
+  @NotNull
   private String serialNumber;
-  
+  @NotNull
   private String assetType;
-  
+  @NotNull
   private String ownerName;
-  
+  @NotNull
   private String description;
-  
+  @NotNull
   private String summary;
 
   public String getSerialNumber() {
