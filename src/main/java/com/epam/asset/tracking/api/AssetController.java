@@ -63,7 +63,7 @@ public class AssetController {
 
   @PostMapping(value = "/", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  @RolesAllowed("ROLE_BUSINESS_PROVIDER")   
+  //@RolesAllowed("ROLE_BUSINESS_PROVIDER")   
   public Asset postAsset(@RequestPart("file") MultipartFile file, @Valid AssetDTO dto,
       HttpServletRequest request) {
     logger.debug("Call to POST:/asset/tracking/asset");
@@ -79,7 +79,7 @@ public class AssetController {
 
     Event registerEvent = new Event();
     registerEvent.setSummary("Asset Registration");
-    registerEvent.setBusinessProviderId(request.getUserPrincipal().getName());
+    //registerEvent.setBusinessProviderId(request.getUserPrincipal().getName());
     registerEvent.setDate(ZonedDateTime.now());
     registerEvent.setDescription(String.format(
         "Registration of an asset of type %s     " + "On date: %s     " + "Serial number: %s     "
@@ -90,8 +90,9 @@ public class AssetController {
     registerEvent.setEncodedImage(mapper.map(file, String.class));
 
     asset.getEvents().add(registerEvent);
-    // TODO
-    // api.saveAsset(asset);
+
+    //Save asset to blockchain
+    api.saveAsset(asset);
 
     return asset;
   }
