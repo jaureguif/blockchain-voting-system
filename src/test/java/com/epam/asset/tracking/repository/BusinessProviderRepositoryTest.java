@@ -59,7 +59,7 @@ public class BusinessProviderRepositoryTest {
 		assertNotNull(result.getId());
 		
 		//Retrieve it from in-memory database to check that it was actually saved
-		BusinessProvider businessProviderFromDb = repository.findByName(NAME);
+		BusinessProvider businessProviderFromDb = repository.findByUsername(USERNAME).get();
 		
 		assertEquals(entity, businessProviderFromDb);
 		logger.info("Retrieve it from in-memory database succeded");
