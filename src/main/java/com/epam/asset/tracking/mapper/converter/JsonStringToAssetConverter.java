@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import com.epam.asset.tracking.domain.Asset;
 import com.epam.asset.tracking.exception.AssetConvertException;
-import com.epam.asset.tracking.service.ApiServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ma.glasnost.orika.CustomConverter;
 import ma.glasnost.orika.metadata.Type;
