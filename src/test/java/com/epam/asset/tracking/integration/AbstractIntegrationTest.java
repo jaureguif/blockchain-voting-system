@@ -32,12 +32,9 @@ public abstract class AbstractIntegrationTest {
 		String executable;
 		if (System.getenv("OS") != null && System.getenv("OS").contains("Windows")) {
 			executable = tempFile + ".exe";
-		} else {
-			executable = tempFile + ".sh";
-		}
-		Files.deleteIfExists(new File(executable).toPath());
-		Files.deleteIfExists(new File(tempFile + ".pid").toPath());
-
+			Files.deleteIfExists(new File(executable).toPath());
+	        Files.deleteIfExists(new File(tempFile + ".pid").toPath());
+		} 
 	}
 	
 }

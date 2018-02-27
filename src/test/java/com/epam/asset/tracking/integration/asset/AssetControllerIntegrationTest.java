@@ -64,6 +64,8 @@ public class AssetControllerIntegrationTest extends AbstractIntegrationTest {
 		System.out.println("USERNAME: " + username);
 		dto.setUsername(username);
 
+		
+		
 		MockMultipartFile multipartFile = new MockMultipartFile("file","FileUploadTest.txt",null, new byte[100]);
 
 		mockMvc.perform(MockMvcRequestBuilders.fileUpload("/asset/tracking/asset/")
