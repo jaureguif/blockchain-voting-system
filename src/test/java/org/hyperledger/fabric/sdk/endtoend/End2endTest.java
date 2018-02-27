@@ -16,10 +16,8 @@ package org.hyperledger.fabric.sdk.endtoend;
 
 import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
-
 import java.io.File;
 import java.net.MalformedURLException;
 import java.nio.file.Paths;
@@ -29,9 +27,7 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-
 import org.hyperledger.fabric.sdk.BlockEvent;
 import org.hyperledger.fabric.sdk.ChaincodeEndorsementPolicy;
 import org.hyperledger.fabric.sdk.ChaincodeID;
@@ -48,7 +44,6 @@ import org.hyperledger.fabric.sdk.QueryByChaincodeRequest;
 import org.hyperledger.fabric.sdk.SDKUtils;
 import org.hyperledger.fabric.sdk.TestConfigHelper;
 import org.hyperledger.fabric.sdk.TransactionProposalRequest;
-import org.hyperledger.fabric.sdk.TxReadWriteSetInfo;
 import org.hyperledger.fabric.sdk.exception.TransactionEventException;
 import org.hyperledger.fabric.sdk.security.CryptoSuite;
 import org.hyperledger.fabric.sdk.testutils.TestConfig;
