@@ -1,15 +1,21 @@
 package com.epam.asset.tracking.domain;
 
 import java.time.ZonedDateTime;
+import com.epam.asset.tracking.mapper.converter.serialize.ZonedDateTimeDeserializer;
+import com.epam.asset.tracking.mapper.converter.serialize.ZonedDateTimeSerializer;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 public class Event {
 
   private String summary;
   private String description;
+  @JsonSerialize(using = ZonedDateTimeSerializer.class)
+  @JsonDeserialize(using = ZonedDateTimeDeserializer.class)
   private ZonedDateTime date;
   private String businessProviderId;
   private String encodedImage;
-  private String encodedFiles;
+  private String attachment;
 
   public String getSummary() {
     return summary;
@@ -51,12 +57,12 @@ public class Event {
     this.encodedImage = encodedImage;
   }
 
-  public String getEncodedFiles() {
-    return encodedFiles;
+  public String getAttachment() {
+    return attachment;
   }
 
-  public void setEncodedFiles(String encodedFiles) {
-    this.encodedFiles = encodedFiles;
+  public void setAttachment(String attachment) {
+    this.attachment = attachment;
   }
 
 

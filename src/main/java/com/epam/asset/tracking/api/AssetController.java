@@ -1,6 +1,27 @@
 package com.epam.asset.tracking.api;
 
 
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.UUID;
+import javax.annotation.security.RolesAllowed;
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+
 import com.epam.asset.tracking.domain.Asset;
 import com.epam.asset.tracking.domain.Event;
 import com.epam.asset.tracking.dto.AssetDTO;
@@ -10,22 +31,11 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import ma.glasnost.orika.MapperFacade;
-import org.apache.commons.lang.NotImplementedException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import javax.annotation.security.RolesAllowed;
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.UUID;
+import ma.glasnost.orika.MapperFacade;
+
+import io.swagger.annotations.Authorization;
+
 
 
 @RestController
@@ -54,16 +64,21 @@ public class AssetController {
 
     return api.getAssetById(id);
   }
+  
 
-  @ApiOperation("Post an Asset")
+  @ApiOperation(value = "Post an Asset", authorizations = {@Authorization(value="basicAuth")})
   @ApiResponses({@ApiResponse(code = 201, message = "Returns saved Asset", response = Asset.class),
       @ApiResponse(code = 400, message = "Bad, request.")})
 
   @PostMapping(value = "/", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public Asset postAsset(@RequestPart("file") MultipartFile file, @Valid AssetDTO dto, HttpServletRequest request) {
+  @Secured(value = {"ROLE_BUSINESS_PROVIDER"})
+  @RolesAllowed("ROLE_BUSINESS_PROVIDER")
+  public Asset postAsset(@RequestPart("file") MultipartFile file, AssetDTO dto,
+      HttpServletRequest request) {
     logger.debug("Call to POST:/asset/tracking/asset");
     // TODO validate dto fields
+
 
     Asset asset = new Asset();
     asset.setUuid(UUID.randomUUID().toString());
@@ -74,25 +89,20 @@ public class AssetController {
 
     Event registerEvent = new Event();
     registerEvent.setSummary("Asset Registration");
-    // registerEvent.setBusinessProviderId(request.getUserPrincipal().getName());
+    registerEvent.setBusinessProviderId(request.getUserPrincipal().getName());
     registerEvent.setDate(ZonedDateTime.now());
-    registerEvent.setDescription(String.format("Registration of an asset of type %s     "
-                                              + "On date: %s     "
-                                              + "Serial number: %s     "
-                                              + "Owner name: %s     "
-                                              + "Business provider id: %s     "
-                                              + "Attached image name: %s"
-                                              , asset.getAssetType()
-                                              , registerEvent.getDate().format(DateTimeFormatter.RFC_1123_DATE_TIME)
-                                              , asset.getSerialNumber()
-                                              , asset.getOwnerName()
-                                              , registerEvent.getBusinessProviderId()
-                                              , file.getOriginalFilename()));
+    registerEvent.setDescription(String.format(
+        "Registration of an asset of type %s     " + "On date: %s     " + "Serial number: %s     "
+            + "Owner name: %s     " + "Business provider id: %s     " + "Attached image name: %s",
+        asset.getAssetType(), registerEvent.getDate().format(DateTimeFormatter.RFC_1123_DATE_TIME),
+        asset.getSerialNumber(), asset.getOwnerName(), registerEvent.getBusinessProviderId(),
+        file.getOriginalFilename()));
     registerEvent.setEncodedImage(mapper.map(file, String.class));
 
     asset.getEvents().add(registerEvent);
-    // TODO
-    // api.saveAsset(asset);
+
+    //Save asset to blockchain
+    api.saveAsset(asset);
 
     return asset;
   }
