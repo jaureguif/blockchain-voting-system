@@ -176,8 +176,8 @@ func (t *AssetTrackingSmartContract) create(stub shim.ChaincodeStubInterface, ar
 
 func (t *AssetTrackingSmartContract) createAsset(args []string) Asset {
 	event := Event{
-		Summary:            "CREATED",
-		Description:        "CREATED",
+		Summary:            args[9],
+		Description:        args[10],
 		Date:               time.Now().Format(time.RFC3339),
 		BusinessProviderID: args[6],
 	}

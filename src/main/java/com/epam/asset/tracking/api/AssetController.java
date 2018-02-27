@@ -24,14 +24,14 @@ import com.epam.asset.tracking.domain.Asset;
 import com.epam.asset.tracking.domain.Event;
 import com.epam.asset.tracking.dto.AssetDTO;
 import com.epam.asset.tracking.exception.AssetNotFoundException;
+import com.epam.asset.tracking.repository.BusinessProviderRepository;
 import com.epam.asset.tracking.service.ApiService;
+import com.epam.asset.tracking.service.BusinessProviderService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
-import io.swagger.annotations.BasicAuthDefinition;
-import io.swagger.annotations.SecurityDefinition;
 import ma.glasnost.orika.MapperFacade;
 
 @RestController
@@ -45,6 +45,9 @@ public class AssetController {
 
   @Autowired
   private MapperFacade mapper;
+
+  @Autowired
+  private BusinessProviderRepository businesProviderRepository;
 
   @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiOperation("Getting an unique Asset by its Id")
@@ -60,9 +63,9 @@ public class AssetController {
 
     return api.getAssetById(id);
   }
-  
 
-  @ApiOperation(value = "Post an Asset", authorizations = {@Authorization(value="basicAuth")})
+
+  @ApiOperation(value = "Post an Asset", authorizations = {@Authorization(value = "basicAuth")})
   @ApiResponses({@ApiResponse(code = 201, message = "Returns saved Asset", response = Asset.class),
       @ApiResponse(code = 400, message = "Bad, request.")})
 
@@ -71,13 +74,17 @@ public class AssetController {
   @Secured(value = {"ROLE_BUSINESS_PROVIDER"})
   @RolesAllowed("ROLE_BUSINESS_PROVIDER")
   public Asset postAsset(@RequestPart("file") MultipartFile file, AssetDTO dto,
-      HttpServletRequest request) {
+      HttpServletRequest request) throws AssetNotFoundException {
     logger.debug("Call to POST:/asset/tracking/asset");
     // TODO validate dto fields
 
 
+    String businessProviderName = businesProviderRepository
+        .findByUsername(request.getUserPrincipal().getName()).get().getName();
+
+
     Asset asset = new Asset();
-    asset.setUuid(UUID.randomUUID().toString());
+    asset.setUuid(UUID.randomUUID());
     asset.setAssetType(dto.getAssetType());
     asset.setDescription(dto.getDescription());
     asset.setOwnerName(dto.getOwnerName());
@@ -89,17 +96,19 @@ public class AssetController {
     registerEvent.setDate(ZonedDateTime.now());
     registerEvent.setDescription(String.format(
         "Registration of an asset of type %s     " + "On date: %s     " + "Serial number: %s     "
-            + "Owner name: %s     " + "Business provider id: %s     " + "Attached image name: %s",
+            + "Owner name: %s     " + "Business provider id: %s     " + "Business provider name: %s     " + "Attached image name: %s",
         asset.getAssetType(), registerEvent.getDate().format(DateTimeFormatter.RFC_1123_DATE_TIME),
-        asset.getSerialNumber(), asset.getOwnerName(), registerEvent.getBusinessProviderId(),
+        asset.getSerialNumber(), asset.getOwnerName(), 
+        registerEvent.getBusinessProviderId(),
+        businessProviderName,
         file.getOriginalFilename()));
     registerEvent.setEncodedImage(mapper.map(file, String.class));
 
     asset.getEvents().add(registerEvent);
 
-    //Save asset to blockchain
+    // Save asset to blockchain
     api.saveAsset(asset);
 
-    return asset;
+    return api.getAssetById(asset.getUuid());
   }
 }
