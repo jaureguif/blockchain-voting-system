@@ -1,12 +1,21 @@
 package com.epam.asset.tracking.integration.asset;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.fileUpload;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.epam.asset.tracking.domain.Address;
+import com.epam.asset.tracking.domain.BUSINESS_TYPE;
+import com.epam.asset.tracking.domain.BusinessProvider;
+import com.epam.asset.tracking.domain.User;
+import com.epam.asset.tracking.dto.AssetDTO;
 import com.epam.asset.tracking.dto.EntityDTO;
+import com.epam.asset.tracking.repository.BusinessProviderRepository;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 
 import com.epam.asset.tracking.integration.AbstractIntegrationTest;
@@ -18,13 +27,51 @@ import java.util.UUID;
 
 public class AssetControllerIntegrationTest extends AbstractIntegrationTest {
 
+	@Autowired
+	private BusinessProviderRepository businesProviderRepository;
+
+
 	private String username;
+
+	private static final String CITY = "GDL";
+	private static final String COUNTRY = "Mexico";
+	private static final String STATE = "Jalisco";
+	private static final String ZIPCODE = "3332";
+	private static final String STREET = "Anillo periferico";
+	private static final BUSINESS_TYPE BIZZ_TYPE = BUSINESS_TYPE.CAR_SELLER;
+	private static final String EMAIL = "email@email.com";
+	private static final String NAME = "audi factory";
+	private static final String USERNAME = "admin";
+	private static final String PASSWORD = "pass";
+	private static final String TAX_ID = "ddas2332";
 
 	@Before
 	public void setup() {
 
 		username = UUID.randomUUID().toString().replaceAll("-", "").replaceAll("[0-9]", "");
 
+
+		businesProviderRepository.save(getBusinessProviderEntity());
+	}
+
+	private BusinessProvider getBusinessProviderEntity(){
+		BusinessProvider entity = new BusinessProvider();
+		Address address = new Address();
+		address.setCity(CITY);
+		address.setCountry(COUNTRY);
+		address.setState(STATE);
+		address.setZipCode(ZIPCODE);
+		address.setStreet(STREET);
+
+		entity.setAddress(address);
+		entity.setType(BIZZ_TYPE);
+		entity.setEmail(EMAIL);
+		entity.setName(NAME);
+		entity.setUsername(USERNAME);
+		entity.setPassword(PASSWORD);
+		entity.setRfc(TAX_ID);
+
+		return entity;
 	}
 
 	@Test
@@ -48,29 +95,15 @@ public class AssetControllerIntegrationTest extends AbstractIntegrationTest {
 	@Test
 	@WithMockUser(username = "admin", roles = {"BUSINESS_PROVIDER", "USER"})
 	public void testConverter() throws Exception{
-
-		EntityDTO dto = new EntityDTO();
-		dto.setAddress(
-				"string with a comma, not at the end, of course, but with a period at the end. and one more thing...");
-		dto.setBusinessType("businessType");
-		dto.setCity("CityTEST");
-		dto.setLastName("lastNameTest");
-		dto.setEmail("foo@mail.com");
-		dto.setName("NameTest");
-		dto.setPassword("password1");
-		dto.setRfc("rfc");
-		dto.setState("State TEST");
-		dto.setZipCode("12345");
-		System.out.println("USERNAME: " + username);
-		dto.setUsername(username);
-
-		
-		
 		MockMultipartFile multipartFile = new MockMultipartFile("file","FileUploadTest.txt",null, new byte[100]);
 
-		mockMvc.perform(MockMvcRequestBuilders.fileUpload("/asset/tracking/asset/")
-				.file(multipartFile)
-				.content(jacksonMapper.writeValueAsString(dto)))
+		mockMvc.perform(fileUpload("/asset/tracking/asset/").file(multipartFile)
+					.param("assetType", "BUSINESS type")
+					.param("description", "A brief description")
+					.param("ownerName", "Owner 1")
+					.param("serialNumber", "123456789")
+					.param("summary","A summary for this asset")
+				.accept(MediaType.APPLICATION_JSON))
 				.andDo(print())
 				.andExpect(status().is2xxSuccessful());
 
