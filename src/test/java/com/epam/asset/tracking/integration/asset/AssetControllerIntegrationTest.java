@@ -1,35 +1,37 @@
 package com.epam.asset.tracking.integration.asset;
 
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.fileUpload;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
+import java.util.UUID;
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.test.context.support.WithMockUser;
 import com.epam.asset.tracking.domain.Address;
 import com.epam.asset.tracking.domain.BUSINESS_TYPE;
 import com.epam.asset.tracking.domain.BusinessProvider;
-import com.epam.asset.tracking.domain.User;
-import com.epam.asset.tracking.dto.AssetDTO;
-import com.epam.asset.tracking.dto.EntityDTO;
-import com.epam.asset.tracking.repository.BusinessProviderRepository;
-import org.junit.Before;
-import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
-
+import com.epam.asset.tracking.exception.AssetNotFoundException;
 import com.epam.asset.tracking.integration.AbstractIntegrationTest;
-import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-
-import java.util.UUID;
+import com.epam.asset.tracking.repository.BusinessProviderRepository;
+import com.epam.asset.tracking.service.ApiService;
+import com.epam.asset.tracking.service.ApiServiceImpl;
 
 public class AssetControllerIntegrationTest extends AbstractIntegrationTest {
 
 	@Autowired
 	private BusinessProviderRepository businesProviderRepository;
-
+	
+	@MockBean
+	ApiService api;
 
 	private String username;
 
@@ -85,6 +87,11 @@ public class AssetControllerIntegrationTest extends AbstractIntegrationTest {
 	
 	@Test
 	public void shouldReturn404() throws Exception {
+	  
+	  
+	  when(api.getAssetById(UUID.fromString("9d40ee4e-bf1e-4f74-8237-c5e9b6e8f6d2")))
+	  .thenThrow(new AssetNotFoundException(""));
+	  
 		mockMvc.perform(get("/asset/tracking/asset/9d40ee4e-bf1e-4f74-8237-c5e9b6e8f6d2")
 				.contentType(MediaType.APPLICATION_JSON))
 				.andDo(print())
