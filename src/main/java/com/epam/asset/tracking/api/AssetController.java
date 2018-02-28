@@ -1,6 +1,5 @@
 package com.epam.asset.tracking.api;
 
-import java.lang.reflect.Constructor;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.UUID;
@@ -15,9 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.BeanPropertyBindingResult;
-import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
-import org.springframework.validation.beanvalidation.SpringValidatorAdapter;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -126,7 +123,8 @@ public class AssetController {
     validator.validate(asset, errors);
     if (errors.hasErrors()) {
       throw new MethodArgumentNotValidException(
-          new MethodParameter(this.getClass().getDeclaredMethod("postAsset", MultipartFile.class, AssetDTO.class, HttpServletRequest.class), 0),
+          new MethodParameter(this.getClass().getDeclaredMethod("postAsset", MultipartFile.class,
+              AssetDTO.class, HttpServletRequest.class), 0),
           errors);
     }
   }
