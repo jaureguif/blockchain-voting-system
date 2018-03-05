@@ -25,14 +25,9 @@ public class UserServiceImpl implements UserDetailsService, UserService {
 
 	@Override
 	public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
-
-		Optional<BusinessProvider> user = userRepository.findByUsername(userName);
-
-		if (!user.isPresent()) {
-			throw new UsernameNotFoundException("Invalid username or password.");
-		}
-		return new org.springframework.security.core.userdetails.User(user.get().getUsername(),
-				user.get().getPassword(), getAuthority());
+		return userRepository.findByUsername(userName)
+			.map(user -> new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), getAuthority()))
+			.orElseThrow(() -> new UsernameNotFoundException("Invalid username or password."));
 	}
 
 	private List<GrantedAuthority> getAuthority() {
