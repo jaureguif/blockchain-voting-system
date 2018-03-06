@@ -1,6 +1,5 @@
 package com.epam.asset.tracking.integration.asset;
 
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.fileUpload;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -9,8 +8,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
@@ -23,7 +20,6 @@ import com.epam.asset.tracking.exception.AssetNotFoundException;
 import com.epam.asset.tracking.integration.AbstractIntegrationTest;
 import com.epam.asset.tracking.repository.BusinessProviderRepository;
 import com.epam.asset.tracking.service.ApiService;
-import com.epam.asset.tracking.service.ApiServiceImpl;
 
 public class AssetControllerIntegrationTest extends AbstractIntegrationTest {
 
@@ -33,7 +29,7 @@ public class AssetControllerIntegrationTest extends AbstractIntegrationTest {
 	@MockBean
 	ApiService api;
 
-	private String username;
+	private static String username;
 
 	private static final String CITY = "GDL";
 	private static final String COUNTRY = "Mexico";
