@@ -45,7 +45,7 @@ services:
       - ORDERER_GENERAL_TLS_ROOTCAS=[/etc/hyperledger/msp/orderer/tls/ca.crt]
 #      - ORDERER_GENERAL_TLS_ROOTCAS=[/etc/hyperledger/msp/orderer/tls/ca.crt, /etc/hyperledger/msp/peer0Org1/tls/ca.crt, /etc/hyperledger/msp/peer1Org1/tls/ca.crt, /etc/hyperledger/msp/peer0Org2/tls/ca.crt, /etc/hyperledger/msp/peer1Org2/tls/ca.crt]
       - GRPC_TRACE=all=true,
-      - GRPC_VERBOSITY=debug
+      - GRPC_VERBOSITY=info
     working_dir: /opt/gopath/src/github.com/hyperledger/fabric
     command: orderer
     volumes:
