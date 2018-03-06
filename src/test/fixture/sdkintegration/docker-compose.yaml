@@ -33,7 +33,7 @@ services:
     container_name: orderer.example.com
     image: hyperledger/fabric-orderer${IMAGE_TAG_FABRIC}
     environment:
-      - ORDERER_GENERAL_LOGLEVEL=error
+      - ORDERER_GENERAL_LOGLEVEL=info
       - ORDERER_GENERAL_LISTENADDRESS=0.0.0.0
       - ORDERER_GENERAL_GENESISMETHOD=file
       - ORDERER_GENERAL_GENESISFILE=/etc/hyperledger/configtx/orderer.block
