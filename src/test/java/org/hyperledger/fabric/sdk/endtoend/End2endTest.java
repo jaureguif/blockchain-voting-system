@@ -56,12 +56,17 @@ import org.hyperledger.fabric_ca.sdk.RegistrationRequest;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
  * Test end to end scenario
  */
 public class End2endTest {
+  
+  private static final Logger logger = LoggerFactory.getLogger(End2endTest.class);
+  
 
   private static final TestConfig testConfig = TestConfig.getConfig();
   private static final String TEST_ADMIN_NAME = "admin";
@@ -90,12 +95,8 @@ public class End2endTest {
 
   static void out(String format, Object... args) {
 
-    System.err.flush();
-    System.out.flush();
-
-    System.out.println(format(format, args));
-    System.err.flush();
-    System.out.flush();
+    logger.debug(format(format, args));
+   
 
   }
 
