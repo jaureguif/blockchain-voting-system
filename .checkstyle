@@ -6,8 +6,8 @@
     <property name="checkstyle.header.file" value="/Users/fjauregui/IdeaProjects/.metadata/.plugins/org.eclipse.core.resources/.projects/blockchain-voting-system/com.basistech.m2e.code.quality.checkstyleConfigurator/checkstyle-header-default.txt"/>
   </local-check-config>
   <fileset name="java-sources-default" enabled="true" check-config-name="maven-checkstyle-plugin default" local="true">
-    <file-match-pattern match-pattern="^src/main/resources.*\.properties" include-pattern="true"/>
-    <file-match-pattern match-pattern="^src/main/resources.*\.properties" include-pattern="true"/>
-    <file-match-pattern match-pattern="^src/test/resources.*\.properties" include-pattern="true"/>
+    <file-match-pattern match-pattern="^src/main/resources/.*\.properties" include-pattern="true"/>
+    <file-match-pattern match-pattern="^src/main/resources/.*\.properties" include-pattern="true"/>
+    <file-match-pattern match-pattern="^src/test/resources/.*\.properties" include-pattern="true"/>
   </fileset>
 </fileset-config>

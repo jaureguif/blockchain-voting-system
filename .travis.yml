@@ -1,5 +1,8 @@
 sudo: required
 language: java
+cache:
+  directories:
+  - $HOME/.m2
 
 jdk:
   - oraclejdk8
@@ -12,6 +15,8 @@ before_install:
   - ./fabric.sh clean
   - docker-compose up -d
   - cd ../../../../
+
+install: "mvn -q install"
 
 script: "mvn cobertura:cobertura"
 

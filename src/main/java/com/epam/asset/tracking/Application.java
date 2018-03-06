@@ -10,14 +10,18 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
+import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
 
 import com.epam.asset.tracking.annotation.CoverageIgnore;
 
 @SpringBootApplication
+@EnableResourceServer
 @Configuration
 @EnableAutoConfiguration
+@ComponentScan(basePackages = "com.epam.asset.tracking")
 @EnableMongoRepositories(basePackages = "com.epam.asset.tracking.repository")
 public class Application {
 	Logger log = LoggerFactory.getLogger(Application.class);
@@ -42,4 +46,6 @@ public class Application {
 
 		};
 	}
+	
+	
 }
