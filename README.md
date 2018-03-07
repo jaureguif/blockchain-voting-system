@@ -5,30 +5,31 @@ Blockchain Asset Tracking System
 [![Build Status](https://travis-ci.org/jaureguif/blockchain-voting-system.svg?branch=dev)](https://travis-ci.org/jaureguif/blockchain-voting-system)
 
 ## Prerequisites
-----------------
-To build this project, following dependencies must be met
-  * JDK 1.8 or above
-  * Apache Maven
-  * Docker - v1.12 or higher
-  * Docker Compose - v1.8 or higher 
 
-## Run tests
-------------
+To build this project, following dependencies must be met:
+  * JDK - v1.8+
+  * Apache Maven - v3.3+
+  * Docker - v1.12+
+  * Docker Compose - v1.8+
 
-Current tests:
-* src/test/java - two unit test source files.
-* src/test/fixture: artifacts required for test.
+## Run tests and start blockchain from scratch
 
 ```sh
 $ cd src/test/fixture/sdkintegration
-$ ./fabric.sh clean
+$ ./fabric.sh clean  # Drops all docker images!
 $ docker-compose up -d
 $ cd ../../../../
 $ mvn package
 ```
 
-## Stop services
-----------------
+## Start system endopoints services
+
+```sh
+$ mvn spring-boot:run
+```
+
+## Stop blockchain
+------------------
 
 ```sh
 $ cd src/test/fixture/sdkintegration

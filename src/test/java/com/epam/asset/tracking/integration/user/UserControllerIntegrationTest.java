@@ -3,6 +3,7 @@ package com.epam.asset.tracking.integration.user;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -19,8 +20,9 @@ import org.springframework.http.MediaType;
 import com.epam.asset.tracking.dto.UserDTO;
 import com.epam.asset.tracking.integration.AbstractIntegrationTest;
 import com.epam.asset.tracking.service.BusinessProviderService;
+import org.springframework.security.test.context.support.WithMockUser;
 
-public class UserIntegrationTest extends AbstractIntegrationTest {
+public class UserControllerIntegrationTest extends AbstractIntegrationTest {
 
 	String username;
 
@@ -104,6 +106,32 @@ public class UserIntegrationTest extends AbstractIntegrationTest {
 				.contentType(MediaType.APPLICATION_JSON_UTF8).content(jacksonMapper.writeValueAsString(dto)))
 				.andDo(print()).andExpect(status().isConflict())
 				.andExpect(content().string(IsEmptyString.isEmptyString()));
+	}
+
+
+	@Test
+	@WithMockUser(username = "admin", roles = {"BUSINESS_PROVIDER", "USER"})
+	public void getUserData_Fail() {
+		try {
+			mockMvc.perform(get("/asset/tracking/users/mmonraz")
+					.contentType(MediaType.APPLICATION_JSON_UTF8))
+					.andDo(print());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+
+	@Test
+	@WithMockUser(username = "mmonraz", password = "0s0n3gr0",roles = {"BUSINESS_PROVIDER", "USER"})
+	public void getUserData_Success() {
+		try {
+			mockMvc.perform(get("/asset/tracking/users/mmonraz")
+					.contentType(MediaType.APPLICATION_JSON_UTF8))
+					.andDo(print());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 }

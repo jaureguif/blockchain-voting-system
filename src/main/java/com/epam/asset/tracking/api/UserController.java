@@ -1,12 +1,11 @@
 package com.epam.asset.tracking.api;
 
+import com.epam.asset.tracking.dto.UserDTO;
 import com.epam.asset.tracking.exception.InvalidUserException;
-import org.omg.CORBA.DynAnyPackage.Invalid;
 import org.springframework.web.bind.annotation.*;
 
 import com.epam.asset.tracking.domain.BusinessProvider;
 import com.epam.asset.tracking.domain.User.Role;
-import com.epam.asset.tracking.dto.UserDTO;
 import com.epam.asset.tracking.exception.DuplicateKeyExceptionWrapper;
 import com.epam.asset.tracking.service.ApiService;
 import com.epam.asset.tracking.service.BusinessProviderService;
@@ -35,49 +34,53 @@ import java.util.Optional;
 public class UserController {
 	Logger logger = LoggerFactory.getLogger(UserController.class);
 
-	@Autowired
-	ApiService api;
+  @Autowired
+  ApiService api;
 
-	@Autowired
-	private MapperFacade mapper;
+  @Autowired
+  private MapperFacade mapper;
 
-	@Autowired
-	BusinessProviderService businessProviderService;
+  @Autowired
+  BusinessProviderService businessProviderService;
 
-	@PostMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-	@ApiOperation(value = "Posting a new, unique, business provider into DB", notes = "Current validations are:"
-			+ "<br>"+ "Not allowed numbers or symbols (space is not allowed): <b>username</b>"
-			+ "<br>"+ "Not allowed numbers or symbols (space is allowed): <b>name</b>, <b>lastname</b>, <b>city</b> & <b>state</b>"
-			+ "<br>"+ "Not allowed symbols (space, comma and periods are allowed): <b>address</b>"
-			+ "<br>"+ "<b>businessType</b>, one of(case insensitive): Computer Seller, Computer Repair, Car Seller, Car Mechanic, House Seller, House Broker"
-			+ "<br>"+ "<b>rfc</b> rules: Alphanumeric, not special characters allowed"
-			+ "<br>"+ "<b>zipcode</b> rules: Numeric only, lenght exactly 5 digits"
-			+ "<br>"+ "<b>password</b> rules: Text, numbers & symbols allowed, lenght must be between 8 and 10 characters")
-	@ResponseStatus(HttpStatus.CREATED)
-	@ApiResponses({ @ApiResponse(code = 201, message = "Pojo was successfuly posted and insterted in DB."),
-		@ApiResponse(code = 400, message = "Bad, request. Probably a validation error in the payload."),
-		@ApiResponse(code = 409, message = "Username already taken. Please choose another.")})
-	public void postUser(
-			@ApiParam(value = "Posting a new Bussiness Provider. <br><br>"
-					+ "Username must be unique, otherwize application will return a 409 status code. <br><br>"
-					+ "Business Type is validated against allowed values (listed in implementation notes)"
-					, required = true) @RequestBody @Valid UserDTO user, HttpServletRequest req) {
-		
-		logger.debug("Call to POST/user Request " + req);
-		logger.debug("Call to POST/user");
-		logger.info("payload in body request" + user.toString());
+  @PostMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE,
+      consumes = MediaType.APPLICATION_JSON_VALUE)
+  @ApiOperation(value = "Posting a new, unique, business provider into DB",
+      notes = "Current validations are:" + "<br>"
+          + "Not allowed numbers or symbols (space is not allowed): <b>username</b>" + "<br>"
+          + "Not allowed numbers or symbols (space is allowed): <b>name</b>, <b>lastname</b>, <b>city</b> & <b>state</b>"
+          + "<br>" + "Not allowed symbols (space, comma and periods are allowed): <b>address</b>"
+          + "<br>"
+          + "<b>businessType</b>, one of(case insensitive): Computer Seller, Computer Repair, Car Seller, Car Mechanic, House Seller, House Broker"
+          + "<br>" + "<b>rfc</b> rules: Alphanumeric, not special characters allowed" + "<br>"
+          + "<b>zipcode</b> rules: Numeric only, lenght exactly 5 digits" + "<br>"
+          + "<b>password</b> rules: Text, numbers & symbols allowed, lenght must be between 8 and 10 characters")
+  @ResponseStatus(HttpStatus.CREATED)
+  @ApiResponses({
+      @ApiResponse(code = 201, message = "Pojo was successfuly posted and insterted in DB."),
+      @ApiResponse(code = 400,
+          message = "Bad, request. Probably a validation error in the payload."),
+      @ApiResponse(code = 409, message = "Username already taken. Please choose another.")})
+  public void postUser(@ApiParam(
+      value = "Posting a new Bussiness Provider. <br><br>"
+          + "Username must be unique, otherwize application will return a 409 status code. <br><br>"
+          + "Business Type is validated against allowed values (listed in implementation notes)",
+      required = true) @RequestBody @Valid UserDTO user, HttpServletRequest req) {
 
-		user.setRole(Role.BUSINESS_PROVIDER.name());
-		BusinessProvider bp = mapper.map(user, BusinessProvider.class);
-		
-		try {
-			businessProviderService.save(bp);
-		}
-		catch(DuplicateKeyException dke) {
-			logger.info("Duplicated username {}, {}", bp.getUsername(), bp);
-			throw new DuplicateKeyExceptionWrapper("Duplicated username: " + bp.getUsername(), dke);	
-		}
-	}
+    logger.debug("Call to POST/entity Request " + req);
+    logger.debug("Call to POST/entity");
+    logger.info("payload in body request" + user.toString());
+
+    user.setRole(Role.BUSINESS_PROVIDER.name());
+    BusinessProvider bp = mapper.map(user, BusinessProvider.class);
+
+    try {
+      businessProviderService.save(bp);
+    } catch (DuplicateKeyException dke) {
+      logger.info("Duplicated username {}, {}", bp.getUsername(), bp);
+      throw new DuplicateKeyExceptionWrapper("Duplicated username: " + bp.getUsername(), dke);
+    }
+  }
 
 	@RolesAllowed("ROLE_BUSINESS_PROVIDER")
 	@GetMapping(value = "/{username}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -89,12 +92,12 @@ public class UserController {
 			@ApiParam(value = "The username of the asset that we want to retrieve", required = true) @PathVariable @Valid String username,
 			HttpServletRequest req)  throws InvalidUserException {
 		logger.debug("Call to GET:/asset/tracking/user/{username}");
-        Optional<BusinessProvider> userData = null;
+		Optional<BusinessProvider> userData = null;
 
-        //if(req.getUserPrincipal().equals(username)){
-			userData = businessProviderService.findUserbyUsername(username);
+		//if(req.getUserPrincipal().equals(username)){
+		userData = businessProviderService.findUserbyUsername(username);
 		//} else {
-       // 	throw new InvalidUserException("Username provided doesn't match the one who is currently logged in");
+		// 	throw new InvalidUserException("Username provided doesn't match the one who is currently logged in");
 		//}
 
 

@@ -18,7 +18,11 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
+	"strconv"
+	"strings"
+	"time"
 
 	"github.com/hyperledger/fabric/core/chaincode/shim"
 	pb "github.com/hyperledger/fabric/protos/peer"
@@ -28,11 +32,21 @@ type AssetTrackingSmartContract struct {
 }
 
 type Asset struct {
-	UUID         string `json:"uuid"`
-	SerialNumber string `json:"serialNumber"`
-	AssetType    string `json:"assetType"`
-	OwnerName    string `json:"ownerName"`
-	Description  string `json:"description"`
+	UUID         string  `json:"uuid"`
+	SerialNumber string  `json:"serialNumber"`
+	AssetType    string  `json:"assetType"`
+	OwnerName    string  `json:"ownerName"`
+	Description  string  `json:"description"`
+	Events       []Event `json:"events"`
+}
+
+type Event struct {
+	Summary            string `json:"summary"`
+	Description        string `json:"description"`
+	Date               string `json:"date"`
+	BusinessProviderID string `json:"businessProviderId"`
+	EncodedImage       string `json:"encodedImage"`
+	EncodedFiles       string `json:"attachment"`
 }
 
 // Initializes the chaincode state
@@ -51,7 +65,7 @@ func (t *AssetTrackingSmartContract) Init(stub shim.ChaincodeStubInterface) pb.R
 	if err != nil {
 		return shim.Error(err.Error())
 	}
-	
+
 	asset = Asset{
 		UUID:         "9d40ee4e-bf1e-4f74-8237-c5e9b6e8f6d3",
 		SerialNumber: "3VW1W21KIBM312176",
@@ -65,7 +79,7 @@ func (t *AssetTrackingSmartContract) Init(stub shim.ChaincodeStubInterface) pb.R
 	if err != nil {
 		return shim.Error(err.Error())
 	}
-	
+
 	asset = Asset{
 		UUID:         "ab3af1a9-6d81-4be8-94f8-cd1667a894cb",
 		SerialNumber: "157590103000100120006906040003",
@@ -100,7 +114,7 @@ func (t *AssetTrackingSmartContract) Invoke(stub shim.ChaincodeStubInterface) pb
 	fn := args[0]
 	switch fn {
 	case "create":
-		return shim.Error("Not yet implemented")
+		return t.create(stub, args)
 	case "query":
 		return t.query(stub, args)
 	case "update":
@@ -136,6 +150,76 @@ func (t *AssetTrackingSmartContract) query(stub shim.ChaincodeStubInterface, arg
 	fmt.Printf("-> %+v\n", a1)
 	fmt.Printf("Query Response:%s\n", jsonResp)
 	return shim.Success(assetBlob)
+}
+
+func (t *AssetTrackingSmartContract) create(stub shim.ChaincodeStubInterface, args []string) pb.Response {
+	fmt.Println("########### Create ###########")
+	err1 := t.validateAssetParams(args)
+	if err1 != nil {
+		return shim.Error(err1.Error())
+	}
+	asset := t.createAsset(args)
+	jsonBlob, err2 := json.Marshal(asset)
+	if err2 != nil {
+		return shim.Error(err2.Error())
+	}
+
+	fmt.Printf("Puting: " + string(jsonBlob))
+
+	err3 := stub.PutState(asset.UUID, jsonBlob)
+	if err3 != nil {
+		return shim.Error(err3.Error())
+	}
+
+	return shim.Success(nil)
+}
+
+func (t *AssetTrackingSmartContract) createAsset(args []string) Asset {
+	event := Event{
+		Summary:            args[9],
+		Description:        args[10],
+		Date:               time.Now().Format(time.RFC3339),
+		BusinessProviderID: args[6],
+	}
+	if len(args) >= 8 {
+		if t.isBlank(args[7]) == false {
+			event.EncodedImage = args[7]
+		}
+		if len(args) >= 9 && t.isBlank(args[8]) == false {
+			event.EncodedFiles = args[8]
+		}
+	}
+
+	asset := Asset{
+		UUID:         args[1],
+		SerialNumber: args[2],
+		AssetType:    args[3],
+		OwnerName:    args[4],
+		Description:  args[5],
+		Events:       []Event{event},
+	}
+	return asset
+}
+
+func (t *AssetTrackingSmartContract) validateAssetParams(args []string) error {
+	if len(args) < 7 {
+		return errors.New("Expecting 7 arguments, actual: " + strconv.Itoa(len(args)))
+	}
+	errorText := " "
+	for i := 1; i <= 6; i++ {
+		if t.isBlank(args[i]) {
+			errorText += "[element at index " + strconv.Itoa(i) + " must not be blank] "
+		}
+	}
+	errorText = strings.TrimSpace(errorText)
+	if len(errorText) != 0 {
+		return errors.New(errorText)
+	}
+	return nil
+}
+
+func (t *AssetTrackingSmartContract) isBlank(str string) bool {
+	return len(strings.TrimSpace(str)) == 0
 }
 
 func main() {
