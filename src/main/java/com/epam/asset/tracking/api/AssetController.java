@@ -136,9 +136,8 @@ public class AssetController {
     Event event = mapper.map(eventDTO, Event.class);
     event.setBusinessProviderId(request.getUserPrincipal().getName());
     event.setEncodedImage(mapper.map(image, String.class));
-    Asset asset = api.getAssetById(id);
-    asset.getEvents().add(event);
-    return asset;
+
+    return api.addEventToAsset(id, event).orElseThrow(() -> new AssetNotFoundException("Asset with given UUID was not found"));
   }
 
   private void validate(AssetDTO asset)
