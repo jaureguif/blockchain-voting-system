@@ -13,7 +13,7 @@ import org.springframework.format.annotation.NumberFormat.Style;
 import com.epam.asset.tracking.dto.validations.ValidationsUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-public class EntityDTO {
+public class UserDTO {
 
 	// Name --> Text, not allowed numbers or symbols
 	@NotEmpty
@@ -207,7 +207,7 @@ public class EntityDTO {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		EntityDTO other = (EntityDTO) obj;
+		UserDTO other = (UserDTO) obj;
 		if (address == null) {
 			if (other.address != null)
 				return false;

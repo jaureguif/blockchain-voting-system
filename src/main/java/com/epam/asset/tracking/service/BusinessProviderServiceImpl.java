@@ -7,6 +7,8 @@ import org.springframework.stereotype.Component;
 import com.epam.asset.tracking.domain.BusinessProvider;
 import com.epam.asset.tracking.repository.BusinessProviderRepository;
 
+import java.util.Optional;
+
 @Component
 public class BusinessProviderServiceImpl implements BusinessProviderService {
 
@@ -21,6 +23,11 @@ public class BusinessProviderServiceImpl implements BusinessProviderService {
 		//encode password
 		entity.setPassword(bCryptPasswordEncoder.encode(entity.getPassword()));
 		return repository.save(entity);
+	}
+
+	@Override
+	public Optional<BusinessProvider> findUserbyUsername(String name) {
+		return repository.findByUsername(name);
 	}
 
 }

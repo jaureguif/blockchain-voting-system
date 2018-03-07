@@ -5,7 +5,7 @@ import java.util.Objects;
 import org.springframework.data.annotation.Id;
 
 /**
- * Base persistable entity.
+ * Base persistable user.
  *
  * @author daniel_pedraza@epam.com
  */

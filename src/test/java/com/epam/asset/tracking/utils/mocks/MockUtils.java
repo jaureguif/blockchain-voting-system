@@ -1,13 +1,13 @@
 package com.epam.asset.tracking.utils.mocks;
 
-import com.epam.asset.tracking.dto.EntityDTO;
+import com.epam.asset.tracking.dto.UserDTO;
 
 /**
  * Created on 1/26/2018.
  */
 public class MockUtils {
-	public static EntityDTO mockUser() {
-		EntityDTO dto = new EntityDTO();
+	public static UserDTO mockUser() {
+		UserDTO dto = new UserDTO();
 
 		dto.setAddress("5th st ");
 		dto.setName("ddd");

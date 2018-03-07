@@ -1,4 +1,4 @@
-package com.epam.asset.tracking.integration.entity;
+package com.epam.asset.tracking.integration.user;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doThrow;
@@ -16,11 +16,11 @@ import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.MediaType;
 
-import com.epam.asset.tracking.dto.EntityDTO;
+import com.epam.asset.tracking.dto.UserDTO;
 import com.epam.asset.tracking.integration.AbstractIntegrationTest;
 import com.epam.asset.tracking.service.BusinessProviderService;
 
-public class EntityIntegrationTest extends AbstractIntegrationTest {
+public class UserIntegrationTest extends AbstractIntegrationTest {
 
 	String username;
 
@@ -35,7 +35,7 @@ public class EntityIntegrationTest extends AbstractIntegrationTest {
 	@Test
 	public void shouldReturn201() throws Exception {
 
-		EntityDTO dto = new EntityDTO();
+		UserDTO dto = new UserDTO();
 		dto.setAddress(
 				"string with a comma, not at the end, of course, but with a period at the end. and one more thing...");
 		dto.setBusinessType("car mechanic");
@@ -52,7 +52,7 @@ public class EntityIntegrationTest extends AbstractIntegrationTest {
 
 		System.out.println(jacksonMapper.writeValueAsString(dto));
 
-		mockMvc.perform(post("/asset/tracking/entity/")
+		mockMvc.perform(post("/asset/tracking/users/")
 				.contentType(MediaType.APPLICATION_JSON).content(jacksonMapper.writeValueAsString(dto))).andDo(print())
 				.andExpect(status().isCreated());
 	}
@@ -60,7 +60,7 @@ public class EntityIntegrationTest extends AbstractIntegrationTest {
 	@Test
 	public void shouldReturn409() throws Exception {
 
-		EntityDTO dto = new EntityDTO();
+		UserDTO dto = new UserDTO();
 		dto.setAddress(
 				"string with a comma, not at the end, of course, but with a period at the end. and one more thing...");
 		dto.setBusinessType("car mechanic");
@@ -77,12 +77,12 @@ public class EntityIntegrationTest extends AbstractIntegrationTest {
 
 		System.out.println(jacksonMapper.writeValueAsString(dto));
 
-		mockMvc.perform(post("/asset/tracking/entity/")
+		mockMvc.perform(post("/asset/tracking/users/")
 				.contentType(MediaType.APPLICATION_JSON).content(jacksonMapper.writeValueAsString(dto))).andDo(print())
 				.andExpect(status().isCreated());
 
 		// Will insert a new DTO, but with same username
-		dto = new EntityDTO();
+		dto = new UserDTO();
 		dto.setAddress("New address");
 		dto.setBusinessType("car mechanic");
 		dto.setCity("CityTEST");
@@ -100,7 +100,7 @@ public class EntityIntegrationTest extends AbstractIntegrationTest {
 
 		doThrow(new DuplicateKeyException("Duplicated username")).when(businessProviderService).save(any());
 
-		mockMvc.perform(post("/asset/tracking/entity/")
+		mockMvc.perform(post("/asset/tracking/users/")
 				.contentType(MediaType.APPLICATION_JSON_UTF8).content(jacksonMapper.writeValueAsString(dto)))
 				.andDo(print()).andExpect(status().isConflict())
 				.andExpect(content().string(IsEmptyString.isEmptyString()));

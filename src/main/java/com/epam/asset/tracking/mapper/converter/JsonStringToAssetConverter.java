@@ -37,8 +37,8 @@ public class JsonStringToAssetConverter extends CustomConverter<String, Asset> {
 		if (!StringUtils.isEmpty(source)) {
 			try {
 				asset = objectMapper.readValue(source, Asset.class);
-			} catch (IOException e) {
-				throw new AssetConvertException("Not able to convert provide JSON to an Asset representation");
+			} catch (IOException ioe) {
+				throw new AssetConvertException("Not able to convert provide JSON to an Asset representation", ioe);
 			}
 		}
 
