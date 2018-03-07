@@ -208,6 +208,7 @@
 								<!--Excluding ValidationsUtil because this class is used only as 
 									a constants repo -->
 								<exclude>com/epam/asset/tracking/dto/validations/ValidationsUtil.class</exclude>
+								<exclude>com/epam/asset/tracking/service/ApiServiceImpl.class</exclude>
 								<exclude>org/hyperledger/**/*.class</exclude>
 								<exclude>org/hyperledger/**/*Test.class</exclude>
 							</excludes>
