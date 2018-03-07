@@ -6,6 +6,9 @@ import java.util.UUID;
 import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+
+import com.epam.asset.tracking.dto.EventDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -114,6 +117,28 @@ public class AssetController {
     api.saveAsset(asset);
 
     return api.getAssetById(asset.getUuid());
+  }
+
+  @ApiOperation(value = "Register new asset event", authorizations = @Authorization(value = "basicAuth"))
+  @ApiResponses({
+      @ApiResponse(code = 201, message = "Returns the Asset with its new event", response = Asset.class),
+      @ApiResponse(code = 400, message = "Bad request: Invalid UUID string, required fields or missing attachment"),
+      @ApiResponse(code = 404, message = "Asset with given UUID was not found")})
+  @Secured("ROLE_BUSINESS_PROVIDER")
+  @RolesAllowed("ROLE_BUSINESS_PROVIDER")
+  @PostMapping(value = "/{id}/event", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+  @ResponseStatus(HttpStatus.CREATED)
+  public Asset newAssetEvent(
+      @ApiParam(value = "The id of the asset that we want to retrieve", required = true) @PathVariable @Valid UUID id,
+      @RequestPart("image") MultipartFile image,
+      EventDTO eventDTO,
+      HttpServletRequest request) throws AssetNotFoundException {
+    Event event = mapper.map(eventDTO, Event.class);
+    event.setBusinessProviderId(request.getUserPrincipal().getName());
+    event.setEncodedImage(mapper.map(image, String.class));
+    Asset asset = api.getAssetById(id);
+    asset.getEvents().add(event);
+    return asset;
   }
 
   private void validate(AssetDTO asset)
