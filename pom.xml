@@ -82,12 +82,6 @@
 			<version>1.0.0</version>
 		</dependency>
 
-		<dependency>
-			<groupId>org.hyperledger.fabric</groupId>
-			<artifactId>fabric-chaincode-shim</artifactId>
-			<version>1.2.0-SNAPSHOT</version>
-		</dependency>
-
 		<!-- Swagger dependencies -->
 		<dependency>
 			<groupId>io.springfox</groupId>
