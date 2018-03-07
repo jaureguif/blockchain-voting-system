@@ -2,6 +2,7 @@ package com.epam.asset.tracking.api;
 
 import com.epam.asset.tracking.dto.UserDTO;
 import com.epam.asset.tracking.exception.InvalidUserException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import com.epam.asset.tracking.domain.BusinessProvider;
@@ -88,17 +89,17 @@ public class UserController {
 	@ApiResponses({ @ApiResponse(code = 200, message = "Returns the user data by username", response = BusinessProvider.class),
 			@ApiResponse(code = 405, message = "Username provided doesn't match the currently logged username") })
 	@ResponseStatus(HttpStatus.OK)
-	public Optional<BusinessProvider> getUserData (
+	public BusinessProvider getUserData (
 			@ApiParam(value = "The username of the asset that we want to retrieve", required = true) @PathVariable @Valid String username,
 			HttpServletRequest req)  throws InvalidUserException {
 		logger.debug("Call to GET:/asset/tracking/user/{username}");
-		Optional<BusinessProvider> userData = null;
+		BusinessProvider userData = null;
 
-		//if(req.getUserPrincipal().equals(username)){
-		userData = businessProviderService.findUserbyUsername(username);
-		//} else {
-		// 	throw new InvalidUserException("Username provided doesn't match the one who is currently logged in");
-		//}
+		if(req.getUserPrincipal().getName().equals(username)){
+		    userData = businessProviderService.findUserbyUsername(req.getUserPrincipal().getName()).orElseThrow(() -> new UsernameNotFoundException("Invalid username or password."));
+		} else {
+			throw new InvalidUserException("Username provided doesn't match the one who is currently logged in");
+		}
 
 
 
