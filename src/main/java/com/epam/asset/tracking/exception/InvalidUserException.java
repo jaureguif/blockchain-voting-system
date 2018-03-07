@@ -3,7 +3,7 @@ package com.epam.asset.tracking.exception;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-@ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "Invalid username provided")
+@ResponseStatus(value = HttpStatus.METHOD_NOT_ALLOWED, reason = "Invalid username provided")
 public class InvalidUserException extends Exception {
 
 	/**
