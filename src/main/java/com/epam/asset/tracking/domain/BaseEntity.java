@@ -2,6 +2,7 @@ package com.epam.asset.tracking.domain;
 
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.data.annotation.Id;
 
 /**
@@ -11,7 +12,8 @@ import org.springframework.data.annotation.Id;
  */
 public abstract class BaseEntity<ID> {
 
-  @Id	
+  @Id
+  @JsonIgnore
   private ID id;
 
   public ID getId() {
