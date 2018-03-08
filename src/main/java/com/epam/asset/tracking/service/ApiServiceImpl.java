@@ -272,10 +272,12 @@ public class ApiServiceImpl implements ApiService {
     String[] args = {
         "addEvent",
         assetId.toString(),
-        Optional.ofNullable(event.getEncodedImage()).orElse("no-data"),
-        Optional.ofNullable(event.getAttachment()).orElse("no-data"),
         event.getSummary(),
         event.getDescription(),
+        event.getDate().toString(),
+        event.getBusinessProviderId(),
+        Optional.ofNullable(event.getEncodedImage()).orElse("no-data"),
+        Optional.ofNullable(event.getAttachment()).orElse("no-data")
     };
     transactionProposalRequest.setArgs(args);
     transactionProposalRequest.setFcn("invoke");
