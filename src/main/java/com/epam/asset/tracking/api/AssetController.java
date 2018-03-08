@@ -132,11 +132,13 @@ public class AssetController {
       @ApiParam(value = "The id of the asset that we want to retrieve", required = true) @PathVariable @Valid UUID id,
       @RequestPart("image") MultipartFile image,
       EventDTO eventDTO,
-      HttpServletRequest request) throws AssetNotFoundException {
+      HttpServletRequest request)
+      throws AssetNotFoundException, NoSuchMethodException, MethodArgumentNotValidException {
+    validate(eventDTO);
     Event event = mapper.map(eventDTO, Event.class);
     event.setBusinessProviderId(request.getUserPrincipal().getName());
+    event.setDate(ZonedDateTime.now());
     event.setEncodedImage(mapper.map(image, String.class));
-
     return api.addEventToAsset(id, event).orElseThrow(() -> new AssetNotFoundException("Asset with given UUID was not found"));
   }
 
@@ -150,6 +152,15 @@ public class AssetController {
           new MethodParameter(this.getClass().getDeclaredMethod("postAsset", MultipartFile.class,
               AssetDTO.class, HttpServletRequest.class), 0),
           errors);
+    }
+  }
+
+  private void validate(EventDTO eventDTO) throws NoSuchMethodException, SecurityException, MethodArgumentNotValidException {
+    BeanPropertyBindingResult errors = new BeanPropertyBindingResult(eventDTO, "event");
+    validator.validate(eventDTO, errors);
+    if (errors.hasErrors()) {
+      throw new MethodArgumentNotValidException(
+          new MethodParameter(this.getClass().getDeclaredMethod("newAssetEvent", UUID.class, MultipartFile.class, EventDTO.class, HttpServletRequest.class), 0), errors);
     }
   }
 

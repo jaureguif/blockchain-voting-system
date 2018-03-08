@@ -9,12 +9,6 @@ public class EventDTO {
   private @NotBlank String summary;
   private @NotBlank String description;
 
-  private final ZonedDateTime date;
-
-  public EventDTO() {
-    date = ZonedDateTime.now();
-  }
-
   public String getSummary() {
     return summary;
   }
@@ -29,9 +23,5 @@ public class EventDTO {
 
   public void setDescription(String description) {
     this.description = description;
-  }
-
-  public ZonedDateTime getDate() {
-    return date;
   }
 }
