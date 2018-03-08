@@ -18,7 +18,7 @@
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>1.5.9.RELEASE</version>
 	</parent>
-	
+
 	<repositories>
 		<repository>
 			<id>hyperledger-snapshots-repo</id>
@@ -42,8 +42,22 @@
 			<version>4.4.4</version><!--$NO-MVN-MAN-VER$ -->
 			<scope>compile</scope>
 		</dependency>
+		
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-mongodb</artifactId>
+		</dependency>
 
+		<!-- Spring Security -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
+		</dependency>
 
+		<dependency>
+			<groupId>org.springframework.security.oauth</groupId>
+			<artifactId>spring-security-oauth2</artifactId>
+		</dependency>
 
 		<!-- Logging -->
 		<dependency>
@@ -66,12 +80,6 @@
 			<groupId>org.hyperledger.fabric-sdk-java</groupId>
 			<artifactId>fabric-sdk-java</artifactId>
 			<version>1.0.0</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.hyperledger.fabric</groupId>
-			<artifactId>fabric-chaincode-shim</artifactId>
-			<version>1.2.0-SNAPSHOT</version>
 		</dependency>
 
 		<!-- Swagger dependencies -->
@@ -106,14 +114,27 @@
 		</dependency>
 
 
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-annotations</artifactId>
-            <version>2.9.0</version><!--$NO-MVN-MAN-VER$-->
-        </dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-annotations</artifactId>
+			<version>2.9.0</version><!--$NO-MVN-MAN-VER$ -->
+		</dependency>
+
+		<dependency>
+			<groupId>com.fasterxml.jackson.datatype</groupId>
+			<artifactId>jackson-datatype-jsr310</artifactId>
+		</dependency>
 
 
-        <!-- Test dependencies -->
+		<!-- Test dependencies -->
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+
+
 		<dependency>
 			<groupId>commons-httpclient</groupId>
 			<artifactId>commons-httpclient</artifactId>
@@ -125,15 +146,12 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+
 		<dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-mongodb</artifactId>
-        </dependency>
-       <dependency>
-		    <groupId>de.flapdoodle.embed</groupId>
-		    <artifactId>de.flapdoodle.embed.mongo</artifactId><!--$NO-MVN-MAN-VER$-->
-		    <version>2.0.1</version><!--$NO-MVN-MAN-VER$-->
-		    <scope>test</scope>
+			<groupId>de.flapdoodle.embed</groupId>
+			<artifactId>de.flapdoodle.embed.mongo</artifactId><!--$NO-MVN-MAN-VER$ -->
+			<version>2.0.1</version><!--$NO-MVN-MAN-VER$ -->
+			<scope>test</scope>
 		</dependency>
 
 		<!-- Orika -->
@@ -143,6 +161,21 @@
 			<version>1.4.6</version>
 		</dependency>
 		<!-- End Orika -->
+
+		<!-- Multipart File -->
+		<dependency>
+			<groupId>commons-fileupload</groupId>
+			<artifactId>commons-fileupload</artifactId>
+			<version>1.3.1</version>
+		</dependency>
+		<!-- End Multipart File -->
+		
+		<!-- Developer Tools -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-devtools</artifactId>
+			<optional>true</optional>
+		</dependency>
 
 	</dependencies>
 
@@ -164,16 +197,18 @@
 							<format>xml</format>
 						</formats>
 						<instrumentation>
-						<ignoreTrivial>true</ignoreTrivial>
-						<ignoreMethodAnnotation>com.epam.asset.tracking.annotation.CoverageIgnore</ignoreMethodAnnotation>
+							<ignoreTrivial>true</ignoreTrivial>
+							<ignoreMethodAnnotation>com.epam.asset.tracking.annotation.CoverageIgnore</ignoreMethodAnnotation>
 							<excludes>
 								<!--Excluding custom Exceptions -->
 								<exclude>com/epam/asset/tracking/exception/**/*.class</exclude>
 								<!--Excluding /domain & DTO POJOs -->
 								<exclude>com/epam/asset/tracking/domain/**/*.class</exclude>
 								<exclude>com/epam/asset/tracking/dto/**/*.class</exclude>
-								<!--Excluding ValidationsUtil because this class is used only as a constants repo -->
+								<!--Excluding ValidationsUtil because this class is used only as 
+									a constants repo -->
 								<exclude>com/epam/asset/tracking/dto/validations/ValidationsUtil.class</exclude>
+								<exclude>com/epam/asset/tracking/service/ApiServiceImpl.class</exclude>
 								<exclude>org/hyperledger/**/*.class</exclude>
 								<exclude>org/hyperledger/**/*Test.class</exclude>
 							</excludes>
