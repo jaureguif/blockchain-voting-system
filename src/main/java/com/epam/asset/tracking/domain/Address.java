@@ -1,5 +1,7 @@
 package com.epam.asset.tracking.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.util.Objects;
 
 /**
@@ -13,6 +15,7 @@ public class Address {
   private String zipCode;
   private String state;
   private String city;
+  @JsonIgnore
   private String country;
 
   public String getStreet() {
