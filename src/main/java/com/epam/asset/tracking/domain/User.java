@@ -14,10 +14,9 @@ public class User extends BaseEntity<String> {
   public enum Role { ADMIN, BUSINESS_PROVIDER, USER; }
 
   private String username;
-  @JsonIgnore
+
   private String password;
 
-  @JsonIgnore
   private Role role;
   private String email;
   
