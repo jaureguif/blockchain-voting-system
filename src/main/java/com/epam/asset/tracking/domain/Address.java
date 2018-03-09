@@ -15,7 +15,6 @@ public class Address {
   private String zipCode;
   private String state;
   private String city;
-  @JsonIgnore
   private String country;
 
   public String getStreet() {
