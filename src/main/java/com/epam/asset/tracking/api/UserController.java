@@ -3,6 +3,7 @@ package com.epam.asset.tracking.api;
 import com.epam.asset.tracking.dto.BusinessProviderDTO;
 import com.epam.asset.tracking.dto.UserDTO;
 import com.epam.asset.tracking.exception.InvalidUserException;
+import io.swagger.annotations.*;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,11 +12,6 @@ import com.epam.asset.tracking.domain.User.Role;
 import com.epam.asset.tracking.exception.DuplicateKeyExceptionWrapper;
 import com.epam.asset.tracking.service.ApiService;
 import com.epam.asset.tracking.service.BusinessProviderService;
-
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
 
 import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
@@ -86,7 +82,7 @@ public class UserController {
 
 	@RolesAllowed("ROLE_BUSINESS_PROVIDER")
 	@GetMapping(value = "/{username}", produces = MediaType.APPLICATION_JSON_VALUE)
-	@ApiOperation("Getting a user data by username")
+    @ApiOperation(value = "Getting a user data by username", authorizations = {@Authorization(value = "basicAuth")})
 	@ApiResponses({ @ApiResponse(code = 200, message = "Returns the user data by username", response = BusinessProvider.class),
 			@ApiResponse(code = 405, message = "Username provided doesn't match the currently logged username") })
 	@ResponseStatus(HttpStatus.OK)
