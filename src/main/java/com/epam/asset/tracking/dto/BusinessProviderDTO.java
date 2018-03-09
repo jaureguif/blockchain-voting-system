@@ -86,7 +86,7 @@ public class BusinessProviderDTO  {
 		return Objects.equals(name, that.name) &&
 				Objects.equals(lastName, that.lastName) &&
 				Objects.equals(rfc, that.rfc) &&
-				businessType == that.businessType &&
+                businessType == that.businessType &&
 				Objects.equals(address, that.address) &&
 				Objects.equals(username, that.username) &&
 				Objects.equals(email, that.email);
