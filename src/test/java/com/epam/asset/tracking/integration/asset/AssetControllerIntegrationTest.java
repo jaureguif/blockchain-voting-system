@@ -1,13 +1,22 @@
 package com.epam.asset.tracking.integration.asset;
 
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.fileUpload;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.time.ZonedDateTime;
+import java.util.Optional;
 import java.util.UUID;
+
+import com.epam.asset.tracking.domain.Asset;
+import com.epam.asset.tracking.domain.Event;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
@@ -112,6 +121,62 @@ public class AssetControllerIntegrationTest extends AbstractIntegrationTest {
 
 
 	}
-	
-	
+
+	@Test
+	@WithMockUser(username = "admin", roles = {"BUSINESS_PROVIDER", "USER"})
+	public void shouldNewAssetEventReturn200WhenEventIsValid() throws Exception {
+		Event event = new Event();
+		event.setDate(ZonedDateTime.now());
+		event.setBusinessProviderId("BUSINESS_PROVIDER");
+		event.setEncodedImage("image");
+		event.setAttachment("no-data");
+		event.setDescription("A brief description");
+		event.setSummary("A summary for this asset");
+		Asset asset = new Asset();
+		asset.setUuid(UUID.fromString("9d40ee4e-bf1e-4f74-8237-c5e9b6e8f6d3"));
+		asset.getEvents().add(event);
+		when(api.addEventToAsset(eq(asset.getUuid()), any(Event.class))).thenReturn(Optional.of(asset));
+
+		MockMultipartFile multipartFile = new MockMultipartFile("image", "FileUploadTest.txt", null, new byte[100]);
+		mockMvc
+				.perform(fileUpload("/asset/tracking/asset/" + asset.getUuid() + "/event")
+						.file(multipartFile)
+						.param("description", event.getDescription())
+						.param("summary", event.getSummary())
+						.accept(MediaType.APPLICATION_JSON)
+		)
+		 .andDo(print())
+		 .andExpect(status().isCreated());
+	}
+
+	@Test
+	@WithMockUser(username = "admin", roles = {"BUSINESS_PROVIDER", "USER"})
+	public void shouldNewAssetEventReturn400WhenEventIsNotValid() throws Exception {
+		MockMultipartFile multipartFile = new MockMultipartFile("image", "FileUploadTest.txt", null, new byte[100]);
+		mockMvc
+				.perform(fileUpload("/asset/tracking/asset/9d40ee4e-bf1e-4f74-8237-c5e9b6e8f6d3/event")
+						.file(multipartFile)
+						.param("description", "")
+						.param("summary", "")
+						.accept(MediaType.APPLICATION_JSON)
+				)
+				.andDo(print())
+				.andExpect(status().isBadRequest());
+	}
+
+	@Test
+	@WithMockUser(username = "admin", roles = {"BUSINESS_PROVIDER", "USER"})
+	public void shouldNewAssetEventReturn404WhenAssetIsNotFound() throws Exception {
+		when(api.addEventToAsset(any(UUID.class), any(Event.class))).thenReturn(Optional.empty());
+		MockMultipartFile multipartFile = new MockMultipartFile("image", "FileUploadTest.txt", null, new byte[100]);
+		mockMvc
+				.perform(fileUpload("/asset/tracking/asset/9d40ee4e-bf1e-4f74-8237-c5e9b6e8f6d3/event")
+						.file(multipartFile)
+						.param("description", "A brief description")
+						.param("summary", "A summary for this asset")
+						.accept(MediaType.APPLICATION_JSON)
+				)
+				.andDo(print())
+				.andExpect(status().isNotFound());
+	}
 }
