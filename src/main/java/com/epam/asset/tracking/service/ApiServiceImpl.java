@@ -110,6 +110,7 @@ public class ApiServiceImpl implements ApiService {
   private MapperFacade mapper;
 
   @Override
+  @CoverageIgnore
   public String saveAsset(Asset asset) {
     String result = null;
     try {
@@ -123,9 +124,8 @@ public class ApiServiceImpl implements ApiService {
     return result;
   }
 
-
-
   @Override
+  @CoverageIgnore
   public Asset getAssetById(UUID id) throws AssetNotFoundException {
 
     String jsonStr;
@@ -141,6 +141,7 @@ public class ApiServiceImpl implements ApiService {
   }
 
   @Override
+  @CoverageIgnore
   public Optional<Asset> addEventToAsset(UUID assetId, Event event) {
     Optional<String> payload = Optional.empty();
     try {
@@ -156,6 +157,7 @@ public class ApiServiceImpl implements ApiService {
         .map(asset -> { asset.getEvents().add(event); return asset; });
   }
 
+  @CoverageIgnore
   private String saveAssetToFabric(Asset asset)
       throws InvalidArgumentException, ProposalException {
 
@@ -258,6 +260,7 @@ public class ApiServiceImpl implements ApiService {
     return result;
   }
 
+  @CoverageIgnore
   private boolean saveAssetEventOnBlockchain(UUID assetId, Event event) throws BlockchainTransactionException {
     Collection<ProposalResponse> successful = new LinkedList<>();
     Collection<ProposalResponse> failed = new LinkedList<>();
@@ -355,6 +358,7 @@ public class ApiServiceImpl implements ApiService {
     return result;
   }
 
+  @CoverageIgnore
   private String getAssetFromFabric(UUID id)
       throws InvalidArgumentException, ProposalException, AssetNotFoundException {
     String payload = null;
@@ -405,6 +409,7 @@ public class ApiServiceImpl implements ApiService {
     return payload;
   }
 
+  @CoverageIgnore
   private void setup() throws MalformedURLException, NoSuchFieldException, SecurityException,
       IllegalArgumentException, IllegalAccessException {
 
@@ -505,6 +510,7 @@ public class ApiServiceImpl implements ApiService {
     }
   }
 
+  @CoverageIgnore
   private File findFileSk(File directory) {
 
     File[] matches = directory.listFiles((dir, name) -> name.endsWith("_sk"));
@@ -523,6 +529,7 @@ public class ApiServiceImpl implements ApiService {
 
   }
 
+  @CoverageIgnore
   private Channel constructChannel(String name, HFClient client, SampleOrg sampleOrg)
       throws Exception {
     ////////////////////////////
