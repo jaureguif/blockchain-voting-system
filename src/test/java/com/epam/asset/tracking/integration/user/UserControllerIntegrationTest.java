@@ -123,7 +123,7 @@ public class UserControllerIntegrationTest extends AbstractIntegrationTest {
 
 
 	@Test
-	@WithMockUser(username = "mmonraz", password = "0s0n3gr0",roles = {"BUSINESS_PROVIDER", "USER"})
+	@WithMockUser(username = "useraNLH", password = "qwerty1234" ,roles = {"BUSINESS_PROVIDER", "USER"})
 	public void getUserData_Success() {
 		try {
 			mockMvc.perform(get("/asset/tracking/users/mmonraz")
