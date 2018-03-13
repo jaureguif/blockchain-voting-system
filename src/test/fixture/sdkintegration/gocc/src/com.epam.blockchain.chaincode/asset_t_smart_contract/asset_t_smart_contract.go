@@ -121,6 +121,8 @@ func (t *AssetTrackingSmartContract) Invoke(stub shim.ChaincodeStubInterface) pb
 		return shim.Error("Not yet implemented")
 	case "delete":
 		return shim.Error("Not yet implemented")
+	case "addEvent":
+		return t.addEvent(stub,args)
 	default:
 		return shim.Error("Unknown action, check the first argument, must be one of 'create', 'query', 'update' or 'delete'")
 	}
@@ -216,6 +218,73 @@ func (t *AssetTrackingSmartContract) validateAssetParams(args []string) error {
 		return errors.New(errorText)
 	}
 	return nil
+}
+
+func (t *AssetTrackingSmartContract) addEvent(stub shim.ChaincodeStubInterface, args []string) pb.Response {
+	fmt.Println("########### addEvent ###########")
+	if len(args) != 8 {
+		return shim.Error("Incorrect number of arguments. Expecting for add an event.")
+	}
+
+	id := args[1]
+
+	fmt.Println("########### search id = %s ###########", id)
+
+	assetJson, err := stub.GetState(id)
+	if err != nil {
+		return shim.Error("Failed to get state")
+	}
+	if assetJson == nil {
+		return shim.Error("Not found!")
+	}
+
+	asset := Asset{}
+	json.Unmarshal([]byte(assetJson), &asset)
+	/*
+	this is th order of th args
+	Summary            string `json:"summary"`
+	Description        string `json:"description"`
+	Date               string `json:"date"`
+	BusinessProviderID string `json:"businessProviderId"`
+	EncodedImage       string `json:"encodedImage"`
+	EncodedFiles       string `json:"attachment"`
+	*/
+	event := Event {args[2],args[3],args[4],args[5],args[6],args[7]}
+
+
+	asset.Events = insert(asset.Events,len(asset.Events), event)
+
+	jsonBlob, err2 := json.Marshal(asset)
+
+	if err2 != nil {
+		return shim.Error(err2.Error())
+	}
+
+	err3 := stub.PutState(asset.UUID, jsonBlob)
+
+	if err3 != nil {
+		return shim.Error(err3.Error())
+	}
+	fmt.Println("########### json to be saved###########")
+	fmt.Println(" %s ", jsonBlob)
+
+	return shim.Success(nil)
+}
+//for implementing a similar behaviour as a dynamic array.
+func insert(original []Event, position int, value Event) []Event {
+	//we'll grow by 1
+	target := make([]Event, len(original)+1)
+
+	//copy everything up to the position
+	copy(target, original[:position])
+
+	//set the new value at the desired position
+	target[position] = value
+
+	//copy everything left over
+	copy(target[position+1:], original[position:])
+
+	return target
 }
 
 func (t *AssetTrackingSmartContract) isBlank(str string) bool {

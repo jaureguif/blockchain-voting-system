@@ -29,12 +29,19 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import com.epam.asset.tracking.domain.Event;
+import com.epam.asset.tracking.exception.BlockchainTransactionException;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
@@ -116,6 +123,8 @@ public class ApiServiceImpl implements ApiService {
     return result;
   }
 
+
+
   @Override
   public Asset getAssetById(UUID id) throws AssetNotFoundException {
 
@@ -129,6 +138,22 @@ public class ApiServiceImpl implements ApiService {
 
     return mapper.map(jsonStr, Asset.class);
 
+  }
+
+  @Override
+  public Optional<Asset> addEventToAsset(UUID assetId, Event event) {
+    Optional<String> payload = Optional.empty();
+    try {
+      payload = Optional.of(getAssetFromFabric(assetId));
+    } catch (InvalidArgumentException | ProposalException | AssetNotFoundException e) {
+      log.error("Error when trying to retrieve asset with id {}", assetId, e);
+    }
+
+    return payload
+        .filter(json -> !json.trim().isEmpty())
+        .map(json -> mapper.map(json, Asset.class))
+        .filter(asset -> saveAssetEventOnBlockchain(asset.getUuid(), event))
+        .map(asset -> { asset.getEvents().add(event); return asset; });
   }
 
   private String saveAssetToFabric(Asset asset)
@@ -229,6 +254,103 @@ public class ApiServiceImpl implements ApiService {
 
 
     String result = successful.size() == channel.getPeers().size() ? "OK" : "FAIL";
+    channel.shutdown(true);
+    return result;
+  }
+
+  private boolean saveAssetEventOnBlockchain(UUID assetId, Event event) throws BlockchainTransactionException {
+    Collection<ProposalResponse> successful = new LinkedList<>();
+    Collection<ProposalResponse> failed = new LinkedList<>();
+
+    try {
+      setup();
+    } catch (Exception e) {
+      log.error("Error in setup: {}", e);
+    }
+
+    TransactionProposalRequest transactionProposalRequest = client.newTransactionProposalRequest();
+    String[] args = {
+        "addEvent",
+        assetId.toString(),
+        event.getSummary(),
+        event.getDescription(),
+        event.getDate().toString(),
+        event.getBusinessProviderId(),
+        Optional.ofNullable(event.getEncodedImage()).orElse("no-data"),
+        Optional.ofNullable(event.getAttachment()).orElse("no-data")
+    };
+    transactionProposalRequest.setArgs(args);
+    transactionProposalRequest.setFcn("invoke");
+    transactionProposalRequest.setProposalWaitTime(testConfig.getProposalWaitTime());
+    transactionProposalRequest.setChaincodeID(chaincodeID);
+
+    Map<String, byte[]> tm2 = new HashMap<>();
+    tm2.put("HyperLedgerFabric", "TransactionProposalRequest:JavaSDK".getBytes(UTF_8));
+    tm2.put("method", "TransactionProposalRequest".getBytes(UTF_8));
+    tm2.put(EXPECTED_EVENT_NAME, EXPECTED_EVENT_DATA);
+    try {
+      transactionProposalRequest.setTransientMap(tm2);
+    } catch (InvalidArgumentException e) {
+      throw new IllegalArgumentException(e);
+    }
+
+    log.info("sending transactionProposal to all peers with arguments: addEvent()");
+
+    Collection<ProposalResponse> transactionPropResp = null;
+    try {
+      transactionPropResp = channel.sendTransactionProposal(transactionProposalRequest, channel.getPeers());
+    } catch (ProposalException e) {
+      throw new BlockchainTransactionException("Error sending transaction proposal to ledger", e);
+    } catch (InvalidArgumentException e) {
+      throw new IllegalArgumentException(e);
+    }
+    for (ProposalResponse response : transactionPropResp) {
+      if (response.getStatus() == ProposalResponse.Status.SUCCESS) {
+        log.info("Successful transaction proposal response Txid: {} from peer {}", response.getTransactionID(), response.getPeer().getName());
+        successful.add(response);
+      } else failed.add(response);
+    }
+
+    Collection<Set<ProposalResponse>> proposalConsistencySets = null;
+    try {
+      proposalConsistencySets = SDKUtils.getProposalConsistencySets(transactionPropResp);
+    } catch (InvalidArgumentException e) {
+      throw new IllegalArgumentException(e);
+    }
+    if (proposalConsistencySets.size() != 1) {
+      log.error("Expected only one set of consistent proposal responses but got {}", proposalConsistencySets.size());
+    }
+
+    log.info("Received {} transaction proposal responses. Successful+verified: {}. Failed: {}", transactionPropResp.size(), successful.size(), failed.size());
+    if (failed.size() > 0) {
+      ProposalResponse firstTransactionProposalResponse = failed.iterator().next();
+      log.error("Not enough endorsers for create(): {} endorser error: {}. Was verified: {}", failed.size(), firstTransactionProposalResponse.getMessage(), firstTransactionProposalResponse.isVerified());
+    }
+    log.info("Successfully received transaction proposal responses.");
+    ProposalResponse resp = transactionPropResp.iterator().next();
+    try {
+      log.info("RESPONSE ACTION RESPONSE STATUS: " + resp.getChaincodeActionResponseStatus());
+    } catch (InvalidArgumentException e) {
+      // Looking at the source code, this exception will never e thrown... but who knows?
+      log.error("!!!???", e);
+      throw new IllegalArgumentException(e);
+    }
+    log.info("Sending chaincode transaction(addEvent) to orderer.");
+
+    CompletableFuture<TransactionEvent> future = channel.sendTransaction(successful);
+    TransactionEvent txEvent = null;
+    try {
+      txEvent = future.get(testConfig.getTransactionWaitTime(), TimeUnit.SECONDS);
+    } catch (InterruptedException e) {
+      throw new BlockchainTransactionException("Interrupted transaction", e);
+    } catch (ExecutionException e) {
+      throw new BlockchainTransactionException("Transaction throw an exception but complete", e);
+    } catch (TimeoutException e) {
+      throw new BlockchainTransactionException("Wait too much to finish transaction", e);
+    }
+    log.warn("Chaincode transaction(addEvent) completed with transaction ID: {}", txEvent.getTransactionID());
+
+    boolean result = successful.size() == channel.getPeers().size();
     channel.shutdown(true);
     return result;
   }
