@@ -28,6 +28,7 @@ import com.epam.asset.tracking.service.BusinessProviderService;
 import com.epam.asset.tracking.web.AbstractWebTest;
 
 import ma.glasnost.orika.MapperFacade;
+import org.springframework.security.test.context.support.WithMockUser;
 
 public class UserControllerTest extends AbstractWebTest{
 	
@@ -120,6 +121,7 @@ public class UserControllerTest extends AbstractWebTest{
 	}
 
 	@Test
+	@WithMockUser(username = "useraNLH", password = "qwerty1234",roles = {"BUSINESS_PROVIDER", "USER"})
 	public void getUserData() {
 		try {
 			mockMvc.perform(post("/asset/tracking/users/mmonraz")
