@@ -19,7 +19,7 @@ public class JsonStringToAssetConverter extends CustomConverter<String, Asset> {
 
   /**
    * Created by Miguel Monraz on 12/02/2018 Converts a given JSON String into an Java Object
-   * 
+   *
    * @param source a JSON String that represents an Asset
    * @return Asset
    *

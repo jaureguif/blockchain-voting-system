@@ -1,5 +1,7 @@
 package com.epam.asset.tracking.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.util.Objects;
 
 /**
@@ -12,7 +14,9 @@ public class User extends BaseEntity<String> {
   public enum Role { ADMIN, BUSINESS_PROVIDER, USER; }
 
   private String username;
+
   private String password;
+
   private Role role;
   private String email;
   

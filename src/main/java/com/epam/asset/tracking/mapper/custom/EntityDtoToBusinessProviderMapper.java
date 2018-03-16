@@ -4,7 +4,7 @@ import com.epam.asset.tracking.domain.Address;
 import com.epam.asset.tracking.domain.BusinessProvider;
 import com.epam.asset.tracking.domain.BUSINESS_TYPE;
 import com.epam.asset.tracking.domain.User;
-import com.epam.asset.tracking.dto.EntityDTO;
+import com.epam.asset.tracking.dto.UserDTO;
 import ma.glasnost.orika.CustomMapper;
 import ma.glasnost.orika.MappingContext;
 import org.springframework.stereotype.Component;
@@ -13,10 +13,10 @@ import org.springframework.stereotype.Component;
  * Created on 1/29/2018.
  */
 @Component
-public class EntityDtoToBusinessProviderMapper extends CustomMapper<EntityDTO, BusinessProvider> {
+public class EntityDtoToBusinessProviderMapper extends CustomMapper<UserDTO, BusinessProvider> {
 
     @Override
-    public void mapAtoB(EntityDTO dto, BusinessProvider entity, MappingContext context){
+    public void mapAtoB(UserDTO dto, BusinessProvider entity, MappingContext context){
         
         Address address = new Address();
         address.setStreet(dto.getAddress());

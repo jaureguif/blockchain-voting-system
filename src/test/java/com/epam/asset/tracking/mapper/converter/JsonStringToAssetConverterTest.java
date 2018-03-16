@@ -69,6 +69,24 @@ public class JsonStringToAssetConverterTest {
         converter.convert(jsonAsset, null);
 
     }
+
+    @Test
+    public void convertJSONStringToAssetNullString(){
+
+        String jsonAsset = null;
+
+        JsonStringToAssetConverter converter = new JsonStringToAssetConverter();
+
+
+        Asset asset = null;
+
+        //Converts the given JSON Script into an Asset Object
+        asset  = converter.convert(jsonAsset, null);
+
+        //Check if the values from the Asset object created matched the on the JSON String
+        assertThat("Asset is not null", asset, is(nullValue()));
+
+    }
     
     
     
