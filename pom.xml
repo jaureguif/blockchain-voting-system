@@ -209,6 +209,11 @@
 									a constants repo -->
 								<exclude>com/epam/asset/tracking/dto/validations/ValidationsUtil.class</exclude>
 								<exclude>com/epam/asset/tracking/service/ApiServiceImpl.class</exclude>
+								<exclude>com/epam/asset/tracking/service/SampleOrg.class</exclude>
+								<exclude>com/epam/asset/tracking/service/SampleStore.class</exclude>
+								<exclude>com/epam/asset/tracking/service/SampleUser.class</exclude>
+								<exclude>com/epam/asset/tracking/service/TestConfig.class</exclude>
+								<exclude>com/epam/asset/tracking/service/TestConfigHelper.class</exclude>
 								<exclude>org/hyperledger/**/*.class</exclude>
 								<exclude>org/hyperledger/**/*Test.class</exclude>
 							</excludes>

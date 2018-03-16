@@ -1,5 +1,7 @@
 package com.epam.asset.tracking.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.util.Objects;
 
 /**

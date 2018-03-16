@@ -1,6 +1,6 @@
 package com.epam.asset.tracking.api;
 
-import com.epam.asset.tracking.dto.EntityDTO;
+import com.epam.asset.tracking.dto.UserDTO;
 import com.epam.asset.tracking.repository.BusinessProviderRepository;
 import com.epam.asset.tracking.service.ApiService;
 import com.epam.asset.tracking.service.BusinessProviderService;
@@ -47,7 +47,7 @@ public class AssetControllerTest extends AbstractWebTest {
   @Ignore
   public void testConverter() throws Exception {
 
-    EntityDTO dto = new EntityDTO();
+    UserDTO dto = new UserDTO();
     dto.setAddress(
         "string with a comma, not at the end, of course, but with a period at the end. and one more thing...");
     dto.setBusinessType("businessType");

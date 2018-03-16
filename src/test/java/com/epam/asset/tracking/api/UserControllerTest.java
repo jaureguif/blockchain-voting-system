@@ -21,15 +21,16 @@ import org.springframework.http.MediaType;
 
 import com.epam.asset.tracking.domain.BusinessProvider;
 import com.epam.asset.tracking.domain.User.Role;
-import com.epam.asset.tracking.dto.EntityDTO;
+import com.epam.asset.tracking.dto.UserDTO;
 import com.epam.asset.tracking.repository.BusinessProviderRepository;
 import com.epam.asset.tracking.service.ApiService;
 import com.epam.asset.tracking.service.BusinessProviderService;
 import com.epam.asset.tracking.web.AbstractWebTest;
 
 import ma.glasnost.orika.MapperFacade;
+import org.springframework.security.test.context.support.WithMockUser;
 
-public class EntityControllerTest extends AbstractWebTest{
+public class UserControllerTest extends AbstractWebTest{
 	
 	@MockBean
 	ApiService api;
@@ -56,7 +57,7 @@ public class EntityControllerTest extends AbstractWebTest{
 	@Ignore
 	public void shouldReturn201() throws Exception {
 		
-		EntityDTO dto = new EntityDTO();
+		UserDTO dto = new UserDTO();
 		dto.setAddress(
 				"string with a comma, not at the end, of course, but with a period at the end. and one more thing...");
 		dto.setBusinessType("businessType");
@@ -74,7 +75,7 @@ public class EntityControllerTest extends AbstractWebTest{
 		
 		System.out.println(jacksonMapper.writeValueAsString(dto));
 		
-		mockMvc.perform(post("/asset/tracking/entity/")
+		mockMvc.perform(post("/asset/tracking/users/")
 				.contentType(MediaType.APPLICATION_JSON_UTF8)
 				.content(jacksonMapper.writeValueAsString(dto)))
 			.andDo(print())
@@ -87,7 +88,7 @@ public class EntityControllerTest extends AbstractWebTest{
 	@Ignore
 	public void shouldReturn409() throws Exception {
 		
-		EntityDTO dto = new EntityDTO();
+		UserDTO dto = new UserDTO();
 		dto.setAddress(
 				"string with a comma, not at the end, of course, but with a period at the end. and one more thing...");
 		dto.setBusinessType("businessType");
@@ -111,12 +112,24 @@ public class EntityControllerTest extends AbstractWebTest{
 		
 		when(businessProviderService.save(bp)).thenThrow(new DuplicateKeyException("Duplicated username"));
 		
-		mockMvc.perform(post("/asset/tracking/entity/")
+		mockMvc.perform(post("/asset/tracking/users/")
 				.contentType(MediaType.APPLICATION_JSON_UTF8)
 				.content(jacksonMapper.writeValueAsString(dto)))
 			.andDo(print())
 			.andExpect(status().isConflict())
 			.andExpect(content().string(IsEmptyString.isEmptyString()));
+	}
+
+	@Test
+	@WithMockUser(username = "useraNLH", password = "qwerty1234",roles = {"BUSINESS_PROVIDER", "USER"})
+	public void getUserData() {
+		try {
+			mockMvc.perform(post("/asset/tracking/users/mmonraz")
+                    .contentType(MediaType.APPLICATION_JSON_UTF8))
+                    .andDo(print());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 }

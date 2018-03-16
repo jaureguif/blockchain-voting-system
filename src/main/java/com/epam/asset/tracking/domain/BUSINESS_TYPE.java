@@ -1,5 +1,7 @@
 package com.epam.asset.tracking.domain;
 
+import org.springframework.util.StringUtils;
+
 import java.util.Locale;
 
 public enum BUSINESS_TYPE {
@@ -18,4 +20,12 @@ public enum BUSINESS_TYPE {
 		return bt;
 
 	}
+
+	public static String getValue(BUSINESS_TYPE enumValue) {
+
+		String value = StringUtils.capitalize(enumValue.name().trim().replaceAll("_", " ").toLowerCase(Locale.ENGLISH));
+		return value;
+
+	}
+
 }
