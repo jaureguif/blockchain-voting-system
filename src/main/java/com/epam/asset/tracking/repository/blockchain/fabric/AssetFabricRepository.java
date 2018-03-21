@@ -8,7 +8,9 @@ import com.epam.asset.tracking.domain.Event;
 import com.epam.asset.tracking.repository.AssetRepository;
 import ma.glasnost.orika.MapperFacade;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public class AssetFabricRepository extends BaseFabricRepository<Asset, UUID> implements AssetRepository {
 
   private static final String NO_BINARY_DATA = "no-data";
@@ -22,6 +24,7 @@ public class AssetFabricRepository extends BaseFabricRepository<Asset, UUID> imp
   private @Autowired MapperFacade mapper;
 
   @Override
+  @InitFabric
   public Optional<Asset> findOne(UUID uuid) {
     ProposalRequestArgs args = new ProposalRequestArgs.Builder()
         .chaincodeMethod(AssetChaincodeMethods.QUERY)
@@ -32,6 +35,7 @@ public class AssetFabricRepository extends BaseFabricRepository<Asset, UUID> imp
   }
 
   @Override
+  @InitFabric
   public Asset save(Asset asset) {
     Event event = asset.getEvents().iterator().next();
     ProposalRequestArgs args = new ProposalRequestArgs.Builder()
@@ -54,6 +58,7 @@ public class AssetFabricRepository extends BaseFabricRepository<Asset, UUID> imp
   }
 
   @Override
+  @InitFabric
   public Optional<Asset> addEvent(UUID assetId, Event event) {
     return findOne(assetId)
       .filter(asset -> persistEvent(asset, event))

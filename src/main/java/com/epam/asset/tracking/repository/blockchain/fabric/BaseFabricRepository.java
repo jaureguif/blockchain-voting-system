@@ -128,4 +128,12 @@ public abstract class BaseFabricRepository<T, ID> implements BlockchainRepositor
     channel.shutdown(true);
     return Optional.ofNullable(payload);
   }
+
+  public void setClient(HFClient client) {
+    this.client = client;
+  }
+
+  public void setChannel(Channel channel) {
+    this.channel = channel;
+  }
 }
