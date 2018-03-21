@@ -130,12 +130,7 @@ public class ApiServiceImpl implements ApiService {
   @Cacheable(value= "assets",  key="#id")
   public Asset getAssetById(UUID id) throws AssetNotFoundException {
 
-    try {
-      Thread.sleep(5000);
-    } catch (Exception e1) {
-      // TODO Auto-generated catch block
-      e1.printStackTrace();
-    }
+    
     String jsonStr;
     try {
       jsonStr = getAssetFromFabric(id);
