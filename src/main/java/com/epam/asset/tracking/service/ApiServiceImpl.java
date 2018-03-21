@@ -70,6 +70,7 @@ import org.hyperledger.fabric_ca.sdk.RegistrationRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import com.epam.asset.tracking.annotation.CoverageIgnore;
@@ -126,7 +127,7 @@ public class ApiServiceImpl implements ApiService {
 
   @Override
   @CoverageIgnore
-  @Cacheable("assets")
+  @Cacheable(value= "assets",  key="#id")
   public Asset getAssetById(UUID id) throws AssetNotFoundException {
 
     try {
@@ -149,6 +150,7 @@ public class ApiServiceImpl implements ApiService {
 
   @Override
   @CoverageIgnore
+  @CacheEvict(value ="assets", key="#assetId")
   public Optional<Asset> addEventToAsset(UUID assetId, Event event) {
     Optional<String> payload = Optional.empty();
     try {
