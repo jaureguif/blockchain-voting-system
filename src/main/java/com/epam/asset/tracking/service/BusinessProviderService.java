@@ -10,4 +10,6 @@ public interface BusinessProviderService {
 
 	public Optional<BusinessProvider> findUserbyUsername(String name);
 
+	public BusinessProvider updatePassword(BusinessProvider entity, String password);
+
 }
