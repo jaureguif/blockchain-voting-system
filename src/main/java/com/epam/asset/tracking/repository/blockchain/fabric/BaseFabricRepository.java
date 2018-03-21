@@ -1,11 +1,7 @@
 package com.epam.asset.tracking.repository.blockchain.fabric;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
@@ -15,12 +11,8 @@ import java.util.concurrent.TimeoutException;
 
 import com.epam.asset.tracking.exception.BlockchainTransactionException;
 import com.epam.asset.tracking.repository.BlockchainRepository;
-import com.epam.asset.tracking.repository.blockchain.fabric.internal.SampleOrg;
 import com.epam.asset.tracking.repository.blockchain.fabric.internal.TestConfig;
-import com.epam.asset.tracking.repository.blockchain.fabric.internal.TestConfigHelper;
-import ma.glasnost.orika.MapperFacade;
 import org.hyperledger.fabric.sdk.BlockEvent.TransactionEvent;
-import org.hyperledger.fabric.sdk.ChaincodeID;
 import org.hyperledger.fabric.sdk.Channel;
 import org.hyperledger.fabric.sdk.HFClient;
 import org.hyperledger.fabric.sdk.ProposalResponse;
@@ -31,64 +23,28 @@ import org.hyperledger.fabric.sdk.exception.InvalidArgumentException;
 import org.hyperledger.fabric.sdk.exception.ProposalException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
-public abstract class BaseFabricRespository<T, ID> implements BlockchainRepository<T, ID> {
+public abstract class BaseFabricRepository<T, ID> implements BlockchainRepository<T, ID> {
 
   private static final TestConfig testConfig = TestConfig.getConfig();
-  private static final String TEST_ADMIN_NAME = "admin";
-  private static final String TESTUSER_1_NAME = "user1";
-  private static final String CHAIN_CODE_NAME = "asset_t_smart_contract_go";
-  private static final String CHAIN_CODE_PATH = "com.epam.blockchain.chaincode/asset_t_smart_contract";
-  private static final String CHAIN_CODE_VERSION = "1";
-  private static final byte[] EXPECTED_EVENT_DATA = "!".getBytes(UTF_8);
-  private static final String EXPECTED_EVENT_NAME = "event";
-  private static final String CHANNEL_NAME = "foo";
-  private static final Logger log = LoggerFactory.getLogger(BaseFabricRespository.class);
+  private static final Logger log = LoggerFactory.getLogger(BaseFabricRepository.class);
 
-  private final ChaincodeID chaincodeID = ChaincodeID.newBuilder().setName(CHAIN_CODE_NAME).setVersion(CHAIN_CODE_VERSION).setPath(CHAIN_CODE_PATH).build();
-  private final TestConfigHelper configHelper = new TestConfigHelper();
-
-  private HFClient client = null;
-  private Channel channel = null;
-  private Collection<SampleOrg> testSampleOrgs;
-
-  private @Autowired MapperFacade mapper;
-
-  public Optional<T> findOne(ID id) {
-    return Optional.empty();
-  }
-
-  public T save(T entity) {
-    return null;
-  }
+  private HFClient client;
+  private Channel channel;
 
   public boolean delete(T entity) {
-    return false;
+    throw new UnsupportedOperationException("Not yet implemented");
   }
 
-  private boolean modify() {
+  protected boolean modify(ProposalRequestArgs proposalRequestArgs) {
     Collection<ProposalResponse> successful = new LinkedList<>();
     Collection<ProposalResponse> failed = new LinkedList<>();
-    TransactionProposalRequest transactionProposalRequest = client.newTransactionProposalRequest();
-    String[] args = { "modify", "" };
-    transactionProposalRequest.setArgs(args);
-    transactionProposalRequest.setFcn("invoke");
-    transactionProposalRequest.setProposalWaitTime(testConfig.getProposalWaitTime());
-    transactionProposalRequest.setChaincodeID(chaincodeID);
-
-    Map<String, byte[]> tm2 = new HashMap<>();
-    tm2.put("HyperLedgerFabric", "TransactionProposalRequest:JavaSDK".getBytes(UTF_8));
-    tm2.put("method", "TransactionProposalRequest".getBytes(UTF_8));
-    tm2.put(EXPECTED_EVENT_NAME, EXPECTED_EVENT_DATA);
-    try {
-      transactionProposalRequest.setTransientMap(tm2);
-    } catch (InvalidArgumentException e) {
-      throw new IllegalArgumentException(e.getMessage());
-    }
-
+    TransactionProposalRequest transactionProposalRequest = new TransactionProposalRequestBuilder(client)
+        .args(proposalRequestArgs.getArgs())
+        .proposalWaitTime(testConfig.getProposalWaitTime())
+        .buildTransactionProposalRequest();
     log.info("sending transactionProposal to all peers with arguments: addEvent()");
-    Collection<ProposalResponse> transactionPropResp = null;
+    Collection<ProposalResponse> transactionPropResp;
     try {
       transactionPropResp = channel.sendTransactionProposal(transactionProposalRequest, channel.getPeers());
     } catch (ProposalException e) {
@@ -103,7 +59,7 @@ public abstract class BaseFabricRespository<T, ID> implements BlockchainReposito
       } else failed.add(response);
     }
 
-    Collection<Set<ProposalResponse>> proposalConsistencySets = null;
+    Collection<Set<ProposalResponse>> proposalConsistencySets;
     try {
       proposalConsistencySets = SDKUtils.getProposalConsistencySets(transactionPropResp);
     } catch (InvalidArgumentException e) {
@@ -129,7 +85,7 @@ public abstract class BaseFabricRespository<T, ID> implements BlockchainReposito
     log.info("Sending chaincode transaction(addEvent) to orderer.");
 
     CompletableFuture<TransactionEvent> future = channel.sendTransaction(successful);
-    TransactionEvent txEvent = null;
+    TransactionEvent txEvent;
     try {
       txEvent = future.get(testConfig.getTransactionWaitTime(), TimeUnit.SECONDS);
     } catch (InterruptedException e) {
@@ -146,21 +102,12 @@ public abstract class BaseFabricRespository<T, ID> implements BlockchainReposito
     return result;
   }
 
-  private Optional<String> query() {
+  protected Optional<String> query(ProposalRequestArgs proposalRequestArgs) {
     String payload = null;
-    QueryByChaincodeRequest queryByChaincodeRequest = client.newQueryProposalRequest();
-    queryByChaincodeRequest.setArgs(new String[]{"query", ""});
-    queryByChaincodeRequest.setFcn("invoke");
-    queryByChaincodeRequest.setChaincodeID(chaincodeID);
-    Map<String, byte[]> transientMap = new HashMap<>();
-    transientMap.put("HyperLedgerFabric", "QueryByChaincodeRequest:JavaSDK".getBytes(UTF_8));
-    transientMap.put("method", "QueryByChaincodeRequest".getBytes(UTF_8));
-    try {
-      queryByChaincodeRequest.setTransientMap(transientMap);
-    } catch (InvalidArgumentException e) {
-      throw new IllegalArgumentException(e.getMessage());
-    }
-    Collection<ProposalResponse> queryProposals = null;
+    QueryByChaincodeRequest queryByChaincodeRequest = new TransactionProposalRequestBuilder(client)
+        .args(proposalRequestArgs.getArgs())
+        .buildQueryByChaincodeRequest();
+    Collection<ProposalResponse> queryProposals;
     try {
       queryProposals = channel.queryByChaincode(queryByChaincodeRequest, channel.getPeers());
     } catch (InvalidArgumentException e) {
