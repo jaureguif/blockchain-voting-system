@@ -115,7 +115,7 @@ public class UserController {
 	}
 
     @GetMapping(value = "retrievePassword/{username}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "Sending a new random password to he user")
+    @ApiOperation(value = "Sending a new random password to the user")
     @ApiResponses({ @ApiResponse(code = 200, message = "Send an email to the user with the new password", response = BusinessProvider.class),
             @ApiResponse(code = 404, message = "Username not found not able to send email") })
     @ResponseStatus(HttpStatus.OK)
@@ -133,19 +133,19 @@ public class UserController {
 
         String newPassword = passwordGenerator.generatePassword(8, characterRule);
 
-        businessProviderService.updatePassword(userData, newPassword);
+        //businessProviderService.updatePassword(userData, newPassword);
 
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(userData.getEmail());
         message.setSubject("New password Generated:");
-        message.setText("Hi this email is your generated password: "+newPassword);
+        message.setText("Hi "+userData.getName()+"\n\nThis is your generated password: "+newPassword);
 
         emailSender.send(message);
 
     }
 
 
-    @Bean
+    /*@Bean
     public JavaMailSender getJavaMailSender() {
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
         mailSender.setHost("smtp.gmail.com");
@@ -161,5 +161,5 @@ public class UserController {
         props.put("mail.debug", "true");
 
         return mailSender;
-    }
+    }*/
 }
