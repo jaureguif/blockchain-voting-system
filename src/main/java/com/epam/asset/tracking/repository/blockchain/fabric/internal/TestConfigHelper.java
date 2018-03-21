@@ -1,5 +1,7 @@
 package com.epam.asset.tracking.repository.blockchain.fabric.internal;
 
+import java.lang.reflect.Field;
+
 import org.hyperledger.fabric.sdk.helper.Config;
 
 public class TestConfigHelper {
@@ -17,12 +19,18 @@ public class TestConfigHelper {
    * @throws IllegalArgumentException
    *
    */
-  public void clearConfig() throws NoSuchFieldException, SecurityException,
-      IllegalArgumentException, IllegalAccessException {
+  public void clearConfig()  {
     Config config = Config.getConfig();
-    java.lang.reflect.Field configInstance = config.getClass().getDeclaredField("config");
-    configInstance.setAccessible(true);
-    configInstance.set(null, null);
+    Field configInstance = null;
+    try {
+      configInstance = config.getClass().getDeclaredField("config");
+      configInstance.setAccessible(true);
+      configInstance.set(null, null);
+    } catch (NoSuchFieldException e) {
+      throw new RuntimeException("Cannot find 'config' field in Config class", e);
+    } catch (IllegalAccessException e) {
+      throw new RuntimeException("Cannot delete 'config' field in Config class", e);
+    }
   }
 
   /**
@@ -30,13 +38,10 @@ public class TestConfigHelper {
    * env var is <i>property1=value1,property2=value2</i> and so on where each <i>property</i> is a
    * property from the SDK's config file.
    *
-   * @throws NoSuchFieldException
    * @throws SecurityException
    * @throws IllegalArgumentException
-   * @throws IllegalAccessException
    */
-  public void customizeConfig() throws NoSuchFieldException, SecurityException,
-      IllegalArgumentException, IllegalAccessException {
+  public void customizeConfig() throws SecurityException, IllegalArgumentException {
     String fabricSdkConfig = System.getenv(CONFIG_OVERRIDES);
     if (fabricSdkConfig != null && fabricSdkConfig.length() > 0) {
       String[] configs = fabricSdkConfig.split(",");
