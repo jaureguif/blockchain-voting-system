@@ -30,4 +30,10 @@ public class BusinessProviderServiceImpl implements BusinessProviderService {
 		return repository.findByUsername(name);
 	}
 
+	@Override
+	public BusinessProvider updatePassword(BusinessProvider entity, String password) {
+		entity.setPassword(bCryptPasswordEncoder.encode(password));
+		return repository.save(entity);
+	}
+
 }
