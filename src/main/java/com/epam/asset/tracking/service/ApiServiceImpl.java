@@ -39,9 +39,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import com.epam.asset.tracking.domain.Event;
-import com.epam.asset.tracking.exception.BlockchainTransactionException;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
@@ -73,10 +70,14 @@ import org.hyperledger.fabric_ca.sdk.RegistrationRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import com.epam.asset.tracking.annotation.CoverageIgnore;
 import com.epam.asset.tracking.domain.Asset;
+import com.epam.asset.tracking.domain.Event;
 import com.epam.asset.tracking.exception.AssetNotFoundException;
+import com.epam.asset.tracking.exception.BlockchainTransactionException;
 import io.netty.util.internal.StringUtil;
 import ma.glasnost.orika.MapperFacade;
 
@@ -126,8 +127,10 @@ public class ApiServiceImpl implements ApiService {
 
   @Override
   @CoverageIgnore
+  @Cacheable(value= "assets",  key="#id")
   public Asset getAssetById(UUID id) throws AssetNotFoundException {
 
+    
     String jsonStr;
     try {
       jsonStr = getAssetFromFabric(id);
@@ -142,6 +145,7 @@ public class ApiServiceImpl implements ApiService {
 
   @Override
   @CoverageIgnore
+  @CacheEvict(value ="assets", key="#assetId")
   public Optional<Asset> addEventToAsset(UUID assetId, Event event) {
     Optional<String> payload = Optional.empty();
     try {
