@@ -23,6 +23,7 @@ import org.hyperledger.fabric.sdk.exception.InvalidArgumentException;
 import org.hyperledger.fabric.sdk.exception.ProposalException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public abstract class BaseFabricRepository<T, ID> implements BlockchainRepository<T, ID> {
 
@@ -32,11 +33,14 @@ public abstract class BaseFabricRepository<T, ID> implements BlockchainRepositor
   private HFClient client;
   private Channel channel;
 
+  private @Autowired FabricInitializerHelper initializerHelper;
+
   public boolean delete(T entity) {
     throw new UnsupportedOperationException("Not yet implemented");
   }
 
-  protected boolean modify(ProposalRequestArgs proposalRequestArgs) {
+  protected boolean modifyBlockchain(ProposalRequestArgs proposalRequestArgs) {
+    init();
     Collection<ProposalResponse> successful = new LinkedList<>();
     Collection<ProposalResponse> failed = new LinkedList<>();
     TransactionProposalRequest transactionProposalRequest = new TransactionProposalRequestBuilder(client)
@@ -102,7 +106,8 @@ public abstract class BaseFabricRepository<T, ID> implements BlockchainRepositor
     return result;
   }
 
-  protected Optional<String> query(ProposalRequestArgs proposalRequestArgs) {
+  protected Optional<String> queryBlockchain(ProposalRequestArgs proposalRequestArgs) {
+    init();
     String payload = null;
     QueryByChaincodeRequest queryByChaincodeRequest = new TransactionProposalRequestBuilder(client)
         .args(proposalRequestArgs.getArgs())
@@ -129,11 +134,9 @@ public abstract class BaseFabricRepository<T, ID> implements BlockchainRepositor
     return Optional.ofNullable(payload);
   }
 
-  public void setClient(HFClient client) {
-    this.client = client;
-  }
-
-  public void setChannel(Channel channel) {
-    this.channel = channel;
+  private void init() {
+    initializerHelper.init();
+    client = initializerHelper.getClient();
+    channel = initializerHelper.getChannel();
   }
 }

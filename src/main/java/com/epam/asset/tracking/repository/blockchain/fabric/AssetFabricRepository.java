@@ -24,18 +24,16 @@ public class AssetFabricRepository extends BaseFabricRepository<Asset, UUID> imp
   private @Autowired MapperFacade mapper;
 
   @Override
-  @InitFabric
   public Optional<Asset> findOne(UUID uuid) {
     ProposalRequestArgs args = new ProposalRequestArgs.Builder()
         .chaincodeMethod(AssetChaincodeMethods.QUERY)
         .args(uuid.toString())
         .build();
-    return query(args)
+    return queryBlockchain(args)
         .map(json -> mapper.map(json, Asset.class));
   }
 
   @Override
-  @InitFabric
   public Asset save(Asset asset) {
     Event event = asset.getEvents().iterator().next();
     ProposalRequestArgs args = new ProposalRequestArgs.Builder()
@@ -53,12 +51,11 @@ public class AssetFabricRepository extends BaseFabricRepository<Asset, UUID> imp
             event.getDescription()
         )
         .build();
-    modify(args);
+    modifyBlockchain(args);
     return asset;
   }
 
   @Override
-  @InitFabric
   public Optional<Asset> addEvent(UUID assetId, Event event) {
     return findOne(assetId)
       .filter(asset -> persistEvent(asset, event))
@@ -78,6 +75,6 @@ public class AssetFabricRepository extends BaseFabricRepository<Asset, UUID> imp
             Optional.ofNullable(event.getAttachment()).orElse(NO_BINARY_DATA)
         )
         .build();
-    return modify(proposalRequestArgs);
+    return modifyBlockchain(proposalRequestArgs);
   }
 }
