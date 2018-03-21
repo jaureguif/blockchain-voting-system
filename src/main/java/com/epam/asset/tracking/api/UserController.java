@@ -117,15 +117,15 @@ public class UserController {
     @GetMapping(value = "retrievePassword/{username}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Sending a new random password to the user")
     @ApiResponses({ @ApiResponse(code = 200, message = "Send an email to the user with the new password", response = BusinessProvider.class),
-            @ApiResponse(code = 404, message = "Username not found not able to send email") })
+            @ApiResponse(code = 405, message = "Invalid Username provided") })
     @ResponseStatus(HttpStatus.OK)
     public void sendUserPassword (
-            @ApiParam(value = "Sends a random to the provided email, if the email is valid", required = true) @PathVariable @Valid String username,
+            @ApiParam(value = "Sends a random password to the user email, if the email is valid", required = true) @PathVariable @Valid String username,
             HttpServletRequest req)  throws InvalidUserException {
         logger.debug("Call to GET:/asset/tracking/users/retrievePassword/{username}");
         BusinessProvider userData = null;
 
-        userData = businessProviderService.findUserbyUsername(username).orElseThrow(() -> new UsernameNotFoundException("Invalid username or password."));
+        userData = businessProviderService.findUserbyUsername(username).orElseThrow(() -> new InvalidUserException("Invalid username provided"));
 
         PasswordGenerator passwordGenerator = new PasswordGenerator();
 
