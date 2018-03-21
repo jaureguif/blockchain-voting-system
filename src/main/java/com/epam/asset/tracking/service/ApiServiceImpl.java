@@ -1,6 +1,7 @@
 package com.epam.asset.tracking.service;
 
-import java.util.Optional;
+import static java.lang.String.format;
+
 import java.util.UUID;
 
 import com.epam.asset.tracking.domain.Asset;
@@ -20,17 +21,21 @@ public class ApiServiceImpl implements ApiService {
   private @Autowired AssetRepository assetRepository;
 
   @Override
-  public String saveAsset(Asset asset) {
-    return assetRepository.save(asset) != null ? "OK" : "FAIL";
+  public Asset saveAsset(Asset asset) {
+    return assetRepository.save(asset);
   }
 
   @Override
   public Asset getAssetById(UUID id) {
-    return assetRepository.findOne(id).orElse(null);
+    return assetRepository
+        .findOne(id)
+        .orElseThrow(() -> new AssetNotFoundException(format("Asset not found with the id %s", id)));
   }
 
   @Override
-  public Optional<Asset> addEventToAsset(UUID assetId, Event event) {
-    return assetRepository.addEvent(assetId, event);
+  public Asset addEventToAsset(UUID assetId, Event event) {
+    return assetRepository
+        .addEvent(assetId, event)
+        .orElseThrow(() -> new AssetNotFoundException(format("Asset not found with the id %s", assetId)));
   }
 }
