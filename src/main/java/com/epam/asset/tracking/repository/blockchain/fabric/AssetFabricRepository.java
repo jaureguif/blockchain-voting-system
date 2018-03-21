@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import com.epam.asset.tracking.domain.Asset;
 import com.epam.asset.tracking.domain.Event;
+import com.epam.asset.tracking.exception.BlockchainTransactionException;
 import com.epam.asset.tracking.repository.AssetRepository;
 import ma.glasnost.orika.MapperFacade;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,8 +52,8 @@ public class AssetFabricRepository extends BaseFabricRepository<Asset, UUID> imp
             event.getDescription()
         )
         .build();
-    modifyBlockchain(args);
-    return asset;
+    if (modifyBlockchain(args)) return asset;
+    throw new BlockchainTransactionException("Unable to persist asset");
   }
 
   @Override
