@@ -133,7 +133,7 @@ public class UserController {
 
         String newPassword = passwordGenerator.generatePassword(8, characterRule);
 
-        //businessProviderService.updatePassword(userData, newPassword);
+        businessProviderService.updatePassword(userData, newPassword);
 
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(userData.getEmail());
