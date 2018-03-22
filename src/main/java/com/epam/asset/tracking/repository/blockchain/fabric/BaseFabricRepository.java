@@ -35,10 +35,6 @@ public abstract class BaseFabricRepository<T, ID> implements BlockchainRepositor
 
   private @Autowired FabricInitializerHelper initializerHelper;
 
-  public boolean delete(T entity) {
-    throw new UnsupportedOperationException("Not yet implemented");
-  }
-
   protected boolean modifyBlockchain(ProposalRequestArgs proposalRequestArgs) {
     init();
     Collection<ProposalResponse> successful = new LinkedList<>();

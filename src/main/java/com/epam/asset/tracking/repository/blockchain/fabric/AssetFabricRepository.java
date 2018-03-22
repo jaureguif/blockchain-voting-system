@@ -17,18 +17,19 @@ public class AssetFabricRepository extends BaseFabricRepository<Asset, UUID> imp
   private static final String NO_BINARY_DATA = "no-data";
 
   private static final class AssetChaincodeMethods {
-    private static final String QUERY = "query";
-    private static final String SAVE = "create";
-    private static final String SAVE_EVENT = "addEvent";
+    private static final String CREATE = "create";
+    private static final String CREATE_EVENT = "addEvent";
+    private static final String READ = "query";
+    private static final String DELETE = "delete";
   }
 
   private @Autowired MapperFacade mapper;
 
   @Override
-  public Optional<Asset> findOne(UUID uuid) {
+  public Optional<Asset> findOne(UUID assetId) {
     ProposalRequestArgs args = new ProposalRequestArgs.Builder()
-        .chaincodeMethod(AssetChaincodeMethods.QUERY)
-        .args(uuid.toString())
+        .chaincodeMethod(AssetChaincodeMethods.READ)
+        .args(assetId.toString())
         .build();
     return queryBlockchain(args)
         .map(json -> mapper.map(json, Asset.class));
@@ -37,8 +38,10 @@ public class AssetFabricRepository extends BaseFabricRepository<Asset, UUID> imp
   @Override
   public Asset save(Asset asset) {
     Event event = asset.getEvents().iterator().next();
+    event.setEncodedImage(Optional.ofNullable(event.getEncodedImage()).orElse(NO_BINARY_DATA));
+    event.setAttachment(Optional.ofNullable(event.getAttachment()).orElse(NO_BINARY_DATA));
     ProposalRequestArgs args = new ProposalRequestArgs.Builder()
-        .chaincodeMethod(AssetChaincodeMethods.SAVE)
+        .chaincodeMethod(AssetChaincodeMethods.CREATE)
         .args(
             asset.getUuid().toString(),
             asset.getSerialNumber(),
@@ -46,8 +49,8 @@ public class AssetFabricRepository extends BaseFabricRepository<Asset, UUID> imp
             asset.getOwnerName(),
             asset.getDescription(),
             event.getBusinessProviderId(),
-            Optional.ofNullable(event.getEncodedImage()).orElse(NO_BINARY_DATA),
-            Optional.ofNullable(event.getAttachment()).orElse(NO_BINARY_DATA),
+            event.getEncodedImage(),
+            event.getAttachment(),
             event.getSummary(),
             event.getDescription()
         )
@@ -63,17 +66,28 @@ public class AssetFabricRepository extends BaseFabricRepository<Asset, UUID> imp
       .map(asset -> { asset.getEvents().add(event); return asset; });
   }
 
+  @Override
+  public boolean delete(Asset entity) {
+    ProposalRequestArgs args = new ProposalRequestArgs.Builder()
+        .chaincodeMethod(AssetChaincodeMethods.DELETE)
+        .args(entity.getUuid().toString())
+        .build();
+    return modifyBlockchain(args);
+  }
+
   private boolean persistEvent(Asset asset, Event event) {
+    event.setEncodedImage(Optional.ofNullable(event.getEncodedImage()).orElse(NO_BINARY_DATA));
+    event.setAttachment(Optional.ofNullable(event.getAttachment()).orElse(NO_BINARY_DATA));
     ProposalRequestArgs proposalRequestArgs = new ProposalRequestArgs.Builder()
-        .chaincodeMethod(AssetChaincodeMethods.SAVE_EVENT)
+        .chaincodeMethod(AssetChaincodeMethods.CREATE_EVENT)
         .args(
             asset.getUuid().toString(),
             event.getSummary(),
             event.getDescription(),
             event.getDate().toString(),
             event.getBusinessProviderId(),
-            Optional.ofNullable(event.getEncodedImage()).orElse(NO_BINARY_DATA),
-            Optional.ofNullable(event.getAttachment()).orElse(NO_BINARY_DATA)
+            event.getEncodedImage(),
+            event.getAttachment()
         )
         .build();
     return modifyBlockchain(proposalRequestArgs);

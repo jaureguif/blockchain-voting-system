@@ -2,8 +2,10 @@ package com.epam.asset.tracking.repository;
 
 import java.util.Optional;
 
+import javax.annotation.Nonnull;
+
 public interface BlockchainRepository<T, ID> {
-  Optional<T> findOne(ID id);
-  T save(T entity);
-  boolean delete(T entity);
+  @Nonnull Optional<T> findOne(@Nonnull ID id);
+  @Nonnull T save(@Nonnull T entity);
+  boolean delete(@Nonnull T entity);
 }
