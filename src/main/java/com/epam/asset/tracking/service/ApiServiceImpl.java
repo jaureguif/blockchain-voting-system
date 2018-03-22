@@ -38,4 +38,8 @@ public class ApiServiceImpl implements ApiService {
         .addEvent(assetId, event)
         .orElseThrow(() -> new AssetNotFoundException(format("Asset not found with the id %s", assetId)));
   }
+
+  public void setAssetRepository(AssetRepository assetRepository) {
+    this.assetRepository = assetRepository;
+  }
 }
