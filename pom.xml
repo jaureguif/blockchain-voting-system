@@ -137,6 +137,12 @@
 			<version>3.9.0</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>pl.pragmatists</groupId>
+			<artifactId>JUnitParams</artifactId>
+			<version>1.1.1</version>
+			<scope>test</scope>
+		</dependency>
 
 
 		<dependency>
@@ -211,13 +217,10 @@
 								<exclude>com/epam/asset/tracking/dto/**/*.class</exclude>
 								<!--Excluding ValidationsUtil because this class is used only as 
 									a constants repo -->
+								<exclude>com/epam/asset/tracking/repository/blockchain/fabric/internal/*.class</exclude>
+								<exclude>com/epam/asset/tracking/repository/blockchain/fabric/*FabricRepository.class</exclude>
+								<exclude>com/epam/asset/tracking/repository/blockchain/fabric/FabricInitializerHelper.class</exclude>
 								<exclude>com/epam/asset/tracking/dto/validations/ValidationsUtil.class</exclude>
-								<exclude>com/epam/asset/tracking/service/ApiServiceImpl.class</exclude>
-								<exclude>com/epam/asset/tracking/service/SampleOrg.class</exclude>
-								<exclude>com/epam/asset/tracking/service/SampleStore.class</exclude>
-								<exclude>com/epam/asset/tracking/service/SampleUser.class</exclude>
-								<exclude>com/epam/asset/tracking/service/TestConfig.class</exclude>
-								<exclude>com/epam/asset/tracking/service/TestConfigHelper.class</exclude>
 								<exclude>org/hyperledger/**/*.class</exclude>
 								<exclude>org/hyperledger/**/*Test.class</exclude>
 							</excludes>

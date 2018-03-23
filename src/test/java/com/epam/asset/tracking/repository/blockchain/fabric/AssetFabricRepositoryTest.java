@@ -27,7 +27,7 @@ public class AssetFabricRepositoryTest {
   private @Autowired AssetFabricRepository repository;
 
   @Test
-  @Ignore
+  @Ignore("Because it's not guaranteed to be run after org.hyperledger.fabric.sdk.endtoend.End2endTest")
   public void testCrud() {
     Asset asset = newTestAsset();
     shouldFindNothingWhenAssetIsNotPresent(asset.getUuid());

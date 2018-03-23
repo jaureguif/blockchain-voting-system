@@ -37,7 +37,7 @@ public class TransactionProposalRequestBuilder {
   }
 
   public TransactionProposalRequestBuilder proposalWaitTime(Long proposalWaitTime) {
-    this.proposalWaitTime = proposalWaitTime;
+    this.proposalWaitTime = proposalWaitTime == null ? Defaults.PROPOSAL_WAIT_TIME : proposalWaitTime;
     return this;
   }
 
@@ -80,10 +80,11 @@ public class TransactionProposalRequestBuilder {
     transactionRequest.setArgs(args);
   }
 
-  private static final class Defaults {
-    private static final String FCN = "invoke";
-    private static final String[] ARGS = new String[0];
-    private static final ChaincodeID CHAINCODE_ID;
+  public static final class Defaults {
+    public static final String FCN = "invoke";
+    public static final String[] ARGS = new String[0];
+    public static final ChaincodeID CHAINCODE_ID;
+    public static final long PROPOSAL_WAIT_TIME = 20000L;
 
     static {
       CHAINCODE_ID = ChaincodeID.newBuilder()

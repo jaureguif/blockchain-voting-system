@@ -42,7 +42,7 @@ public class ProposalRequestArgs {
     }
 
     public Builder chaincodeMethod(String chaincodeMethod) {
-      this.chaincodeMethod = requireNonNull(chaincodeMethod);
+      this.chaincodeMethod = chaincodeMethod;
       return this;
     }
 
