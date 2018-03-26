@@ -3,6 +3,7 @@ package com.epam.asset.tracking.api;
 import com.epam.asset.tracking.dto.BusinessProviderDTO;
 import com.epam.asset.tracking.dto.UserDTO;
 import com.epam.asset.tracking.exception.InvalidUserException;
+import com.epam.asset.tracking.service.UserService;
 import io.swagger.annotations.*;
 import org.passay.CharacterCharacteristicsRule;
 import org.passay.CharacterRule;
@@ -13,6 +14,7 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import com.epam.asset.tracking.domain.BusinessProvider;
@@ -50,9 +52,9 @@ public class UserController {
   BusinessProviderService businessProviderService;
 
   @Autowired
-  public JavaMailSender emailSender;
+  UserService userService;
 
-  @PostMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE,
+    @PostMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE,
       consumes = MediaType.APPLICATION_JSON_VALUE)
   @ApiOperation(value = "Posting a new, unique, business provider into DB",
       notes = "Current validations are:" + "<br>"
@@ -122,44 +124,15 @@ public class UserController {
     public void sendUserPassword (
             @ApiParam(value = "Sends a random password to the user email, if the email is valid", required = true) @PathVariable @Valid String username,
             HttpServletRequest req)  throws InvalidUserException {
-        logger.debug("Call to GET:/asset/tracking/users/retrievePassword/{username}");
-        BusinessProvider userData = null;
+            logger.debug("Call to GET:/asset/tracking/users/retrievePassword/{username}");
 
-        userData = businessProviderService.findUserbyUsername(username).orElseThrow(() -> new InvalidUserException("Invalid username provided"));
+            BusinessProvider userData = userService.generateNewPassword(username);
 
-        PasswordGenerator passwordGenerator = new PasswordGenerator();
+            userService.sendEmail(userData);
 
-        CharacterRule characterRule = new CharacterRule(EnglishCharacterData.Alphabetical);
-
-        String newPassword = passwordGenerator.generatePassword(8, characterRule);
-
-        businessProviderService.updatePassword(userData, newPassword);
-
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(userData.getEmail());
-        message.setSubject("New password Generated:");
-        message.setText("Hi "+userData.getName()+"\n\nThis is your generated password: "+newPassword);
-
-        emailSender.send(message);
 
     }
 
 
-    /*@Bean
-    public JavaMailSender getJavaMailSender() {
-        JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
-        mailSender.setHost("smtp.gmail.com");
-        mailSender.setPort(587);
 
-        mailSender.setUsername("pitfally2k@gmail.com");
-        mailSender.setPassword("0s0n3gr0");
-
-        Properties props = mailSender.getJavaMailProperties();
-        props.put("mail.transport.protocol", "smtp");
-        props.put("mail.smtp.auth", "true");
-        props.put("mail.smtp.starttls.enable", "true");
-        props.put("mail.debug", "true");
-
-        return mailSender;
-    }*/
 }
