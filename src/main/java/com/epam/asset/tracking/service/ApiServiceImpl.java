@@ -1,17 +1,17 @@
 package com.epam.asset.tracking.service;
 
 import static java.lang.String.format;
-
 import java.util.UUID;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.stereotype.Service;
 import com.epam.asset.tracking.domain.Asset;
 import com.epam.asset.tracking.domain.Event;
 import com.epam.asset.tracking.exception.AssetNotFoundException;
 import com.epam.asset.tracking.repository.AssetRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 @Service
 public class ApiServiceImpl implements ApiService {
@@ -26,6 +26,7 @@ public class ApiServiceImpl implements ApiService {
   }
 
   @Override
+  @Cacheable(value="assets", key="#id")
   public Asset getAssetById(UUID id) {
     return assetRepository
         .findOne(id)
@@ -33,6 +34,7 @@ public class ApiServiceImpl implements ApiService {
   }
 
   @Override
+  @CacheEvict(value="assets", key="#assetId")
   public Asset addEventToAsset(UUID assetId, Event event) {
     return assetRepository
         .addEvent(assetId, event)
