@@ -120,12 +120,37 @@ func (t *AssetTrackingSmartContract) Invoke(stub shim.ChaincodeStubInterface) pb
 	case "update":
 		return shim.Error("Not yet implemented")
 	case "delete":
-		return shim.Error("Not yet implemented")
+		return t.delete(stub, args)
 	case "addEvent":
 		return t.addEvent(stub,args)
 	default:
 		return shim.Error("Unknown action, check the first argument, must be one of 'create', 'query', 'update' or 'delete'")
 	}
+}
+
+func (t *AssetTrackingSmartContract) delete(stub shim.ChaincodeStubInterface, args []string) pb.Response {
+	if len(args) != 2 {
+		return shim.Error("Incorrect number of arguments. Expecting asset id to delete")
+	}
+
+	id := args[1]
+	fmt.Println("########### Delete id = %s ###########", id)
+
+	assetBlob, getErr := stub.GetState(id)
+	if getErr != nil {
+		return shim.Error("Failed to get state")
+	}
+	if assetBlob == nil {
+		return shim.Error("Asset not found!")
+	}
+
+	delErr := stub.DelState(id)
+
+	if delErr != nil {
+		return shim.Error(delErr.Error())
+	}
+
+	return shim.Success(nil)
 }
 
 // Finds an asset by id
@@ -142,7 +167,7 @@ func (t *AssetTrackingSmartContract) query(stub shim.ChaincodeStubInterface, arg
 		return shim.Error("Failed to get state")
 	}
 	if assetBlob == nil {
-		return shim.Error("Not found!")
+		return shim.Error("Asset not found!")
 	}
 
 	jsonResp := "{\"id\":\"" + id + "\",\"val\":\"" + string(assetBlob) + "\"}"
@@ -235,7 +260,7 @@ func (t *AssetTrackingSmartContract) addEvent(stub shim.ChaincodeStubInterface, 
 		return shim.Error("Failed to get state")
 	}
 	if assetJson == nil {
-		return shim.Error("Not found!")
+		return shim.Error("Asset not found!")
 	}
 
 	asset := Asset{}
