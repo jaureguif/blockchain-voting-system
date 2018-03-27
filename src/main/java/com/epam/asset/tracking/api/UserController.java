@@ -5,16 +5,8 @@ import com.epam.asset.tracking.dto.UserDTO;
 import com.epam.asset.tracking.exception.InvalidUserException;
 import com.epam.asset.tracking.service.UserService;
 import io.swagger.annotations.*;
-import org.passay.CharacterCharacteristicsRule;
-import org.passay.CharacterRule;
-import org.passay.EnglishCharacterData;
-import org.passay.PasswordGenerator;
-import org.springframework.context.annotation.Bean;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.JavaMailSenderImpl;
+
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import com.epam.asset.tracking.domain.BusinessProvider;
@@ -35,8 +27,6 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
-import java.util.*;
-
 @RestController
 @RequestMapping("/asset/tracking/users")
 public class UserController {
@@ -51,8 +41,6 @@ public class UserController {
   @Autowired
   BusinessProviderService businessProviderService;
 
-  @Autowired
-  UserService userService;
 
     @PostMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE,
       consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -116,19 +104,19 @@ public class UserController {
 		return userData;
 	}
 
-    @GetMapping(value = "retrievePassword/{username}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/password/{username}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Sending a new random password to the user")
     @ApiResponses({ @ApiResponse(code = 200, message = "Send an email to the user with the new password", response = BusinessProvider.class),
             @ApiResponse(code = 405, message = "Invalid Username provided") })
     @ResponseStatus(HttpStatus.OK)
     public void sendUserPassword (
-            @ApiParam(value = "Sends a random password to the user email, if the email is valid", required = true) @PathVariable @Valid String username,
+            @ApiParam(value = "Sends a random password to the user email, if the email is valid", required = true) @PathVariable String username,
             HttpServletRequest req)  throws InvalidUserException {
-            logger.debug("Call to GET:/asset/tracking/users/retrievePassword/{username}");
+            logger.debug("Call to GET:/asset/tracking/users/password/{username}");
 
-            BusinessProvider userData = userService.generateNewPassword(username);
+            BusinessProvider userData = businessProviderService.generateNewPassword(username);
 
-            userService.sendEmail(userData);
+            businessProviderService.sendEmail(userData);
 
 
     }
