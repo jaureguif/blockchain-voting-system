@@ -1,27 +1,23 @@
 package com.epam.asset.tracking.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import com.epam.asset.tracking.domain.BusinessProvider;
+import com.epam.asset.tracking.exception.InvalidUserException;
+import com.epam.asset.tracking.repository.BusinessProviderRepository;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.Mockito;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+
+import java.util.Optional;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-import java.util.Optional;
-
-import com.epam.asset.tracking.exception.InvalidUserException;
-import com.epam.asset.tracking.web.AbstractWebTest;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import com.epam.asset.tracking.domain.BusinessProvider;
-import com.epam.asset.tracking.repository.BusinessProviderRepository;
 
 public class UserServiceImplTest {
 
@@ -70,10 +66,7 @@ public class UserServiceImplTest {
     businessInstance = mock(BusinessProviderService.class);
     Mockito.when(businessInstance.findUserbyUsername(Mockito.anyString())).thenReturn(Optional.ofNullable(userData));
 
-
-    instance.businessProviderService = businessInstance;
-
-    userData = instance.generateNewPassword("mmonraz");
+    Mockito.when(businessInstance.generateNewPassword(Mockito.anyString())).thenReturn(userData);
 
     assertNotEquals("Passwords are not equal","pa55w0rd", userData.getPassword());
 
@@ -92,10 +85,7 @@ public class UserServiceImplTest {
 
     emailSenderInstance = mock(JavaMailSender.class);
 
-    instance.businessProviderService = businessInstance;
-    instance.emailSender = emailSenderInstance;
-
-    instance.sendEmail(userData);
+    businessInstance.sendEmail(userData);
 
     Assert.assertTrue(true);
   }
