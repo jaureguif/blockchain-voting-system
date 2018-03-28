@@ -12,7 +12,6 @@ import static org.mockito.Mockito.mock;
 
 public class RadomPasswordGeneratorTest {
 
-    @Autowired
     private RandomPasswordGenerator randomPasswordGenerator;
 
     @Test

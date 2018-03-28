@@ -21,7 +21,7 @@ public class BusinessProviderServiceImpl implements BusinessProviderService {
 	BCryptPasswordEncoder bCryptPasswordEncoder;
 
 	@Autowired
-	private EmailSender emailSender;
+	EmailSender emailSender;
 
 	@Autowired
 	private RandomPasswordGenerator passwordGenerator;

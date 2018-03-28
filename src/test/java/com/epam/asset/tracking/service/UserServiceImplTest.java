@@ -1,20 +1,15 @@
 package com.epam.asset.tracking.service;
 
 import com.epam.asset.tracking.domain.BusinessProvider;
-import com.epam.asset.tracking.exception.InvalidUserException;
 import com.epam.asset.tracking.repository.BusinessProviderRepository;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.util.Optional;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -22,8 +17,6 @@ import static org.mockito.Mockito.mock;
 public class UserServiceImplTest {
 
   UserServiceImpl instance;
-  BusinessProviderService businessInstance;
-  JavaMailSender emailSenderInstance;
 
   @Before
   public void setup() {
