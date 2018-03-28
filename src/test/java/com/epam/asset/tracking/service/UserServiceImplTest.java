@@ -55,39 +55,4 @@ public class UserServiceImplTest {
 
   }
 
-  @Test
-  public void shouldCreateNewPassword() throws InvalidUserException {
-    BusinessProvider userData = mock(BusinessProvider.class);
-
-    userData.setUsername("mmonraz");
-    userData.setEmail("miguel_monraz@epam.com");
-    userData.setPassword("pa55w0rd");
-
-    businessInstance = mock(BusinessProviderService.class);
-    Mockito.when(businessInstance.findUserbyUsername(Mockito.anyString())).thenReturn(Optional.ofNullable(userData));
-
-    Mockito.when(businessInstance.generateNewPassword(Mockito.anyString())).thenReturn(userData);
-
-    assertNotEquals("Passwords are not equal","pa55w0rd", userData.getPassword());
-
-  }
-
-  @Test
-  public void shouldSendEmail() throws InvalidUserException{
-    BusinessProvider userData = mock(BusinessProvider.class);
-
-    userData.setUsername("mmonraz");
-    userData.setEmail("miguel_monraz@epam.com");
-    userData.setPassword("pa55w0rd");
-
-    businessInstance = mock(BusinessProviderService.class);
-    Mockito.when(businessInstance.findUserbyUsername(Mockito.anyString())).thenReturn(Optional.ofNullable(userData));
-
-    emailSenderInstance = mock(JavaMailSender.class);
-
-    businessInstance.sendEmail(userData);
-
-    Assert.assertTrue(true);
-  }
-  
 }
