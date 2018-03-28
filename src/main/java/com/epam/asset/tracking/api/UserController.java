@@ -106,7 +106,7 @@ public class UserController {
 
     @GetMapping(value = "/password/{username}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Sending a new random password to the user")
-    @ApiResponses({ @ApiResponse(code = 200, message = "Send an email to the user with the new password", response = Void.class),
+    @ApiResponses({ @ApiResponse(code = 405, message = "Send an email to the user with the new password", response = Void.class),
             @ApiResponse(code = 405, message = "Invalid Username provided") })
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void sendUserPassword (
