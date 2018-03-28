@@ -108,16 +108,13 @@ public class UserController {
     @ApiOperation(value = "Sending a new random password to the user")
     @ApiResponses({ @ApiResponse(code = 200, message = "Send an email to the user with the new password", response = Void.class),
             @ApiResponse(code = 405, message = "Invalid Username provided") })
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void sendUserPassword (
             @ApiParam(value = "Sends a random password to the user email, if the email is valid", required = true) @PathVariable String username,
             HttpServletRequest req)  throws InvalidUserException {
             logger.debug("Call to GET:/asset/tracking/users/password/{username}");
 
-            BusinessProvider userData = businessProviderService.generateNewPassword(username);
-
-            businessProviderService.sendEmail(userData);
-
+            businessProviderService.generatePasswordAndSendEmail(username);
 
     }
 
