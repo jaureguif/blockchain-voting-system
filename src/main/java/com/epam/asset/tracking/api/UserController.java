@@ -42,6 +42,7 @@ public class UserController {
   BusinessProviderService businessProviderService;
 
 
+
     @PostMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE,
       consumes = MediaType.APPLICATION_JSON_VALUE)
   @ApiOperation(value = "Posting a new, unique, business provider into DB",
