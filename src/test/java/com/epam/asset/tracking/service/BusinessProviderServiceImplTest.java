@@ -20,10 +20,11 @@ public class BusinessProviderServiceImplTest {
 
     @Before
     public void setup() {
-        businessInstance = new BusinessProviderServiceImpl();
+        businessInstance = mock(BusinessProviderServiceImpl.class);
         businessInstance.emailSender = mock(EmailSender.class);
         businessInstance.passwordGenerator = mock(RandomPasswordGenerator.class);
         businessInstance.repository = mock(BusinessProviderRepository.class);
+        businessInstance.businessProvider = mock(BusinessProvider.class);
 
     }
 
@@ -34,7 +35,7 @@ public class BusinessProviderServiceImplTest {
         ArgumentCaptor valueCapture2 = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor valueCapture3 = ArgumentCaptor.forClass(String.class);
 
-        BusinessProvider bp = new BusinessProvider();
+        BusinessProvider bp = mock(BusinessProvider.class);
         bp.setUsername("mmonraz");
         bp.setEmail("miguel_monraz@epam.com");
         bp.setName("Miguel");
@@ -44,16 +45,16 @@ public class BusinessProviderServiceImplTest {
 
         doNothing().when(businessInstance.emailSender).sendEmail(String.valueOf(valueCapture1.capture()), String.valueOf(valueCapture2.capture()), String.valueOf(valueCapture3.capture()));
 
-        businessInstance.emailSender.sendEmail(bp.getEmail(), bp.getName(), "abcdefghijk");
+        businessInstance.emailSender.sendEmail("miguel_monraz@epam.com", "Miguel", "abcdefghijk");
 
         when(businessInstance.passwordGenerator.generateNewPassword()).thenReturn("abcdefghijk");
 
+        doReturn(bp).when(businessInstance).updatePassword(bp, "abcdefghijk");
+
         businessInstance.generatePasswordAndSendEmail("mmonraz");
 
-
-
         assertEquals("miguel_monraz@epam.com", valueCapture1.getValue());
-        assertEquals("Miguel Monraz", valueCapture2.getValue());
+        assertEquals("Miguel", valueCapture2.getValue());
         assertEquals("abcdefghijk", valueCapture3.getValue());
     }
 }

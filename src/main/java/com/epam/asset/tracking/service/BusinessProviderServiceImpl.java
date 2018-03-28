@@ -26,6 +26,9 @@ public class BusinessProviderServiceImpl implements BusinessProviderService {
 	@Autowired
 	RandomPasswordGenerator passwordGenerator;
 
+	@Autowired
+    BusinessProvider businessProvider;
+
 	@Override
 	public BusinessProvider save(BusinessProvider entity) {
 		//encode password
