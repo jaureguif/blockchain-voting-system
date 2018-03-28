@@ -3,7 +3,9 @@ package com.epam.asset.tracking.api;
 import com.epam.asset.tracking.dto.BusinessProviderDTO;
 import com.epam.asset.tracking.dto.UserDTO;
 import com.epam.asset.tracking.exception.InvalidUserException;
+import com.epam.asset.tracking.service.UserService;
 import io.swagger.annotations.*;
+
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,8 +27,6 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
-import java.util.Optional;
-
 @RestController
 @RequestMapping("/asset/tracking/users")
 public class UserController {
@@ -41,7 +41,9 @@ public class UserController {
   @Autowired
   BusinessProviderService businessProviderService;
 
-  @PostMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE,
+
+
+    @PostMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE,
       consumes = MediaType.APPLICATION_JSON_VALUE)
   @ApiOperation(value = "Posting a new, unique, business provider into DB",
       notes = "Current validations are:" + "<br>"
@@ -102,4 +104,21 @@ public class UserController {
 
 		return userData;
 	}
+
+    @GetMapping(value = "/password/{username}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Sending a new random password to the user")
+    @ApiResponses({ @ApiResponse(code = 405, message = "Send an email to the user with the new password", response = Void.class),
+            @ApiResponse(code = 405, message = "Invalid Username provided") })
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void sendUserPassword (
+            @ApiParam(value = "Sends a random password to the user email, if the email is valid", required = true) @PathVariable String username,
+            HttpServletRequest req)  throws InvalidUserException {
+            logger.debug("Call to GET:/asset/tracking/users/password/{username}");
+
+            businessProviderService.generatePasswordAndSendEmail(username);
+
+    }
+
+
+
 }
