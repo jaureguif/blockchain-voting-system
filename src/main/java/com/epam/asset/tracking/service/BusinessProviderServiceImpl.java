@@ -15,7 +15,7 @@ import java.util.Optional;
 public class BusinessProviderServiceImpl implements BusinessProviderService {
 
 	@Autowired
-	private BusinessProviderRepository repository;
+	BusinessProviderRepository repository;
 
 	@Autowired
 	BCryptPasswordEncoder bCryptPasswordEncoder;
@@ -24,7 +24,7 @@ public class BusinessProviderServiceImpl implements BusinessProviderService {
 	EmailSender emailSender;
 
 	@Autowired
-	private RandomPasswordGenerator passwordGenerator;
+	RandomPasswordGenerator passwordGenerator;
 
 	@Override
 	public BusinessProvider save(BusinessProvider entity) {
