@@ -11,9 +11,7 @@ public interface BusinessProviderService {
 
 	public Optional<BusinessProvider> findUserbyUsername(String name);
 
-	public BusinessProvider generateNewPassword(String username) throws InvalidUserException;
-
-	public void sendEmail(BusinessProvider user);
+	public void generatePasswordAndSendEmail(String username) throws InvalidUserException;
 
 	public BusinessProvider updatePassword(BusinessProvider entity, String password);
 
