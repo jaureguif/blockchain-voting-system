@@ -1,7 +1,5 @@
 package com.epam.asset.tracking.repository.blockchain.fabric;
 
-import static java.util.Objects.requireNonNull;
-
 import static org.apache.commons.lang.ArrayUtils.isEmpty;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
 

@@ -1,5 +1,7 @@
 package com.epam.asset.tracking.service;
 
+import java.util.Optional;
+
 import com.epam.asset.tracking.domain.BusinessProvider;
 import com.epam.asset.tracking.exception.InvalidUserException;
 import com.epam.asset.tracking.repository.BusinessProviderRepository;
@@ -8,8 +10,6 @@ import com.epam.asset.tracking.util.RandomPasswordGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
-
-import java.util.Optional;
 
 @Component
 public class BusinessProviderServiceImpl implements BusinessProviderService {

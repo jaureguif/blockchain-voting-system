@@ -9,7 +9,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.time.ZonedDateTime;
-import java.util.Optional;
 import java.util.UUID;
 
 import com.epam.asset.tracking.domain.Address;

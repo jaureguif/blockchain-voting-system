@@ -11,14 +11,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.UUID;
 
-import org.hamcrest.text.IsEmptyString;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.dao.DuplicateKeyException;
-import org.springframework.http.MediaType;
-
 import com.epam.asset.tracking.domain.BusinessProvider;
 import com.epam.asset.tracking.domain.User.Role;
 import com.epam.asset.tracking.dto.UserDTO;
@@ -26,8 +18,14 @@ import com.epam.asset.tracking.repository.BusinessProviderRepository;
 import com.epam.asset.tracking.service.ApiService;
 import com.epam.asset.tracking.service.BusinessProviderService;
 import com.epam.asset.tracking.web.AbstractWebTest;
-
 import ma.glasnost.orika.MapperFacade;
+import org.hamcrest.text.IsEmptyString;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.dao.DuplicateKeyException;
+import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 
 public class UserControllerTest extends AbstractWebTest{

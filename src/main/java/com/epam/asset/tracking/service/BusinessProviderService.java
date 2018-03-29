@@ -1,9 +1,9 @@
 package com.epam.asset.tracking.service;
 
+import java.util.Optional;
+
 import com.epam.asset.tracking.domain.BusinessProvider;
 import com.epam.asset.tracking.exception.InvalidUserException;
-
-import java.util.Optional;
 
 public interface BusinessProviderService {
 	

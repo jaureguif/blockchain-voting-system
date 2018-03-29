@@ -2,6 +2,7 @@ package com.epam.asset.tracking;
 
 import java.util.Arrays;
 
+import com.epam.asset.tracking.annotation.CoverageIgnore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
@@ -14,8 +15,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
-
-import com.epam.asset.tracking.annotation.CoverageIgnore;
 
 @SpringBootApplication
 @EnableResourceServer

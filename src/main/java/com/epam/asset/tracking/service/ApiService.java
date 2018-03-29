@@ -1,6 +1,5 @@
 package com.epam.asset.tracking.service;
 
-import java.util.Optional;
 import java.util.UUID;
 
 import com.epam.asset.tracking.domain.Asset;

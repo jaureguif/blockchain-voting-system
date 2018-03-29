@@ -1,7 +1,12 @@
 package com.epam.asset.tracking.repository;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
+import com.epam.asset.tracking.Application;
+import com.epam.asset.tracking.domain.Address;
+import com.epam.asset.tracking.domain.BUSINESS_TYPE;
+import com.epam.asset.tracking.domain.BusinessProvider;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -9,11 +14,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
-
-import com.epam.asset.tracking.Application;
-import com.epam.asset.tracking.domain.Address;
-import com.epam.asset.tracking.domain.BusinessProvider;
-import com.epam.asset.tracking.domain.BUSINESS_TYPE;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class)

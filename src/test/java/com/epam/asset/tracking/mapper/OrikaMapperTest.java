@@ -11,7 +11,6 @@ import com.epam.asset.tracking.utils.mocks.MockUtils;
 import ma.glasnost.orika.MapperFacade;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.impl.DefaultMapperFactory;
-
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Test;

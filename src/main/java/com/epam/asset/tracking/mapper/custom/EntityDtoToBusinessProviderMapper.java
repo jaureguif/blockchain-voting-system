@@ -1,8 +1,8 @@
 package com.epam.asset.tracking.mapper.custom;
 
 import com.epam.asset.tracking.domain.Address;
-import com.epam.asset.tracking.domain.BusinessProvider;
 import com.epam.asset.tracking.domain.BUSINESS_TYPE;
+import com.epam.asset.tracking.domain.BusinessProvider;
 import com.epam.asset.tracking.domain.User;
 import com.epam.asset.tracking.dto.UserDTO;
 import ma.glasnost.orika.CustomMapper;

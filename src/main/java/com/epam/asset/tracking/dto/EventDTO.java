@@ -1,7 +1,5 @@
 package com.epam.asset.tracking.dto;
 
-import java.time.ZonedDateTime;
-
 import org.hibernate.validator.constraints.NotBlank;
 
 public class EventDTO {

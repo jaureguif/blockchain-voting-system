@@ -2,21 +2,23 @@ package com.epam.asset.tracking.integration.user;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doThrow;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import java.util.UUID;
+
+import com.epam.asset.tracking.dto.UserDTO;
+import com.epam.asset.tracking.integration.AbstractIntegrationTest;
+import com.epam.asset.tracking.service.BusinessProviderService;
 import org.hamcrest.text.IsEmptyString;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.MediaType;
-import com.epam.asset.tracking.dto.UserDTO;
-import com.epam.asset.tracking.integration.AbstractIntegrationTest;
-import com.epam.asset.tracking.service.BusinessProviderService;
 import org.springframework.security.test.context.support.WithMockUser;
 
 public class UserControllerIntegrationTest extends AbstractIntegrationTest {
