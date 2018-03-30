@@ -14,48 +14,40 @@ import org.springframework.stereotype.Component;
 @Component
 public class BusinessProviderServiceImpl implements BusinessProviderService {
 
-	@Autowired
-	private BusinessProviderRepository repository;
+  private final BusinessProviderRepository repository;
+  private final BCryptPasswordEncoder bCryptPasswordEncoder;
+  private final EmailSender emailSender;
+  private final RandomPasswordGenerator passwordGenerator;
 
-	@Autowired
-	BCryptPasswordEncoder bCryptPasswordEncoder;
+  public @Autowired BusinessProviderServiceImpl(
+      BusinessProviderRepository repository,
+      BCryptPasswordEncoder bCryptPasswordEncoder,
+      EmailSender emailSender, RandomPasswordGenerator passwordGenerator) {
+    this.repository = repository;
+    this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+    this.emailSender = emailSender;
+    this.passwordGenerator = passwordGenerator;
+  }
 
-	@Autowired
-	private EmailSender emailSender;
+  @Override
+  public BusinessProvider save(BusinessProvider entity) {
+    //encode password
+    entity.setPassword(bCryptPasswordEncoder.encode(entity.getPassword()));
+    return repository.save(entity);
+  }
 
-	@Autowired
-	private RandomPasswordGenerator passwordGenerator;
+  @Override
+  public Optional<BusinessProvider> findUserbyUsername(String name) {
+    return repository.findByUsername(name);
+  }
 
-	@Override
-	public BusinessProvider save(BusinessProvider entity) {
-		//encode password
-		entity.setPassword(bCryptPasswordEncoder.encode(entity.getPassword()));
-		return repository.save(entity);
-	}
-
-	@Override
-	public Optional<BusinessProvider> findUserbyUsername(String name) {
-		return repository.findByUsername(name);
-	}
-
-	@Override
-	public void generatePasswordAndSendEmail(String username) throws InvalidUserException {
-		String newPassword = passwordGenerator.generateNewPassword();
-
-		BusinessProvider userData = findUserbyUsername(username).orElseThrow(() -> new InvalidUserException("Invalid username provided"));
-
-		updatePassword(userData, newPassword);
-
-		emailSender.sendEmail(userData.getEmail(), userData.getName(), newPassword);
-	}
-
-	@Override
-	public BusinessProvider updatePassword(BusinessProvider entity, String password) {
-		entity.setPassword(bCryptPasswordEncoder.encode(password));
-		return repository.save(entity);
-	}
-
-
-
-
+  @Override
+  public void generatePasswordAndSendEmail(String username) throws InvalidUserException {
+    BusinessProvider entity = findUserbyUsername(username)
+        .orElseThrow(() -> new InvalidUserException("Invalid username provided"));
+    String newPassword = passwordGenerator.generateNewPassword();
+    entity.setPassword(newPassword);
+    save(entity);
+    emailSender.sendEmail(entity.getEmail(), entity.getName(), newPassword);
+  }
 }

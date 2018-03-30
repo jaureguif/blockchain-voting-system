@@ -12,7 +12,4 @@ public interface BusinessProviderService {
 	public Optional<BusinessProvider> findUserbyUsername(String name);
 
 	public void generatePasswordAndSendEmail(String username) throws InvalidUserException;
-
-	public BusinessProvider updatePassword(BusinessProvider entity, String password);
-
 }
