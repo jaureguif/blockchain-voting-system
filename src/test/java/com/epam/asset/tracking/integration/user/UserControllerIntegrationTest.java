@@ -1,6 +1,8 @@
 package com.epam.asset.tracking.integration.user;
 
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -11,6 +13,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.UUID;
 
 import com.epam.asset.tracking.dto.UserDTO;
+import com.epam.asset.tracking.exception.InvalidUserException;
 import com.epam.asset.tracking.integration.AbstractIntegrationTest;
 import com.epam.asset.tracking.service.BusinessProviderService;
 import org.hamcrest.text.IsEmptyString;
@@ -168,5 +171,27 @@ public class UserControllerIntegrationTest extends AbstractIntegrationTest {
         .andDo(print())
         .andExpect(status().isOk());
   }
-  
+
+  @Test
+  @WithMockUser(username = "testUser", password = "qwerty1234", roles = {"BUSINESS_PROVIDER", "USER"})
+  public void shouldResetPasswordReturn204WhenOk() throws Exception {
+    doNothing().when(businessProviderService).generatePasswordAndSendEmail(anyString());
+
+    mockMvc
+        .perform(get("/asset/tracking/users/password/bp1"))
+        .andDo(print())
+        .andExpect(status().isNoContent());
+  }
+
+  @Test
+  @WithMockUser(username = "testUser", password = "qwerty1234", roles = {"BUSINESS_PROVIDER", "USER"})
+  public void shouldResetPasswordReturn405WhenGeneratePasswordAndSendEmailThrowsInvalidUserException() throws Exception {
+    doThrow(new InvalidUserException("Invalid username provided")).when(businessProviderService).generatePasswordAndSendEmail(anyString());
+
+    mockMvc
+        .perform(get("/asset/tracking/users/password/bp1"))
+        .andDo(print())
+        // Really?
+        .andExpect(status().isMethodNotAllowed());
+  }
 }

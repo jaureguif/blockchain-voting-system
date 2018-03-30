@@ -113,12 +113,14 @@ public class UserController {
 
     @GetMapping(value = "/password/{username}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Sending a new random password to the user")
-    @ApiResponses({ @ApiResponse(code = 405, message = "Send an email to the user with the new password", response = Void.class),
-            @ApiResponse(code = 405, message = "Invalid Username provided") })
+    @ApiResponses({
+        @ApiResponse(code = 204, message = "Send an email to the user with the new password"),
+        @ApiResponse(code = 405, message = "Invalid Username provided")
+    })
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void sendUserPassword (
-            @ApiParam(value = "Sends a random password to the user email, if the email is valid", required = true) @PathVariable String username,
-            HttpServletRequest req)  throws InvalidUserException {
+            @ApiParam(value = "Sends a random password to the user email, if the email is valid", required = true) @PathVariable String username
+            )  throws InvalidUserException {
             logger.debug("Call to GET:/asset/tracking/users/password/{username}");
 
             businessProviderService.generatePasswordAndSendEmail(username);
