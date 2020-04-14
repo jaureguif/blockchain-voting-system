@@ -2,6 +2,7 @@ package com.epam.asset.tracking.mapper.converter.serialize;
 
 import java.io.IOException;
 import java.time.ZonedDateTime;
+
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;

@@ -1,8 +1,9 @@
 package com.epam.asset.tracking.service;
 
-import com.epam.asset.tracking.domain.BusinessProvider;
-
 import java.util.Optional;
+
+import com.epam.asset.tracking.domain.BusinessProvider;
+import com.epam.asset.tracking.exception.InvalidUserException;
 
 public interface BusinessProviderService {
 	
@@ -10,4 +11,5 @@ public interface BusinessProviderService {
 
 	public Optional<BusinessProvider> findUserbyUsername(String name);
 
+	public void generatePasswordAndSendEmail(String username) throws InvalidUserException;
 }

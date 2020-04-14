@@ -1,14 +1,16 @@
 package com.epam.asset.tracking.api;
 
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.util.UUID;
+
 import com.epam.asset.tracking.dto.UserDTO;
 import com.epam.asset.tracking.repository.BusinessProviderRepository;
 import com.epam.asset.tracking.service.ApiService;
 import com.epam.asset.tracking.service.BusinessProviderService;
 import com.epam.asset.tracking.web.AbstractWebTest;
 import ma.glasnost.orika.MapperFacade;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import java.util.UUID;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;

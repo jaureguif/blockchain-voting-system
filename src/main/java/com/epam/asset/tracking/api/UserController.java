@@ -1,22 +1,22 @@
 package com.epam.asset.tracking.api;
 
-import com.epam.asset.tracking.dto.BusinessProviderDTO;
-import com.epam.asset.tracking.dto.UserDTO;
-import com.epam.asset.tracking.exception.InvalidUserException;
-import io.swagger.annotations.*;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.web.bind.annotation.*;
-
-import com.epam.asset.tracking.domain.BusinessProvider;
-import com.epam.asset.tracking.domain.User.Role;
-import com.epam.asset.tracking.exception.DuplicateKeyExceptionWrapper;
-import com.epam.asset.tracking.service.ApiService;
-import com.epam.asset.tracking.service.BusinessProviderService;
-
 import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import com.epam.asset.tracking.domain.BusinessProvider;
+import com.epam.asset.tracking.domain.User.Role;
+import com.epam.asset.tracking.dto.BusinessProviderDTO;
+import com.epam.asset.tracking.dto.UserDTO;
+import com.epam.asset.tracking.exception.DuplicateKeyExceptionWrapper;
+import com.epam.asset.tracking.exception.InvalidUserException;
+import com.epam.asset.tracking.service.ApiService;
+import com.epam.asset.tracking.service.BusinessProviderService;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 import ma.glasnost.orika.MapperFacade;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,8 +24,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-
-import java.util.Optional;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/asset/tracking/users")
@@ -41,7 +47,9 @@ public class UserController {
   @Autowired
   BusinessProviderService businessProviderService;
 
-  @PostMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE,
+
+
+    @PostMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE,
       consumes = MediaType.APPLICATION_JSON_VALUE)
   @ApiOperation(value = "Posting a new, unique, business provider into DB",
       notes = "Current validations are:" + "<br>"
@@ -102,4 +110,23 @@ public class UserController {
 
 		return userData;
 	}
+
+    @GetMapping(value = "/password/{username}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Sending a new random password to the user")
+    @ApiResponses({
+        @ApiResponse(code = 204, message = "Send an email to the user with the new password"),
+        @ApiResponse(code = 405, message = "Invalid Username provided")
+    })
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void sendUserPassword (
+            @ApiParam(value = "Sends a random password to the user email, if the email is valid", required = true) @PathVariable String username
+            )  throws InvalidUserException {
+            logger.debug("Call to GET:/asset/tracking/users/password/{username}");
+
+            businessProviderService.generatePasswordAndSendEmail(username);
+
+    }
+
+
+
 }

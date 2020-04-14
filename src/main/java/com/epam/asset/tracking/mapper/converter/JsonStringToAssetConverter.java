@@ -1,15 +1,16 @@
 package com.epam.asset.tracking.mapper.converter;
 
 import java.io.IOException;
-import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
+
 import com.epam.asset.tracking.domain.Asset;
 import com.epam.asset.tracking.exception.AssetConvertException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ma.glasnost.orika.CustomConverter;
 import ma.glasnost.orika.metadata.Type;
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 /**
  * Created on 1/25/2018.

@@ -9,7 +9,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.time.ZonedDateTime;
-import java.util.Optional;
 import java.util.UUID;
 
 import com.epam.asset.tracking.domain.Address;
@@ -126,7 +125,7 @@ public class AssetControllerIntegrationTest extends AbstractIntegrationTest {
     Asset asset = new Asset();
     asset.setUuid(UUID.fromString("9d40ee4e-bf1e-4f74-8237-c5e9b6e8f6d3"));
     asset.getEvents().add(event);
-    when(api.addEventToAsset(eq(asset.getUuid()), any(Event.class))).thenReturn(Optional.of(asset));
+    when(api.addEventToAsset(eq(asset.getUuid()), any(Event.class))).thenReturn(asset);
 
     MockMultipartFile multipartFile = new MockMultipartFile("image", "FileUploadTest.txt", null, new byte[100]);
     mockMvc
@@ -158,7 +157,7 @@ public class AssetControllerIntegrationTest extends AbstractIntegrationTest {
   @Test
   @WithMockUser(username = "admin", roles = {"BUSINESS_PROVIDER", "USER"})
   public void shouldNewAssetEventReturn404WhenAssetIsNotFound() throws Exception {
-    when(api.addEventToAsset(any(UUID.class), any(Event.class))).thenReturn(Optional.empty());
+    when(api.addEventToAsset(any(UUID.class), any(Event.class))).thenThrow(new AssetNotFoundException("Asset not found with the given id"));
     MockMultipartFile multipartFile = new MockMultipartFile("image", "FileUploadTest.txt", null, new byte[100]);
     mockMvc
         .perform(fileUpload("/asset/tracking/asset/9d40ee4e-bf1e-4f74-8237-c5e9b6e8f6d3/event")

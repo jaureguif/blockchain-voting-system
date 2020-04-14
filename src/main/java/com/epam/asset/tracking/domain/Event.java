@@ -1,6 +1,7 @@
 package com.epam.asset.tracking.domain;
 
 import java.time.ZonedDateTime;
+
 import com.epam.asset.tracking.mapper.converter.serialize.ZonedDateTimeDeserializer;
 import com.epam.asset.tracking.mapper.converter.serialize.ZonedDateTimeSerializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;

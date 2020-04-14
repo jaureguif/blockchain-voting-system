@@ -1,9 +1,9 @@
 package com.epam.asset.tracking.dto;
 
+import java.util.Objects;
+
 import com.epam.asset.tracking.domain.BUSINESS_TYPE;
 import org.springframework.data.mongodb.core.mapping.Document;
-
-import java.util.Objects;
 
 /**
  * Provides/registers assets in the application.
