@@ -25,12 +25,11 @@ import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.epam.asset.tracking.annotation.CoverageIgnore;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hyperledger.fabric.sdk.helper.Utils;
 import org.hyperledger.fabric.sdkintegration.SampleOrg;
-
-import com.epam.asset.tracking.annotation.CoverageIgnore;
 
 /**
  * Config allows for a global config of the toolkit. Central location for all

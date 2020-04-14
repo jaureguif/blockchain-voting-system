@@ -4,14 +4,13 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
 
+import com.epam.asset.tracking.dto.validations.ValidationsUtil;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.format.annotation.NumberFormat;
 import org.springframework.format.annotation.NumberFormat.Style;
-
-import com.epam.asset.tracking.dto.validations.ValidationsUtil;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class UserDTO {
 

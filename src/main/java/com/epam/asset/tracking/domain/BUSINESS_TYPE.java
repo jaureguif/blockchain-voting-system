@@ -1,8 +1,8 @@
 package com.epam.asset.tracking.domain;
 
-import org.springframework.util.StringUtils;
-
 import java.util.Locale;
+
+import org.springframework.util.StringUtils;
 
 public enum BUSINESS_TYPE {
 	COMPUTER_SELLER, COMPUTER_REPAIR, CAR_SELLER, CAR_MECHANIC, HOUSE_SELLER, HOUSE_BROKER;

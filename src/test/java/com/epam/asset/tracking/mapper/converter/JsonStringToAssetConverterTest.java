@@ -7,12 +7,11 @@ import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
 
-import org.junit.Test;
-
 import com.epam.asset.tracking.domain.Asset;
 import com.epam.asset.tracking.exception.AssetConvertException;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
+import org.junit.Test;
 
 public class JsonStringToAssetConverterTest {
 
